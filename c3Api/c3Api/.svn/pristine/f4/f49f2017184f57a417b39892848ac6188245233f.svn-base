@@ -1,0 +1,71 @@
+﻿using C3WizardData.Models;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardHelper.ViewModels
+{
+    public class UserViewModel
+    {
+        public int? UserId { get; set; }
+        public int? ParentUserId { get; set; }
+        public string FirstName { get; set; }
+        public string Reg_Number { get; set; }
+        public string LastName { get; set; }
+        public string? MiddleName { get; set; }
+        public string LoginId { get; set; }
+        public string? Password { get; set; }
+        public string EmailId { get; set; }
+        public string? EmpId { get; set; }
+        public string? SelfEmpId { get; set; }
+        public string? Department { get; set; }
+        public int? RoleId { get; set; }
+        public int? InsertedBy { get; set; }
+        public DateTime? InsertedOn { get; set; }
+        public string? InsertedMachineInfo { get; set; }
+        public int? UpdatedBy { get; set; }
+        public DateTime? UpdatedOn { get; set; }
+        public string? UpdatedMachineInfo { get; set; }
+        public bool? IsActive { get; set; }
+        public bool? IsSelfEmployee { get; set; }
+        public bool? IsPPOC { get; set; }
+        public DateTime? LastLoginTime { get; set; }
+        public bool? IsLoggedIn { get; set; }
+        public DateTime? UserExpiresOn { get; set; }
+        public DateTime? PwdExpiresOn { get; set; }
+        public DateTime? LastPwdUpdate { get; set; }
+        public bool IsDirty { get; set; }
+        public bool? Status { get; set; }
+        //public IFormFile ProfileImage { get; set; }
+        public IFormFile? UserImage { get; set; }
+        public int CompanyId { get; set; }
+        public string? MachineInfo { get; set; }
+        
+        public int UserRole { get; set; }
+        public int mode { get; set; }
+
+        public string? SECUsersProfilesString { get; set; }
+        [NotMapped]
+        public List<SECUsersProfileVm>? SECUsersProfiles { get; set; }
+    }
+
+
+    public class SECUsersProfileVm
+    {
+        public int ProfileId { get; set; }
+        public int? Company_Id { get; set; }
+        public string REG_NUMBER { get; set; }
+        public string? Company_name { get; set; }
+        public bool? Seleted_Comp { get; set; }
+        public int UserId { get; set; }
+      
+      
+
+    }
+
+
+}

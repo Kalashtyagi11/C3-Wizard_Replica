@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace C3WizardData.SelfEmpModel
+{
+
+
+public class GetSelfEmployeeVM
+  {
+    [JsonPropertyName("employeeId")]
+    public int EmployeeId { get; set; }
+
+    [JsonPropertyName("socSecNum")]
+    public string? SocSecNum { get; set; }
+
+    [JsonPropertyName("firstName")]
+    public string? FirstName { get; set; }
+
+    [JsonPropertyName("middleName")]
+    public string? MiddleName { get; set; }
+
+    [JsonPropertyName("lastName")]
+    public string? LastName { get; set; }
+
+    [JsonPropertyName("birthDate")]
+    public DateTime? BirthDate { get; set; }
+
+    [JsonPropertyName("rblgender")]
+    public bool? rblgender { get; set; }
+
+    [JsonPropertyName("address1")]
+    public string? Address1 { get; set; }
+
+    [JsonPropertyName("category_Type")]
+    public int? Category_Type { get; set; }
+
+    [JsonPropertyName("address2")]
+    public string? Address2 { get; set; }
+
+    [JsonPropertyName("city")]
+    public string? City { get; set; }
+
+    [JsonPropertyName("country")]
+    public int? Country { get; set; }
+
+    [JsonPropertyName("zip")]
+    public string? Zip { get; set; }
+
+    [JsonPropertyName("phone")]
+    public string? Phone { get; set; }
+
+    [JsonPropertyName("mobile")]
+    public string? Mobile { get; set; }
+
+    [JsonPropertyName("email")]
+    public string? Email { get; set; }
+
+    [JsonPropertyName("tin")]
+    public string? Tin { get; set; }
+
+    [JsonPropertyName("maritalStat")]
+    public string? MaritalStat { get; set; }
+
+    [JsonPropertyName("occupation")]
+    public string? Occupation { get; set; }
+
+    [JsonPropertyName("mode")]
+    public int? mode { get; set; }
+
+    [JsonPropertyName("helperCompanyId")]
+    public int? HelperCompanyId { get; set; }
+
+    [JsonPropertyName("helperLoginId")]
+    public int? HelperLoginId { get; set; }
+
+    [JsonPropertyName("helperUser_Password")]
+    public string? HelperUser_Password { get; set; }
+
+    [JsonPropertyName("question1")]
+    public string? Question1 { get; set; }
+
+    [JsonPropertyName("question2")]
+    public string? Question2 { get; set; }
+
+    [JsonPropertyName("answer1")]
+    public string? Answer1 { get; set; }
+
+    [JsonPropertyName("answer2")]
+    public string? Answer2 { get; set; }
+
+    [JsonPropertyName("loginId")]
+    public string? LoginId { get; set; }
+
+    [JsonPropertyName("regDate")]
+    public DateTime? regDate { get; set; }
+  }
+
+
+}

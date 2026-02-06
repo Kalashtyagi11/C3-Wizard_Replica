@@ -1,0 +1,17 @@
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3WizardHelper.deps.json
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3WizardHelper.dll
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3WizardHelper.pdb
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3Wizard.COMMONPROP.dll
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3WizardData.dll
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3Wizard.COMMONPROP.pdb
+C:\Atul\c3Api\C3WizardHelper\bin\Debug\net8.0\C3WizardData.pdb
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.csproj.AssemblyReference.cache
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.GeneratedMSBuildEditorConfig.editorconfig
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.AssemblyInfoInputs.cache
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.AssemblyInfo.cs
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.csproj.CoreCompileInputs.cache
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3Wizard.82F825C6.Up2Date
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.dll
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\refint\C3WizardHelper.dll
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\C3WizardHelper.pdb
+C:\Atul\c3Api\C3WizardHelper\obj\Debug\net8.0\ref\C3WizardHelper.dll

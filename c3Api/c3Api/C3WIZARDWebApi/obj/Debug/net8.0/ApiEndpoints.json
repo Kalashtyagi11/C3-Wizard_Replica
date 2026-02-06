@@ -1,0 +1,5594 @@
+[
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "DeleteRole",
+    "RelativePath": "api/Administration/DeleteRole/{roleId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "EditUserProfile",
+    "RelativePath": "api/Administration/EditUserProfile",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "selfempid",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "firstName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "middleName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "lastName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "loginId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "emailId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "roleId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "parentUserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "isPPOC",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "profileImage",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetAboutUs",
+    "RelativePath": "api/Administration/GetAboutUs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetAboutUs",
+    "RelativePath": "api/Administration/GetAboutUsById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetAllRoles",
+    "RelativePath": "api/Administration/GetAllRoles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "ContactUs",
+    "RelativePath": "api/Administration/GetContactByCompanyId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetContactList",
+    "RelativePath": "api/Administration/GetContactList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetEditUserManagement",
+    "RelativePath": "api/Administration/GetEditUserManagement",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetEmployees",
+    "RelativePath": "api/Administration/GetEmployeesDropDown",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetLoggedExceptionsReport",
+    "RelativePath": "api/Administration/GetLoggedExceptionsReport",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "fromDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "toDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetRoleById",
+    "RelativePath": "api/Administration/GetRoleById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Roleid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetUserAuditTrail",
+    "RelativePath": "api/Administration/GetUserAuditTrail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "RoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetUserProfile",
+    "RelativePath": "api/Administration/GetUserProfile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "GetYearList",
+    "RelativePath": "api/Administration/GetYearList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "ImportLastC3",
+    "RelativePath": "api/Administration/ImportLastC3",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyid",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "LoadUsers",
+    "RelativePath": "api/Administration/LoadUsers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "RoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "LoggedInHistory",
+    "RelativePath": "api/Administration/LoggedInHistory",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "isSelfEmployed",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "RoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "fromDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "toDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "Logout",
+    "RelativePath": "api/Administration/Logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "logId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Administration/ResetPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "resetPasswordViewModel",
+        "Type": "C3WizardHelper.ViewModels.ResetPasswordViewModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "ResetSendMail",
+    "RelativePath": "api/Administration/ResetSendMail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "SaveAboutUs",
+    "RelativePath": "api/Administration/SaveAboutUs",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3WizardData.Models.AboutUs",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "SaveContactUs",
+    "RelativePath": "api/Administration/SaveContactUs",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3WizardHelper.ViewModels.ContactUsRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "SaveRole",
+    "RelativePath": "api/Administration/SaveRole",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "saveroleVm",
+        "Type": "C3WizardHelper.ViewModels.SaveroleVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "SaveUserandUpdateUser",
+    "RelativePath": "api/Administration/SaveUser/UpdateUser",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ParentUserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "FirstName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Reg_Number",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "LastName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "MiddleName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "EmailId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "EmpId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SelfEmpId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Department",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "RoleId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "InsertedBy",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "InsertedOn",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "InsertedMachineInfo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UpdatedBy",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UpdatedOn",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UpdatedMachineInfo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsActive",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsSelfEmployee",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsPPOC",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "LastLoginTime",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsLoggedIn",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserExpiresOn",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PwdExpiresOn",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "LastPwdUpdate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsDirty",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "Status",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserImage",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "MachineInfo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserRole",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "mode",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "SECUsersProfilesString",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SECUsersProfiles",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardHelper.ViewModels.SECUsersProfileVm, C3WizardHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "UpdateRole",
+    "RelativePath": "api/Administration/UpdateRole",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "saveroleVm",
+        "Type": "C3WizardHelper.ViewModels.SaveroleVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AdministrationController",
+    "Method": "inActiveuser",
+    "RelativePath": "api/Administration/userInactive",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "RoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "btnNext_Click",
+    "RelativePath": "api/Auth/btnNext_Click",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "Employeelist",
+    "RelativePath": "api/Auth/Employeelist",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "EmployersGetById",
+    "RelativePath": "api/Auth/EmployersGetById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "ForgetPasswordbtnNext",
+    "RelativePath": "api/Auth/ForgetPasswordbtnNext",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "forgetpassword",
+        "Type": "C3WizardHelper.ViewModels.ForgetpasswordVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "ForgetPassword",
+    "RelativePath": "api/Auth/ForgotPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "forgetpassword",
+        "Type": "C3WizardHelper.ViewModels.ForgetpasswordVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllCompany",
+    "RelativePath": "api/Auth/GetAllCompany",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nW",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "empName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "orderName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "keyName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllCompanyData",
+    "RelativePath": "api/Auth/GetAllCompanyData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nW",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllCountry",
+    "RelativePath": "api/Auth/GetAllCountry",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllEmployers",
+    "RelativePath": "api/Auth/GetAllEmployers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "roleid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllEmployersSelf",
+    "RelativePath": "api/Auth/GetAllEmployersSelf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "empName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "orderName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "keyName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllEmployersSelfData",
+    "RelativePath": "api/Auth/GetAllEmployersSelfData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetAllEmployersSelfRpt",
+    "RelativePath": "api/Auth/GetAllEmployersSelfRpt",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "empName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "orderName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "keyName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "GetCompanyDetailsRpt",
+    "RelativePath": "api/Auth/GetCompanyDetailsRpt",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nW",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "empName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "orderName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "keyName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "ImportVerifiedDatainSSB",
+    "RelativePath": "api/Auth/ImportVerifiedDatainSSB",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SSN",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "regno",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "LoadCategoryAll",
+    "RelativePath": "api/Auth/LoadCategoryAll",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "login",
+        "Type": "C3WizardHelper.ViewModels.LoginDeails",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "QuestionAnswerForget",
+    "RelativePath": "api/Auth/QuestionAnswerForget",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "regNo",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "RegisterCompanyNew",
+    "RelativePath": "api/Auth/RegisterCompanyNew",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "registerCompanyVm",
+        "Type": "C3WizardHelper.ViewModels.RegisterCompanyVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "RelationShipCompanies",
+    "RelativePath": "api/Auth/RelationShipCompanies",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "data",
+        "Type": "C3WizardHelper.ViewModels.RelationShipRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "relationshipdropdown",
+    "RelativePath": "api/Auth/relationshipdropdown",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "compid",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "ReSendvarifycode",
+    "RelativePath": "api/Auth/ReSendvarifycode",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "SaveEmployeer",
+    "RelativePath": "api/Auth/SaveEmployeer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "employeerVm",
+        "Type": "C3WizardHelper.ViewModels.EmployeerVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "TextChangeRegNoRegister",
+    "RelativePath": "api/Auth/TextChangeRegNoRegister",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "regNO",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "TextChangeSsnSelfRegister",
+    "RelativePath": "api/Auth/TextChangeSsnSelfRegister",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ssN",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "TextChangeUserEmail",
+    "RelativePath": "api/Auth/TextChangeUserEmail",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EmailId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "regNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "TextChangeUserRegister",
+    "RelativePath": "api/Auth/TextChangeUserRegister",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "UserDecryptPassword",
+    "RelativePath": "api/Auth/UserDecryptPassword",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "ValidateRegistration",
+    "RelativePath": "api/Auth/ValidateRegistration",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "regNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "varificatiion_code",
+    "RelativePath": "api/Auth/varificatiion_code",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "code",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "VerifyOtp",
+    "RelativePath": "api/Auth/VerifyMFAOtp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "otp",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "type",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.AuthController",
+    "Method": "WokingEmployeelist",
+    "RelativePath": "api/Auth/WokingEmployeelist",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.BonusSettingsController",
+    "Method": "BonusSettingAddOrUpdate",
+    "RelativePath": "api/BonusSettings/BonusSettingAddOrUpdate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bonusSettingVM",
+        "Type": "C3WizardHelper.ViewModels.BonusSettingVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.BonusSettingsController",
+    "Method": "DeleteBonusSetting",
+    "RelativePath": "api/BonusSettings/DeleteBonusSetting",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "st_Date",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "en_Date",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserMessage",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.BonusSettingsController",
+    "Method": "GetBonusSetting",
+    "RelativePath": "api/BonusSettings/GetBonusSettingById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.BonusSettingsController",
+    "Method": "GetBonusSettingList",
+    "RelativePath": "api/BonusSettings/GetBonusSettingList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "AddDirectorWagesHolidayPay",
+    "RelativePath": "api/C3/AddDirectorWagesHolidayPay",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3WizardHelper.ViewModels.HolidayPayRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "AddOrUpdateSaveNContinue",
+    "RelativePath": "api/C3/AddOrUpdateSaveNContinue",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3Wizard.COMMONPROP.SaveNContinueRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "btn_DownloadSubmittedC3_Click",
+    "RelativePath": "api/C3/btn_DownloadSubmittedC3_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "FromMonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToMonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Company",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "endYear",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "btn_ImportLastC3_Click",
+    "RelativePath": "api/C3/btn_ImportLastC3_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password1",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "ImportVerifiedDatainSSB",
+    "RelativePath": "api/C3/btnImportEmp_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetC3Report",
+    "RelativePath": "api/C3/C3Report",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "monthName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "c3HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DownloadC3Pdf",
+    "RelativePath": "api/C3/C3Report/DownloadPdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "monthName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "c3HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ispaid",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "isDraft",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "CheckC3Created",
+    "RelativePath": "api/C3/check_C3Created",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DeleteBonus",
+    "RelativePath": "api/C3/DeleteBonus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "BonusPayID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "PayDate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "EmployeeId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DeleteC3",
+    "RelativePath": "api/C3/DeleteC3",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DeleteC3data",
+    "RelativePath": "api/C3/DeleteC3data",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "c3headerid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "type",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DeleteC3LocalAndSSB",
+    "RelativePath": "api/C3/DeleteC3LocalAndSSB",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deletec3",
+        "Type": "C3WizardHelper.ViewModels.submitC3bulk",
+        "IsRequired": true
+      },
+      {
+        "Name": "headerid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "payerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "scheduleno",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DeleteC3SSBAndLocal",
+    "RelativePath": "api/C3/DeleteC3SSBAndLocal",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "DeleteEmployee",
+    "RelativePath": "api/C3/DeleteEmployee",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EmployeeId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "isc3created",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetC3EmployeeListing",
+    "RelativePath": "api/C3/EditC3EmployeeListing",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.editC3Vm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetC3EmployeeListingNew",
+    "RelativePath": "api/C3/EditC3EmployeeListingNew",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.editC3Vm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "Export_C3_Data",
+    "RelativePath": "api/C3/Export_C3_Data",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Schedule_No",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Period_year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "Get_EmployeeDetails_SSB_Click",
+    "RelativePath": "api/C3/Get_EmployeeDetails_SSB_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Txt_SSN",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Txt_Surname",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Txt_Fname",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Txt_Mname",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "DOB",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "username",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "password",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetAllEmployee",
+    "RelativePath": "api/C3/GetAllEmployee",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetAllEmployeePgn",
+    "RelativePath": "api/C3/GetAllEmployeePgn",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetAllHolidayPay",
+    "RelativePath": "api/C3/GetAllHolidayPay",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetAllHolidayPayByIdNew",
+    "RelativePath": "api/C3/GetAllHolidayPayById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "holidayPayId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "holidayPayView",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetC3Reports",
+    "RelativePath": "api/C3/GetC3Reports/{companyId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetEmployee_List",
+    "RelativePath": "api/C3/GetEmployee_List",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetEmployeeByid",
+    "RelativePath": "api/C3/GetEmployeeByid",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Employeeid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetEmployeesOrDirector",
+    "RelativePath": "api/C3/GetEmployeesOrDirector",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Employeetype",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "empId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "GetHolidayPayByEmployee",
+    "RelativePath": "api/C3/GetHolidayPayByEmployee",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "employee",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "HolidaypayDelete",
+    "RelativePath": "api/C3/HolidaypayDelete",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "holidayPayId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "HolidayPayEmployeeData",
+    "RelativePath": "api/C3/HolidayPayEmployeeData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ssN",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "empSalary",
+        "Type": "System.Nullable\u00601[[System.Decimal, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Remarks",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "monthNo",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "Load_Wages_Bonus_PayEmployee",
+    "RelativePath": "api/C3/Load_Wages_Bonus_PayEmployee",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "LoadEmployee",
+    "RelativePath": "api/C3/LoadEmployee",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "monthno",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CmbPayPeriod",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardHelper.ViewModels.PayPeriod, C3WizardHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "isNilReturn",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "LoadHolidayPayEmployee",
+    "RelativePath": "api/C3/LoadHolidayPayEmployee",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "emplSsn",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "emplid",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "monthIndex",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "SaveBonus",
+    "RelativePath": "api/C3/SaveBonus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3WizardHelper.ViewModels.BonusVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "SaveEmployee",
+    "RelativePath": "api/C3/SaveEmployee",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "c3EmployeeVM",
+        "Type": "C3WizardHelper.ViewModels.C3EmployeeVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "SaveEmployeeHoliday",
+    "RelativePath": "api/C3/SaveEmployeeHoliday",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "holidayPay",
+        "Type": "C3WizardHelper.ViewModels.HolidayPayDatesVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "SaveNContinue",
+    "RelativePath": "api/C3/SaveNContinue",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3Wizard.COMMONPROP.SaveNContinueRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "SubmitC3Bulk",
+    "RelativePath": "api/C3/SubmitC3Bulk",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "SubmitC3Bulk_NW",
+    "RelativePath": "api/C3/SubmitC3Bulk_NW",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "UpdateBonus",
+    "RelativePath": "api/C3/UpdateBonus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3WizardHelper.ViewModels.BonusVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "UpdateEmployeeHoliday",
+    "RelativePath": "api/C3/UpdateEmployeeHoliday",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "holidayPay",
+        "Type": "C3WizardHelper.ViewModels.HolidayPayDatesVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "FileUploadC3",
+    "RelativePath": "api/C3/UploadC3File",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "val1",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "val2",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "FileUploadC32",
+    "RelativePath": "api/C3/UploadC3File2",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "val1",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "val2",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "validateC3FileEmp",
+    "RelativePath": "api/C3/validateC3FileEmp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "data",
+        "Type": "System.Collections.Generic.List\u00601[[C3Wizard.COMMONPROP.C3Contributions, C3Wizard.COMMONPROP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.C3Controller",
+    "Method": "validateC3FileEmp2",
+    "RelativePath": "api/C3/validateC3FileEmp2",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "data",
+        "Type": "System.Collections.Generic.List\u00601[[C3Wizard.COMMONPROP.C3Contributions, C3Wizard.COMMONPROP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "AdminDashBoardMaster",
+    "RelativePath": "api/DashBoard/AdminDashBoardMaster",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "AdminRoleWiseMenu",
+    "RelativePath": "api/DashBoard/AdminRoleWiseMenu",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "DeleteRoleMapping",
+    "RelativePath": "api/DashBoard/DeleteRoleMapping",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ModuleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "FillCompanyDropdown",
+    "RelativePath": "api/DashBoard/FillCompanyDropdown",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ParentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "roleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "GetUnSubmitNotes",
+    "RelativePath": "api/DashBoard/GetUnSubmitNotes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "type",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "unSubmitC3",
+    "RelativePath": "api/DashBoard/isC3satusChange",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notes",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "type",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "load_dashboard",
+    "RelativePath": "api/DashBoard/load_dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "endYear",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ResultArea",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromMonth",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToMonth",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.DashBoardController",
+    "Method": "SaveRoleMapping",
+    "RelativePath": "api/DashBoard/SaveRoleMapping",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menuList",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardHelper.ViewModels.MenuItem, C3WizardHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.javaEmployerController",
+    "Method": "GetERMasterDetails",
+    "RelativePath": "api/javaEmployer/getERMasterDetails",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "regNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "btn_Search_Click",
+    "RelativePath": "api/NonDirector/btn_Search_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "FromMonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToMonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "C3Report_Delete_Click",
+    "RelativePath": "api/NonDirector/C3Report_Delete_Click",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "HeaderID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "DownloadDirectorPdf",
+    "RelativePath": "api/NonDirector/C3Report/DownloadDirectorPdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "c3HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ispaid",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "isDraft",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "checkDirectorReports",
+    "RelativePath": "api/NonDirector/checkDirectorReports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "monthId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "c3HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "EditDirectorPayroll",
+    "RelativePath": "api/NonDirector/EditDirectorPayroll",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.EditDirPayrolVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "EditDirectorPayrollView",
+    "RelativePath": "api/NonDirector/EditDirectorPayrollView",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.editDirC3Vm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "FinalizeSaveAndSubmit",
+    "RelativePath": "api/NonDirector/FinalizeSaveAndSubmit",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.DirPayrollpreviewSubmitVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NewDirectorDetailsC3",
+    "RelativePath": "api/NonDirector/NewDirectorDetailsC3",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "monthNo",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CmbPayPeriod",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardHelper.ViewModels.PayPeriod1, C3WizardHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "isNilReturn",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NewDirectorMainDetails",
+    "RelativePath": "api/NonDirector/NewDirectorMainDetails",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NWButton_Finalize_Click",
+    "RelativePath": "api/NonDirector/NWButton_Finalize_Click",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3Wizard.COMMONPROP.SaveNContinueRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NwCheckC3Created",
+    "RelativePath": "api/NonDirector/NwCheckC3Created",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NWDirectorReports",
+    "RelativePath": "api/NonDirector/NWDirectorReports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "MonthF",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "MonthTO",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "endYear",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NWSaveNContinue",
+    "RelativePath": "api/NonDirector/NWSaveNContinue",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "C3Wizard.COMMONPROP.SaveNContinueRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "NWSubmitC3Bulk",
+    "RelativePath": "api/NonDirector/NWSubmitC3Bulk",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "PreviewDirectorPayroll",
+    "RelativePath": "api/NonDirector/PreviewDirectorPayroll",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.DirPayrollpreviewVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "SaveNewDirector",
+    "RelativePath": "api/NonDirector/SaveNewDirector",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.saveDirPayrolVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "FileUploadC3",
+    "RelativePath": "api/NonDirector/UploadC3FileDir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "val1",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "val2",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonDirectorController",
+    "Method": "validateC3FileEmp",
+    "RelativePath": "api/NonDirector/validateC3FileEmpDir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "data",
+        "Type": "System.Collections.Generic.List\u00601[[C3Wizard.COMMONPROP.C3Contributions, C3Wizard.COMMONPROP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "DeleteDirector",
+    "RelativePath": "api/NonWorkingDirector/DeleteDirector",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EmployeeId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "isc3created",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "btn_DownloadSubmittedC3_Click",
+    "RelativePath": "api/NonWorkingDirector/DownloadSubmittedC3_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "endYear",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "f_month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "t_month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "Get_NWEmployeeDetails_SSB_Click",
+    "RelativePath": "api/NonWorkingDirector/Get_NWEmployeeDetails_SSB_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Txt_SSN",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Txt_Surname",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Txt_Fname",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Txt_Mname",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "DOB",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "username",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "password",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "ImportDirector",
+    "RelativePath": "api/NonWorkingDirector/ImportDirector",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "ImportLastC3_Click",
+    "RelativePath": "api/NonWorkingDirector/ImportLastC3_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "NonWorkingDirector_List",
+    "RelativePath": "api/NonWorkingDirector/NonWorkingDirector_List",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "NonWorkingDirectorGetById",
+    "RelativePath": "api/NonWorkingDirector/NonWorkingDirectorGetById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EmployeeID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "Save_Director",
+    "RelativePath": "api/NonWorkingDirector/Save_Director",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "DirectorVM",
+        "Type": "C3WizardHelper.ViewModels.NondirectorVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.NonWorkingDirectorController",
+    "Method": "SearchC3",
+    "RelativePath": "api/NonWorkingDirector/SearchC3",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "f_month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "t_month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "ConfirmEmail",
+    "RelativePath": "api/Payment",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "AdminTranactionHistory",
+    "RelativePath": "api/Payment/AdminTranactionHistory",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "PaymentStatus",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "types",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "AdminTranactionHistoryData",
+    "RelativePath": "api/Payment/AdminTranactionHistoryData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "PaymentStatus",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "types",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "ProcessPayment",
+    "RelativePath": "api/Payment/BuySubscription",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "C3WizardHelper.ViewModels.DTOSubscriptionPayment",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "CardDetailsByCyber",
+    "RelativePath": "api/Payment/CardDetailsByCyber",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "CardDetailsUpdateAndDel",
+    "RelativePath": "api/Payment/CardDetailsUpdateAndDel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.CarddetailsModelVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "ConfirmEmail",
+    "RelativePath": "api/Payment/ConfirmEmailSignalR",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "DownloadPdf",
+    "RelativePath": "api/Payment/DownloadPdf",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "CardHolders",
+    "RelativePath": "api/Payment/getCardHolderName",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetCyberSourceFields",
+    "RelativePath": "api/Payment/GetCyberSourceFields",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetOfflinePaymentData",
+    "RelativePath": "api/Payment/GetOfflinePaymentData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetOfflinePaymentDataDirector",
+    "RelativePath": "api/Payment/GetOfflinePaymentDataDirector",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetOfflinePaymentDataSelfEmp",
+    "RelativePath": "api/Payment/GetOfflinePaymentDataSelfEmp",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "SelfHeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "getOfflinePaymentsDetails",
+    "RelativePath": "api/Payment/getOfflinePaymentsDetails",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "receiptId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetReconciliationDataAsync",
+    "RelativePath": "api/Payment/GetReconciliationData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetReconciliationDataCyber",
+    "RelativePath": "api/Payment/GetReconciliationDataCyber",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "fromDate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "toDate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "cardHolderName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetReconciliationDataCyberData",
+    "RelativePath": "api/Payment/GetReconciliationDataCyberData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "GetReconcilNotes",
+    "RelativePath": "api/Payment/GetReconcilNotes",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "loaddashboardPaymentStatus",
+    "RelativePath": "api/Payment/loaddashboardPaymentStatus",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Fromdate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Todate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ResultArea",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromMonth",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToMonth",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "OfflineProcessPayment",
+    "RelativePath": "api/Payment/OfflinepayNowDataCyberSource",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modal",
+        "Type": "C3WizardHelper.ViewModels.PaymentDetailsofflineVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "PaymentCancel",
+    "RelativePath": "api/Payment/PaymentCancel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "Paymentsuccess",
+    "RelativePath": "api/Payment/Paymentsuccess",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "C3WizardHelper.ViewModels.PaymentDetails1",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "payNowCyberSourceTestAndLive",
+    "RelativePath": "api/Payment/payNowCyberSourceTestAndLive",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modal",
+        "Type": "C3WizardHelper.ViewModels.PaymentFormModelVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "ProcessPayment",
+    "RelativePath": "api/Payment/payNowDataCyberSource",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modal",
+        "Type": "C3WizardHelper.ViewModels.PaymentFormModelVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "PostCyberSourceList",
+    "RelativePath": "api/Payment/PostCyberSourceList",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataList",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardHelper.ViewModels.PostCyberSourceVm, C3WizardHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "saveConfig",
+    "RelativePath": "api/Payment/saveConfigCyberSource",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modal",
+        "Type": "C3WizardHelper.ViewModels.SiteSettingsVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "TestPaymentTransactionHistory",
+    "RelativePath": "api/Payment/TestPaymentTransactionHistory",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "TransactionReport",
+    "RelativePath": "api/Payment/TransactionReport",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "C3HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "transactionId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "UpdateReconciliationData",
+    "RelativePath": "api/Payment/UpdateReconciliationData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "C3WizardHelper.ViewModels.ReconciliationRequestModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "UpdateReconciliationNotes",
+    "RelativePath": "api/Payment/UpdateReconciliationNotes",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestNotes",
+        "Type": "C3WizardHelper.ViewModels.ReconciliationRequestNotes",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "updateStatusConfig",
+    "RelativePath": "api/Payment/updateStatusConfig",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modal",
+        "Type": "C3WizardHelper.ViewModels.SiteSettingsVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "UploadCyberCsv",
+    "RelativePath": "api/Payment/UploadCyberCsv",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "UploadCyberJson",
+    "RelativePath": "api/Payment/UploadCyberJson",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataListn",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardHelper.ViewModels.ReconciliationCyberJsonVm, C3WizardHelper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Payroll_25.Controllers.PaymentController",
+    "Method": "UploadExcel",
+    "RelativePath": "api/Payment/UploadExcelData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "ChangeSelpEmpContribution",
+    "RelativePath": "api/SelfEmpContribution/ChangeSelpEmpContribution",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "chgObj",
+        "Type": "C3WizardHelper.ViewModels.selfEmpVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "DeleteSelfEmpContribution",
+    "RelativePath": "api/SelfEmpContribution/DeleteSelfEmpContribution",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "headerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "DownloadDirectorC3Pdf",
+    "RelativePath": "api/SelfEmpContribution/DownloadSelfC3Pdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sec3Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ispaid",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "isDraft",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "EditListingSelfContibution",
+    "RelativePath": "api/SelfEmpContribution/EditListingSelfContibution",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "H_Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "MainGridSelfEmpContribution",
+    "RelativePath": "api/SelfEmpContribution/MainGridSelfEmpContribution",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "ReprtsdataSelfAndDashboard",
+    "RelativePath": "api/SelfEmpContribution/ReprtsdataSelfAndDashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SEC3ID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "ReprtsdataSelfSearach",
+    "RelativePath": "api/SelfEmpContribution/ReprtsdataSelfSearach",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Fmonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Tmonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "SaveSelfEmployeeContribution",
+    "RelativePath": "api/SelfEmpContribution/SaveSelfEmployeeContribution",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.SaveSelEmpVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmpContributionController",
+    "Method": "SearchSelpEmpContribution",
+    "RelativePath": "api/SelfEmpContribution/SearchSelpEmpContribution",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "SEC3ID",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "btn_DownloadSubmittedC3_Click",
+    "RelativePath": "api/SelfEmployee/btn_DownloadSubmittedC3_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "FromMonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToMonth",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "endYear",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SEC3ID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "btn_ImportLastC3_Click",
+    "RelativePath": "api/SelfEmployee/btn_ImportLastC3_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LoginID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SEC3ID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "C3_Setting_Delete_Click",
+    "RelativePath": "api/SelfEmployee/C3_Setting_Delete_Click",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "SESId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Start_Date",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "End_Date",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsLocked",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "Export_button_Click",
+    "RelativePath": "api/SelfEmployee/Export_button_Click",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "HeaderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "Export_button_Data",
+    "RelativePath": "api/SelfEmployee/Export_button_Data",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Headerid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "period_Month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Period_year",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "Get_Master_Self_Employed_Settings",
+    "RelativePath": "api/SelfEmployee/Get_Master_Self_Employed_Settings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "Get_Wages_Catagory_Self_Employed_SettingsEdit",
+    "RelativePath": "api/SelfEmployee/Get_Wages_Catagory_Self_Employed_SettingsEdit",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "SESId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "GetMasterSettingsimportdata",
+    "RelativePath": "api/SelfEmployee/GetMasterSettingsimportdata",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "GetYearList",
+    "RelativePath": "api/SelfEmployee/GetYearList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "load_dashboard",
+    "RelativePath": "api/SelfEmployee/load_dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "MonthF",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "MonthTO",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "endYear",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "SaveEmployeeSettings",
+    "RelativePath": "api/SelfEmployee/SaveEmployeeSettings",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "importDefaultSelf",
+        "Type": "C3WizardData.SelfEmpModel.ImportDefaultSelfSaveVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "SelfEmployeeGet",
+    "RelativePath": "api/SelfEmployee/SelfEmployeeGet",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "selfEmployeeid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "Submit_C3_Click",
+    "RelativePath": "api/SelfEmployee/Submit_C3_Click",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "SSNofEmp",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Headerid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "period_Month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Period_year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserLoginID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "User_Password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfEmployeeController",
+    "Method": "Update_SelfEmployee",
+    "RelativePath": "api/SelfEmployee/Update_SelfEmployee",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "employeeVM",
+        "Type": "C3WizardData.SelfEmpModel.GetSelfEmployeeVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "AllDetailsAuditLog",
+    "RelativePath": "api/SelfUserManagement/AllDetailsAuditLog",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EventType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "AllDetailsAuditLogPgn",
+    "RelativePath": "api/SelfUserManagement/AllDetailsAuditLogPgn",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EventType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ToDate",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "GetLoggedInHistory",
+    "RelativePath": "api/SelfUserManagement/GetLoggedInHistory",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "isSelfEmployed",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "GetSelfEmployedReports",
+    "RelativePath": "api/SelfUserManagement/GetSelfEmployedReports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "GetSelfUserManagement",
+    "RelativePath": "api/SelfUserManagement/GetSelfUserManagement",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "GetUserAuditTrail",
+    "RelativePath": "api/SelfUserManagement/GetUserAuditTrail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "CompanyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "ReportPreview",
+    "RelativePath": "api/SelfUserManagement/ReportPreview",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sec3Id",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "SelfDownloadSubmittedC3",
+    "RelativePath": "api/SelfUserManagement/SelfDownloadSubmittedC3",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyid",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "fmonths",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "tomonths",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "SelfImportLastC3",
+    "RelativePath": "api/SelfUserManagement/SelfImportLastC3",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "password",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "companyid",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "userid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SelfUserManagementController",
+    "Method": "UpdateSelfUserManagement",
+    "RelativePath": "api/SelfUserManagement/UpdateSelfUserManagement",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "selfempid",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "firstName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "middleName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "lastName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "loginId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "emailId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "roleId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "parentUserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "isPPOC",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "profileImage",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "AddOrUpdateDeductionsTaxTableDetail",
+    "RelativePath": "api/Settings/AddOrUpdateDeductionsTaxTableDetail",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "detail",
+        "Type": "C3WizardData.Models.DeductionsTaxTableDetail",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "AddOrUpdateDeductionsTaxTableDetailNew",
+    "RelativePath": "api/Settings/AddOrUpdateDeductionsTaxTableDetailNew",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "System.Collections.Generic.List\u00601[[C3WizardData.Models.DeductionsTaxTableDetail, C3WizardData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "C3SettingDeleteNew",
+    "RelativePath": "api/Settings/C3SettingDeleteNew",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Gsettingid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "st_Date",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "en_Date",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "message",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "HelperRoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "C3Settingedit",
+    "RelativePath": "api/Settings/C3Settingedit",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Gsettingid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "C3Settings",
+    "RelativePath": "api/Settings/C3Settings",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "settings",
+        "Type": "C3WizardHelper.ViewModels.C3Settings",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "carryforwardDeductionsTaxTableDetailData",
+    "RelativePath": "api/Settings/carryforwardDeductionsTaxTableDetailData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Fromyear",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Toyear",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "carryforwardDeductionsTaxTableDetailDataNew",
+    "RelativePath": "api/Settings/carryforwardDeductionsTaxTableDetailDataNew",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Fromyear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Toyear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "DeleteDeductionsTaxTableDetail",
+    "RelativePath": "api/Settings/DeleteDeductionsTaxTableDetail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "TaxTabID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "editHeadersDeductionsTaxTable",
+    "RelativePath": "api/Settings/editHeadersDeductionsTaxTable",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "GetDeductionsTaxTableDetailsSettings",
+    "RelativePath": "api/Settings/Get_Deductions_Tax_Table_Details_Settings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "Get_EXEMPTED_CONTRIBUTION_Settings",
+    "RelativePath": "api/Settings/Get_EXEMPTED_CONTRIBUTION_Settings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "RoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "GetAllC3Settings",
+    "RelativePath": "api/Settings/GetAllC3Settings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fromPeriod",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "toPeriod",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "RoleId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "GetDeductionsTaxTableDetail",
+    "RelativePath": "api/Settings/GetDeductionsTaxTableDetail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "TaxTabID",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "GetMasterDefaultSettingRatesRates",
+    "RelativePath": "api/Settings/GetMasterDefaultSettingRatesRates",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "C3WizardHelper.ViewModels.ResponseModel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "C3WIZARDWebApi.Controllers.SettingsController",
+    "Method": "setHeadersDeductionsTaxTable",
+    "RelativePath": "api/Settings/setHeadersDeductionsTaxTable",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "obj",
+        "Type": "C3WizardHelper.ViewModels.deductionHeaderVm",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

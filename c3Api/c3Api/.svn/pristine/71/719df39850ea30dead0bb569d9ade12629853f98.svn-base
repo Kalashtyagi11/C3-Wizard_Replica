@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardHelper.ViewModels
+{
+    public class GetEmployerDeailsModule
+    {
+        public string? name { get; set; }
+        public string? regNo { get; set; }
+        public string? email { get; set; }
+        public string? statusCode { get; set; }
+        public string? statusText { get; set; }
+        public string? dateRegistered { get; set; }
+        public string? tradeName { get; set; }
+        public string? contactPerson { get; set; }
+        public string? compName { get; set; }
+        public string? address1 { get; set; }
+        public string? address2 { get; set; }
+        public string? city { get; set; }
+        public string? countryName { get; set; }
+        public string? postalCode { get; set; }
+        public string? phoneNo { get; set; }
+        public string? mobileNo { get; set; }
+        public string? prntRegNo { get; set; }
+        public string? firstName { get; set; }
+        public string? lastName { get; set; }
+        public string? companyAddress { get; set; }
+        public string? userName { get; set; }
+        public string? passwordHash { get; set; }
+        public string? userType { get; set; }
+        public string? employerType { get; set; }
+        public string? isActive { get; set; }
+        public string? c3RegnStatusCode { get; set; }
+        public string? c3RegnStatusText { get; set; }
+        public string? officeCode { get; set; }
+    }
+}

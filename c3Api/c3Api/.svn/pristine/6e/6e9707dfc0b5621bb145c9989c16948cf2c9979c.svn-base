@@ -1,0 +1,748 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static C3Wizard.COMMONPROP.C3Contributions;
+
+namespace C3Wizard.COMMONPROP
+{
+    public class C3Contributions : DVOBase
+    {
+        private int? _CONTID;
+        private int? _C3HEADERID;
+        private int? _EmployeeId;
+        private string _SSN;
+        private string _SSND;
+        private string _EmpName;
+        private string _PERIODD_MONTH;
+        private string _PERIOD_YEAR;
+        private string _PayFreq;
+        private decimal? _EmpSalary;
+        private decimal? _WAGES1;
+        private decimal? _WAGES2;
+        private decimal? _WAGES3;
+        private decimal? _WAGES4;
+        private decimal? _WAGES5;
+        private decimal? _tempWAGES1;
+        private decimal? _tempWAGES2;
+        private decimal? _tempWAGES3;
+        private decimal? _tempWAGES4;
+        private decimal? _tempWAGES5;
+        protected decimal? _wage_Amt;
+        private decimal? _HPAY;
+        private decimal? _OtherPAY;
+        private decimal? _DirectorWagesPAY;
+        private string _IsHPAY;
+        private decimal? _BONUS;
+        private decimal? _TotalWadges;
+        private bool _WEEK1;
+        private bool _WEEK2;
+        private bool _WEEK3;
+        private bool _WEEK4;
+        private bool _WEEK5;
+        private int _SelectedTypeWEEK1;
+        private int _SelectedTypeWEEK2;
+        private int _SelectedTypeWEEK3;
+        private int _SelectedTypeWEEK4;
+        private int _SelectedTypeWEEK5;
+        private string _ISSelectedWEEK1;
+        private string _ISSelectedWEEK2;
+        private string _ISSelectedWEEK3;
+        private string _ISSelectedWEEK4;
+        private string? _ISSelectedWEEK5;
+        private decimal? _LEVYEE;
+        private decimal? _SocialSecurity;
+        private string? _Date_Joining;
+        private string? _Date_terminated;
+        private string? _T_C_Date;
+        private string _Remarks;
+        private string _DirRemarks;
+        private bool _IsWeekfifth;
+        private bool _emp_add_remove;
+        private bool _IsRemarkDisable;
+        private bool _IsemployeeDirector;
+        private bool _IsLevyExempt;
+        private string _BirthDate;
+        private decimal? _SS_Employee;
+        private decimal? _SS_Employer;
+        private decimal? _Levy_Penalty;
+        private decimal? _SS_Fines;
+        private decimal? _SERVAYANCE;
+        private decimal? _SERVAYANCE_PENALTY;
+        private string _Department;
+        private string _PayPeriod;
+
+        private decimal? _HPay_Week1;
+        private decimal? _HPay_Week2;
+        private decimal? _HPay_Week3;
+        private decimal? _HPay_Week4;
+        private decimal? _HPay_Week5;
+        #region public constructor
+
+
+        public C3Contributions()
+        {
+            _CONTID = 0;
+            _C3HEADERID = 0;
+            _SSN = string.Empty;
+            _SSND = string.Empty;
+            _EmpName = string.Empty;
+            _EmployeeId = 0;
+            _PERIODD_MONTH = string.Empty;
+            _PERIOD_YEAR = string.Empty;
+            _PayFreq = string.Empty;
+            _ISSelectedWEEK1 = string.Empty;
+            _ISSelectedWEEK2 = string.Empty;
+            _ISSelectedWEEK3 = string.Empty;
+            _ISSelectedWEEK4 = string.Empty;
+            _ISSelectedWEEK5 = string.Empty;
+            _SelectedTypeWEEK1 = 0;
+            _SelectedTypeWEEK2 = 0;
+            _SelectedTypeWEEK3 = 0;
+            _SelectedTypeWEEK4 = 0;
+            _SelectedTypeWEEK5 = 0;
+            _EmpSalary = (decimal)0.00;
+            _WAGES1 = (decimal)0.00;
+            _WAGES2 = (decimal)0.00;
+            _WAGES3 = (decimal)0.00;
+            _WAGES4 = (decimal)0.00;
+            _WAGES5 = (decimal)0.00;
+            _tempWAGES1 = (decimal)0.00;
+            _tempWAGES2 = (decimal)0.00;
+            _tempWAGES3 = (decimal)0.00;
+            _tempWAGES4 = (decimal)0.00;
+            _tempWAGES5 = (decimal)0.00;
+            _HPAY = (decimal)0.00;
+            _OtherPAY = (decimal)0.00;
+            _DirectorWagesPAY = (decimal)0.00;
+            _BONUS = (decimal)0.00;
+            _IsHPAY = "Green";
+            _TotalWadges = (decimal)0.00;
+            _WEEK1 = false;
+            _WEEK2 = false;
+            _WEEK3 = false;
+            _WEEK4 = false;
+            _WEEK5 = false;
+            _LEVYEE = (decimal)0.00;
+            _SocialSecurity = 0;
+            _Date_Joining = null;
+            _Date_terminated = null;
+            _T_C_Date = null;
+            _Remarks = string.Empty;
+            _IsWeekfifth = false;
+            _emp_add_remove = true;
+            _IsRemarkDisable = true;
+            _IsemployeeDirector = false;
+            _BirthDate = "01011900";
+            _SS_Employee = (decimal)0.00;
+            _SS_Employer = (decimal)0.00;
+            _Levy_Penalty = (decimal)0.00;
+            _SS_Fines = (decimal)0.00;
+            _SERVAYANCE = (decimal)0.00;
+            _SERVAYANCE_PENALTY = (decimal)0.00;
+            _Department = string.Empty;
+            _PayPeriod = string.Empty;
+
+            _HPay_Week1 = (decimal)0.00;
+            _HPay_Week2 = (decimal)0.00;
+            _HPay_Week3 = (decimal)0.00;
+            _HPay_Week4 = (decimal)0.00;
+            _HPay_Week5 = (decimal)0.00;
+        }
+        #endregion constructor
+        #region public properties
+        public int? CONTID
+        {
+            get { return _CONTID; }
+            set { _CONTID = value; }
+        }
+        public int? C3HEADERID
+        {
+            get { return _C3HEADERID; }
+            set { _C3HEADERID = value; }
+        }
+        public string SSN
+        {
+            get { return _SSN; }
+            set { _SSN = value; }
+        }
+        public string SSND
+        {
+            get { return _SSND; }
+            set { _SSND = value; }
+        }
+        public int? EmployeeId
+        {
+            get { return _EmployeeId; }
+            set { _EmployeeId = value; }
+        }
+        public string EmployeeName
+        {
+            get { return _EmpName; }
+            set { _EmpName = value; }
+        }
+        public string period_Month
+        {
+            get { return _PERIODD_MONTH; }
+            set { _PERIODD_MONTH = value; }
+        }
+        public string Period_year
+        {
+            get { return _PERIOD_YEAR; }
+            set { _PERIOD_YEAR = value; }
+        }
+        public string PayFreq
+        {
+            get { return _PayFreq; }
+            set { _PayFreq = value; }
+        }
+        public string ISSelectedWEEK1
+        {
+            get { return _ISSelectedWEEK1; }
+            set { _ISSelectedWEEK1 = value; }
+        }
+        public string ISSelectedWEEK2
+        {
+            get { return _ISSelectedWEEK2; }
+            set { _ISSelectedWEEK2 = value; }
+        }
+        public string ISSelectedWEEK3
+        {
+            get { return _ISSelectedWEEK3; }
+            set { _ISSelectedWEEK3 = value; }
+        }
+        public string ISSelectedWEEK4
+        {
+            get { return _ISSelectedWEEK4; }
+            set { _ISSelectedWEEK4 = value; }
+        }
+        public string? ISSelectedWEEK5
+        {
+            get { return _ISSelectedWEEK5; }
+            set { _ISSelectedWEEK5 = value; }
+        }
+        public decimal? EmpSalary
+        {
+            get { return _EmpSalary; }
+            set { _EmpSalary = value; }
+        }
+        public virtual decimal? wage_Amt
+        {
+            get { return _wage_Amt; }
+            set { _wage_Amt = value; }
+        }
+        public decimal? WAGES1
+        {
+            get { return _WAGES1; }
+            set { _WAGES1 = value; }
+        }
+        public decimal? WAGES2
+        {
+            get { return _WAGES2; }
+            set { _WAGES2 = value; }
+        }
+        public decimal? WAGES3
+        {
+            get { return _WAGES3; }
+            set { _WAGES3 = value; }
+        }
+
+        public decimal? WAGES4
+        {
+            get { return _WAGES4; }
+            set { _WAGES4 = value; }
+        }
+        public decimal? WAGES5
+        {
+            get { return _WAGES5; }
+            set { _WAGES5 = value; }
+        }
+
+        public decimal? tempWAGES1
+        {
+            get { return _tempWAGES1; }
+            set { _tempWAGES1 = value; }
+        }
+        public decimal? tempWAGES2
+        {
+            get { return _tempWAGES2; }
+            set { _tempWAGES2 = value; }
+        }
+        public decimal? tempWAGES3
+        {
+            get { return _tempWAGES3; }
+            set { _tempWAGES3 = value; }
+        }
+
+        public decimal? tempWAGES4
+        {
+            get { return _tempWAGES4; }
+            set { _tempWAGES4 = value; }
+        }
+        public decimal? tempWAGES5
+        {
+            get { return _tempWAGES5; }
+            set { _tempWAGES5 = value; }
+        }
+        public decimal? HPAY
+        {
+            get { return _HPAY; }
+            set { _HPAY = value; }
+        }
+        public decimal? OtherPAY
+        {
+            get { return _OtherPAY; }
+            set { _OtherPAY = value; }
+        }
+        public decimal? DirectorWagesPAY
+        {
+            get { return _DirectorWagesPAY; }
+            set { _DirectorWagesPAY = value; }
+        }
+        public string IsHPAY
+        {
+            get { return _IsHPAY; }
+            set { _IsHPAY = value; }
+        }
+        public decimal? BONUS
+        {
+            get { return _BONUS; }
+            set { _BONUS = value; }
+        }
+        public decimal? TotalWadeges
+        {
+            get { return _TotalWadges; }
+            set { _TotalWadges = value; }
+        }
+        public bool WEEK1
+        {
+            get { return _WEEK1; }
+            set { _WEEK1 = value; }
+        }
+        public bool WEEK2
+        {
+            get { return _WEEK2; }
+            set { _WEEK2 = value; }
+        }
+        public bool WEEK3
+        {
+            get { return _WEEK3; }
+            set { _WEEK3 = value; }
+        }
+        public bool WEEK4
+        {
+            get { return _WEEK4; }
+            set { _WEEK4 = value; }
+        }
+        public bool WEEK5
+        {
+            get { return _WEEK5; }
+            set { _WEEK5 = value; }
+        }
+        public int SelectedTypeWEEK1
+        {
+            get { return _SelectedTypeWEEK1; }
+            set { _SelectedTypeWEEK1 = value; }
+        }
+        public int SelectedTypeWEEK2
+        {
+            get { return _SelectedTypeWEEK2; }
+            set { _SelectedTypeWEEK2 = value; }
+        }
+        public int SelectedTypeWEEK3
+        {
+            get { return _SelectedTypeWEEK3; }
+            set { _SelectedTypeWEEK3 = value; }
+        }
+        public int SelectedTypeWEEK4
+        {
+            get { return _SelectedTypeWEEK4; }
+            set { _SelectedTypeWEEK4 = value; }
+        }
+        public int SelectedTypeWEEK5
+        {
+            get { return _SelectedTypeWEEK5; }
+            set { _SelectedTypeWEEK5 = value; }
+        }
+        public bool IsWeekfifth
+        {
+            get { return _IsWeekfifth; }
+            set { _IsWeekfifth = value; }
+        }
+        public bool emp_add_remove
+        {
+            get { return _emp_add_remove; }
+            set { _emp_add_remove = value; }
+        }
+        public bool IsRemarkDisable
+        {
+            get { return _IsRemarkDisable; }
+            set { _IsRemarkDisable = value; }
+        }
+        public bool IsemployeeDirector
+        {
+            get { return _IsemployeeDirector; }
+            set { _IsemployeeDirector = value; }
+        }
+        public bool IsLevyExempt
+        {
+            get { return _IsLevyExempt; }
+            set { _IsLevyExempt = value; }
+        }
+        public decimal? LEVYEE
+        {
+            get { return _LEVYEE; }
+            set { _LEVYEE = value; }
+        }
+        public decimal? SocialSecurity
+        {
+            get { return _SocialSecurity; }
+            set { _SocialSecurity = value; }
+        }
+        public decimal? SS_Fines
+        {
+            get { return _SS_Fines; }
+            set { _SS_Fines = value; }
+        }
+        public decimal? SS_Employee
+        {
+            get { return _SS_Employee; }
+            set { _SS_Employee = value; }
+        }
+        public decimal? SS_Employer
+        {
+            get { return _SS_Employer; }
+            set { _SS_Employer = value; }
+        }
+        public decimal? Levy_Penalty
+        {
+            get { return _Levy_Penalty; }
+            set { _Levy_Penalty = value; }
+        }
+        public decimal? SERVAYANCE
+        {
+            get { return _SERVAYANCE; }
+            set { _SERVAYANCE = value; }
+        }
+        public decimal? SERVAYANCE_PENALTY
+        {
+            get { return _SERVAYANCE_PENALTY; }
+            set { _SERVAYANCE_PENALTY = value; }
+        }
+        public string? Date_Joining
+        {
+            get { return _Date_Joining; }
+            set { _Date_Joining = value; }
+        }
+        public string? Date_terminated
+        {
+            get { return _Date_terminated; }
+            set { _Date_terminated = value; }
+        }
+        public string BirthDate
+        {
+            get { return _BirthDate; }
+            set { _BirthDate = value; }
+        }
+        public string? T_C_Date
+        {
+            get { return _T_C_Date; }
+            set { _T_C_Date = value; }
+        }
+        public string Remarks
+        {
+            get { return _Remarks; }
+            set { _Remarks = value; }
+        }
+        public string? DirRemarks
+        {
+            get { return _DirRemarks; }
+            set { _DirRemarks = value; }
+        }
+        public string Department
+        {
+            get { return _Department; }
+            set { _Department = value; }
+        }
+        public string PayPeriod
+        {
+            get { return _PayPeriod; }
+            set { _PayPeriod = value; }
+        }
+
+        public decimal? HPay_Week1
+        {
+            get { return _HPay_Week1; }
+            set { _HPay_Week1 = value; }
+        }
+        public decimal? HPay_Week2
+        {
+            get { return _HPay_Week2; }
+            set { _HPay_Week2 = value; }
+        }
+        public decimal? HPay_Week3
+        {
+            get { return _HPay_Week3; }
+            set { _HPay_Week3 = value; }
+        }
+        public decimal? HPay_Week4
+        {
+            get { return _HPay_Week4; }
+            set { _HPay_Week4 = value; }
+        }
+        public decimal? HPay_Week5
+        {
+            get { return _HPay_Week5; }
+            set { _HPay_Week5 = value; }
+        }
+        public int holidayPayId { get; set; }
+        #endregion public properties
+
+
+
+
+        #region Stored-Procedures
+        /// <summary>
+        /// stored procedures
+        /// </summary>
+
+        public override string INSERT_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string UPDATE_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string DELETE_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string FIND_SPNAME
+        {
+            get { return "uspTimeCardDetailGet"; }
+        }
+
+        public override string ALL_SPNAME
+        {
+            get { return "GetAllContributionDetails"; }
+        }
+        public override string TABLE_NAME
+        {
+            get { return ""; }
+        }
+
+        public override int UNIQUE_ID
+        {
+            get { return 0; }
+        }
+
+        //public override string NOTES_TABLE_RECORD_ID
+        //{
+        //    get { return string.Empty; }
+        //    set { throw new Exception("The method or operation is not implemented."); }
+        //}
+
+        /// <summary>
+        /// Find the record 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public class PayPeriods
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+
+
+        public override string FIND_QUERY(ref Object[] parameters)
+        {
+            System.Text.StringBuilder sql = new StringBuilder();
+            sql.Append("select MasterEmployee.first_name p_first_name,MasterEmployee.last_name p_last_name,MasterEmployee.department p_department, ");
+            sql.Append(" PayrollGLAccounts.keyvalue p_keyvalue,EmployeeTCard_Details.card_no p_card_no,EmployeeTCard_Details.inc_code p_inc_code, ");
+            sql.Append("EmployeeTCard_Details.inc_hours p_inc_hours,EmployeeTCard_Details.inc_number p_inc_number,MasterEmployee.cash_acct p_acct_no, ");
+            sql.Append(" EmployeeTCard_Details.inc_rate p_inc_rate,EmployeeTCard_Details.line_no p_line_no,EmployeeTCard_Header.used_flag p_used_flag ,");
+            sql.Append(" EmployeeTCard_Header.empl_code p_empl_code,EmployeeTCard_Header.end_date p_end_date,EmployeeTCard_Header.start_date p_start_date ");
+            sql.Append(" , 1 p_key , 2  p_description ");
+            sql.Append("  from EmployeeTCard_Details INNER JOIN  EmployeeTCard_Header ON EmployeeTCard_Header.card_no = EmployeeTCard_Details.card_no  INNER JOIN MasterEmployee  ON  MasterEmployee.empl_code=EmployeeTCard_Header.empl_code LEFT Outer JOIN PayrollGLAccounts ");
+            sql.Append(" ON PayrollGLAccounts.acct_no=EmployeeTCard_Details.acct_no ");
+            //  sql.Append(" INNER JOIN Flex_Segment_Value_Details ON Flex_Segment_Value_Details.Keyvalue = Substring(ISNULL(PayrollGLAccounts.keyvalue,'000'),1,3) ");
+            sql.Append("where  1=1  ");// and Flex_Segment_Value_Details.segmentid=1 ");
+            sql.Append("  ");
+            sql.Append(" and EmployeeTCard_Details.inc_number >= 0 AND EmployeeTCard_Details.inc_rate >= 0 ");
+            if (parameters[0] != null)
+                if (parameters[0].ToString() != string.Empty)
+                    sql.Append(" AND EmployeeTCard_Header.empl_code = '" + Convert.ToString(parameters[0]).Replace("'", "''") + "'");
+            if (parameters[1] != null)
+                if (parameters[1].ToString() != string.Empty)
+                    sql.Append(" AND Rtrim(MasterEmployee.first_name) LIKE '" + parameters[1].ToString().Trim().Replace("'", "''") + "%'");
+
+            if (parameters[2] != null)
+                if (parameters[2].ToString() != string.Empty)
+                    sql.Append(" AND Rtrim(MasterEmployee.last_name) LIKE '" + parameters[2].ToString().Trim().Replace("'", "''") + "%'");
+            if (parameters[3] != null)
+                if (parameters[3].ToString() != string.Empty && parameters[3].ToString() != "01/01/1900")//dateFrom
+                    sql.Append(" AND EmployeeTCard_Header.start_date >= '" + parameters[3].ToString().Trim().Replace("'", "''") + "'");
+            if (parameters[4] != null)
+                if (parameters[4].ToString() != string.Empty && parameters[4].ToString() != "01/01/1900")//dateto
+                    sql.Append(" AND EmployeeTCard_Header.end_date <= '" + parameters[4].ToString().Trim().Replace("'", "''") + "'");
+            if (parameters[5] != null)
+                if (parameters[5].ToString() != string.Empty)
+                    sql.Append(" AND Rtrim(EmployeeTCard_Header.used_flag) = '" + parameters[5].ToString().Trim().Replace("'", "''") + "'");
+            if (parameters[6] != null && parameters[7] != null)
+                if (parameters[6].ToString() != string.Empty && parameters[7].ToString() != string.Empty)
+                    sql.Append(" AND EmployeeTCard_Header.empl_code BETWEEN '" + parameters[6].ToString().Trim() + "' AND '" + parameters[7].ToString().Trim().Replace("'", "''") + "'");
+
+            return sql.ToString();
+        }
+        #endregion Stored-Procedures
+    }
+    public class SaveNContinueRequest
+    {
+        public List<PayPeriods> CmbPayPeriod { get; set; }
+        public List<C3Contributions>? AllEmployeeList_List { get; set; }
+        public footerCalcuations? footerCalcuations { get; set; }
+        public int CompanyId { get; set; }
+        public int Monthno { get; set; }
+        public string MonthName { get; set; }
+        public string c3FilePath { get; set; }
+        public string Year { get; set; }
+        public bool IsSave { get; set; }
+        public bool Is_Preview { get; set; }
+        public bool isNilReturn { get; set; }
+        public bool IsLevyExempt { get; set; }
+        public bool IsRecordEdit { get; set; }
+        public string? TextChanged { get; set; }
+        public bool ListHavingItems { get; set; }
+        public string? User_Name { get; set; }
+        public int UserID { get; set; }
+        public string? Text_SSTotal { get; set; }
+        public string? TextTotalWages { get; set; }
+        public string? TextTotalWagesNLevy { get; set; }
+        public string? TextEmployerLevy { get; set; }
+        public string? TextLevyPenalty { get; set; }
+        public string? TextServayance { get; set; }
+        public string? TextPEPenalty { get; set; }
+        public string? TextTotalAccountantGeneral { get; set; }
+        public string? TextSSContribution { get; set; }
+        public string? TextSSPenalty { get; set; }
+        public string? TexttotalSS { get; set; }
+        public string? Txt_GrandTotal { get; set; }
+        public string? TextAccountantGeneral { get; set; }
+        public int schedule_no { get; set; }
+        public int H_Id { get; set; }
+
+        public string? OrderName { get; set; }
+        public string? OrderKey { get; set; }
+        public string? company_name { get; set; }
+        public string? trade_name { get; set; }
+        public string? company_address { get; set; }
+        public string? company_reg_no { get; set; }
+        public bool Is_SendBima { get; set; } = false;
+    }
+    public class footerCalcuations
+    {
+        public int countRecord { get; set; }
+        public string totalWages { get; set; }
+        public string totalSscontributions { get; set; }
+        public string sumLevyemployeeAndemployer { get; set; }
+        public string totalServayance { get; set; }
+    }
+
+    public class EmployeeValidationError
+    {
+        public string SSN { get; set; }
+        public List<string> Errors { get; set; } = new List<string>();
+    }
+    public class ViewModelMaster_Setting_Rates_Rates
+    {
+
+        public float Soc_ER_Rate { get; set; }
+        public float EIB_Rate { get; set; }
+        public float Soc_EE_Rate { get; set; }
+        public float Bonus_Levy_EE_Rate { get; set; }
+        public float SeveranceRate { get; set; }
+        public float Fine_Rate { get; set; }
+        public float Additional_Fine_Rate { get; set; }
+        public float Additional_Penalty_Rate { get; set; }
+        public float Employer_Levy_Rate { get; set; }
+        public decimal? Soc_ER_Pay_Limit { get; set; } = 0.00M;
+        public decimal? Soc_EE_Pay_Limit { get; set; } = 0.00M;
+        public decimal? EIB_Pay_Limit { get; set; } = 0.00M;
+        public float Penalty_Rate { get; set; }
+        public int Min_Age { get; set; }
+        public int Max_Age { get; set; }
+
+    }
+    public class DecemberBonusSetting
+    {
+        public bool exemptedLevybonus { get; set; }
+        public bool exemptedEmployerLevybonus { get; set; }
+        public bool exemptedSeverancebonus { get; set; }
+        public bool exemptedsocialsecuritybonus { get; set; }
+
+    }
+    public class Employeedetails
+    {
+        public string socSecNum { get; set; }
+        public string regNo { get; set; }
+        public string firstName { get; set; }
+        public string surName { get; set; }
+        public string birthDate { get; set; }
+        public string gender { get; set; }
+        public string maritalStatus { get; set; }
+        public string phone { get; set; }
+        public string mobile { get; set; }
+        public string email { get; set; }
+        public string startDate { get; set; }
+        public string last_Pay_Date { get; set; }
+        public string endDate { get; set; }
+        public string payPeriod { get; set; }
+        public string isActive { get; set; }
+        public string isLevyExempt { get; set; }
+        public string occupation { get; set; }
+        public string isdirectorOnly { get; set; }
+        public string isemployeeDirector { get; set; }
+        public string emptype { get; set; }
+        public string salary { get; set; }
+        public string status { get; set; }
+        public string addressTypeDescr { get; set; }
+        public string addressLinkId { get; set; }
+        public string addressTypeCode { get; set; }
+        public string streetAddress { get; set; }
+        public string streetName { get; set; }
+        public string cityTownName { get; set; }
+        public string stateRegion { get; set; }
+        public string postalCode { get; set; }
+        public string countryCode { get; set; }
+        public string wagesPaid1 { get; set; }
+        public string wagesPaid2 { get; set; }
+        public string wagesPaid3 { get; set; }
+        public string wagesPaid4 { get; set; }
+        public string wagesPaid5 { get; set; }
+        public string wagesPaid6 { get; set; }
+        public string wagesPaid7 { get; set; }
+
+    }
+    public class EmployeeWagesdetails
+    {
+        public int weekno { get; set; }
+        public string wagesPaid { get; set; }
+
+    }
+    public class EmployeeL
+    {
+        public string? FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string? LastName { get; set; }
+        public string? BirthDate { get; set; }
+        public int ssnn { get; set; }
+        public int companyId { get; set; }
+        public int userId { get; set; }
+
+    }
+}

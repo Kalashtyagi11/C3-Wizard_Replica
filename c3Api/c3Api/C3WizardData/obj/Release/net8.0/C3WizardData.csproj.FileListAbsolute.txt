@@ -1,0 +1,14 @@
+C:\Atul\c3Api\C3WizardData\bin\Release\net8.0\C3WizardData.deps.json
+C:\Atul\c3Api\C3WizardData\bin\Release\net8.0\C3WizardData.runtimeconfig.json
+C:\Atul\c3Api\C3WizardData\bin\Release\net8.0\C3WizardData.dll
+C:\Atul\c3Api\C3WizardData\bin\Release\net8.0\C3WizardData.pdb
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.csproj.AssemblyReference.cache
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.GeneratedMSBuildEditorConfig.editorconfig
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.AssemblyInfoInputs.cache
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.AssemblyInfo.cs
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.csproj.CoreCompileInputs.cache
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.dll
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\refint\C3WizardData.dll
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.pdb
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\C3WizardData.genruntimeconfig.cache
+C:\Atul\c3Api\C3WizardData\obj\Release\net8.0\ref\C3WizardData.dll

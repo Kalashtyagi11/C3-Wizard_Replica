@@ -1,0 +1,525 @@
+﻿using C3Wizard.COMMONPROP;
+using C3WizardData.Models;
+using C3WizardData.SelfEmpModel;
+using C3WizardHelper.ViewModels;
+using C3WizardLayer.BusinessObjects;
+using C3WizardLayer.DataObjects;
+using C3WizardRepository.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using static C3WizardRepository.Repository.RepoRegisterCompany;
+
+namespace C3WizardRepository.Repository
+{
+    public class RepoSelfEmployee
+    {
+        private readonly IConfiguration configuration;
+        public RepoSelfEmployee(IConfiguration _configuration)
+        {
+            configuration = _configuration;
+        }
+        public async Task<bool> Reg_save_at_saever(GetSelfEmployeeVM employeeVM)
+        {
+            try
+            {
+                if (ConnectionInfom.HasConnection() && ConnectionInfom.APIConnection(configuration))
+                {
+                    int? CompanyId = employeeVM.HelperCompanyId;
+                    string? LoginId = employeeVM.HelperLoginId.ToString();
+
+                    string User_Password = employeeVM.HelperUser_Password.ToString();
+                    if (employeeVM.EmployeeId > 0)
+                    {
+                        SqlConnection empstaticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection;
+                        DataSet empdataSet = new DataSet();
+                        SqlCommand empcmdEmployerList = new SqlCommand("SELECT * FROM SECUsers WHERE Isactive=1 and SelfEmpID='" + employeeVM.EmployeeId + "'", empstaticConnection);
+                        if (empstaticConnection.State == System.Data.ConnectionState.Closed) empstaticConnection.Open();
+                        SqlDataReader empdr = empcmdEmployerList.ExecuteReader();
+                        while (empdr.Read())
+                        {
+                            CompanyId = employeeVM.EmployeeId;
+                            LoginId = empdr["LoginId"].ToString();
+                            User_Password = empdr["Password"].ToString();
+                        }
+                        empstaticConnection.Close();
+                    }
+
+                    SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                    SqlCommand CurrentCompany = new SqlCommand("SELECT UserId ,CompanyId ,UserName,RegistrationNo,CompanyName,Question1,Question2,Answer1,Answer2  FROM SecurityQuestionAnswer where CompanyId =  " + CompanyId, staticConnection);
+                    if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                    //  string value = CurrentCompanyId.ExecuteScalar().ToString();
+                    SqlDataReader dr = CurrentCompany.ExecuteReader();
+                    string Question1 = "", Question2 = "", Answer1 = "", Answer2 = "";
+                    while (dr.Read())
+                    {
+                        Question1 = dr["Question1"].ToString();
+                        Question2 = dr["Question2"].ToString();
+                        Answer1 = dr["Answer1"].ToString();
+                        Answer2 = dr["Answer2"].ToString();
+                    }
+                    staticConnection.Close();
+
+                    SqlCommand SecuserCompany = new SqlCommand("SELECT * FROM SECUsers WHERE LoginId ='" + LoginId + "'  AND Password ='" + User_Password + "' and Isactive=1 and status=1", staticConnection);
+                    if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                    SqlDataReader Secuserdr = SecuserCompany.ExecuteReader();
+                    string Firstname = "", Surname = "";
+                    while (Secuserdr.Read())
+                    {
+                        Firstname = Secuserdr["FirstName"].ToString();
+                        Surname = Secuserdr["LastName"].ToString();
+                    }
+                    staticConnection.Close();
+                    List<BLSelfEmployed> blempList = new List<BLSelfEmployed>();
+                    var blempList_ALL = BLSelfEmployed.SelfEmployedCollection().ToList();
+                    blempList = blempList_ALL.Where(t => t.EmployeeID == employeeVM.EmployeeId).ToList();
+                    if (employeeVM != null)
+                    {
+                        if (employeeVM.mode == 2)
+                        {
+                            var reg = new SelfEmployedDeailsModule();
+                            reg.payerId = employeeVM.SocSecNum.Trim();
+                            reg.tin = null;//Txt_TIN.Text.Trim();
+                            reg.firstName = employeeVM.FirstName;
+                            reg.surName = employeeVM.LastName.Trim();
+
+                            try
+                            {
+                                reg.wageCategory = GetIncome_Wages_Catagory_Self_Employed(Convert.ToInt32(employeeVM.Category_Type));
+                                reg.dateOfBirth = employeeVM.BirthDate != null ? ((DateTime)employeeVM.BirthDate).ToString(Helper.MMDDyyyyDateFormat) : "";
+                            }
+                            catch (Exception ex)
+                            {
+                                string controller = "UnknownController";
+                                string action = "UnknownAction";
+                                var context = ExceptionMiddleware1.GetActionInfo();
+                                controller = context.Controller;
+                                action = context.Action;
+                                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                            }
+                            reg.tradeName = "";
+                            reg.employerType = "SE";
+                            reg.contactName = "";
+                            reg.mobile = employeeVM.Mobile.Trim();
+                            reg.Phone = employeeVM.Phone.Trim();
+                            reg.email = employeeVM.Email.Trim();
+                            reg.address1 = employeeVM.Address1.Trim();
+                            reg.address2 = employeeVM.Address2.Trim();
+                            reg.city = employeeVM.City.Trim();
+                            reg.firstName = Firstname;
+                            reg.surName = Surname;
+                            reg.userName = LoginId;
+                            reg.companyName = "";
+                            reg.question1 = Question1;
+                            reg.question2 = Question2;
+                            reg.answer1 = Answer1;
+                            reg.answer2 = Answer2;
+                            reg.deviceIp = Helper.MachineInfo;
+                            reg.macDeviceId = "";
+                            reg.deviceName = Helper.MachineInfo;
+                            reg.passwordHash = User_Password;
+                            reg.parentCompanyRegistration = "";
+                            reg.employerType = "SE";
+                            reg.userStatus = "A";
+                            reg.parentCompanyRegistration = "";
+
+                            //String Newsurl = ConfigurationManager.AppSettings["ServiceUriString"];
+                            string Newsurl = configuration["ServiceConfig:ServiceUriString"];
+
+                            string NewsURL = Newsurl + "/User/updateUser";
+                            var myContent = JsonConvert.SerializeObject(reg);
+                            var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+                            var byteContent = new ByteArrayContent(buffer);
+                            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+
+                            HttpMessageHandler handler = new HttpClientHandler()
+                            {
+                            };
+
+                            var httpClient = new HttpClient(handler)
+                            {
+                                BaseAddress = new Uri(NewsURL),
+                                Timeout = new TimeSpan(0, 2, 0)
+                            };
+                            httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                            //This is the key section you were missing    
+                            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(LoginId + ":" + User_Password);
+                            string val = System.Convert.ToBase64String(plainTextBytes);
+                            httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                            HttpResponseMessage response = httpClient.PostAsync(NewsURL, byteContent).Result;
+
+                            if (response.StatusCode == HttpStatusCode.OK)
+                            {
+
+                                var customerJsonString = await response.Content.ReadAsStringAsync();
+                                var Emp_model = JsonConvert.DeserializeObject<success>(customerJsonString);
+
+                                return true;
+                            }
+                            else
+                            {
+                                var customerJsonString = await response.Content.ReadAsStringAsync();
+                                var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                                return false;
+
+                            }
+                        }
+                    }
+                    return false;
+                }
+                else
+                {
+                    return false; ;
+                }
+            }
+            catch (Exception ex)
+            {
+                string controller = "UnknownController";
+                string action = "UnknownAction";
+                var context = ExceptionMiddleware1.GetActionInfo();
+                controller = context.Controller;
+                action = context.Action;
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                throw ex;
+            }
+        }
+
+        public string GetIncome_Wages_Catagory_Self_Employed(int index)
+        {
+            string income = "0.00";
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            SqlCommand cmd = new SqlCommand("Get_Wages_Catagory_List", staticConnection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            sqlAdapter.Fill(ds);
+            DataTable dtMRS = new DataTable();
+            dtMRS = ds.Tables[0];
+            if (dtMRS.Rows.Count > 0)
+            {
+                if (dtMRS.Rows.Count >= index)
+                {
+                    income = Convert.IsDBNull(dtMRS.Rows[index]["WeeklyIncome"]) ? "0.00" : decimal.Parse(String.Format("{0:0.00}", float.Parse(dtMRS.Rows[index]["WeeklyIncome"].ToString()))).ToString();
+                }
+            }
+            return income;
+        }
+
+
+
+        public bool validateC3settingExists(DateTime? newFrom_date, DateTime? newTo_date, ImportDefaultSelfSaveVm importDefaultSelf, int Wcid)
+        {
+            SqlCommand cmd = null;
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            if (importDefaultSelf.param > 0)
+            {
+                cmd = new SqlCommand("EditValidateSelfSettingExists", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@From_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(DateTime)newFrom_date ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@To_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)newTo_date ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@SESId", SqlDbType.Int, 12, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)Wcid ?? (object)DBNull.Value));
+            }
+            else
+            {
+                cmd = new SqlCommand("ValidateSelfSettingExists", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@From_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(DateTime)newFrom_date ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@To_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)newTo_date ?? (object)DBNull.Value));
+
+            }
+
+
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            sqlAdapter.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
+
+
+        public void General_Save_button_Click(int mrsid, DateTime? fromdate, DateTime? todate, ImportDefaultSelfSaveVm importDefaultSelf)
+        {
+            if (importDefaultSelf.param > 0 && mrsid > 0)
+            {
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                SqlCommand cmd = new SqlCommand("Self_Employed_Settings_Update_One", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@From_Date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)fromdate ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@To_Date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)todate ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@Name", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)"Test" ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@SESId", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)mrsid ?? (object)DBNull.Value));
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                sqlAdapter.Fill(dt);
+
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.A)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.AWC)), 2)), "A", 1);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.B)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.BWC)), 2)), "B", 2);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.C)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.CWC)), 2)), "C", 3);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.D)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.DWC)), 2)), "D", 4);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.E)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.EWC)), 2)), "E", 5);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.F)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.FWC)), 2)), "F", 6);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.G)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.GWC)), 2)), "G", 7);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.H)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.HWC)), 2)), "H", 8);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.I)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.IWC)), 2)), "I", 9);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.J)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.JWC)), 2)), "J", 10);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.K)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.KWC)), 2)), "K", 11);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.L)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.LWC)), 2)), "L", 12);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.M)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.MWC)), 2)), "M", 13);
+                saveSelfEmployedWages(mrsid, (Math.Round((decimal.Parse(importDefaultSelf.Special)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.SpecialWC)), 2)), "Special", 14);
+
+            }
+            else
+            {
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                SqlCommand cmd = new SqlCommand("Self_Employed_Settings_Insert_One", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@From_Date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)fromdate ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@To_Date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)todate ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@Name", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)"Test" ?? (object)DBNull.Value));
+
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                sqlAdapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    int SEid = (int)dt.Rows[0].ItemArray[0];
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.A)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.AWC)), 2)), "A", 1);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.B)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.BWC)), 2)), "B", 2);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.C)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.CWC)), 2)), "C", 3);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.D)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.DWC)), 2)), "D", 4);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.E)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.EWC)), 2)), "E", 5);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.F)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.FWC)), 2)), "F", 6);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.G)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.GWC)), 2)), "G", 7);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.H)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.HWC)), 2)), "H", 8);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.I)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.IWC)), 2)), "I", 9);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.J)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.JWC)), 2)), "J", 10);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.K)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.KWC)), 2)), "K", 11);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.L)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.LWC)), 2)), "L", 12);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.M)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.MWC)), 2)), "M", 13);
+                    saveSelfEmployedWages(SEid, (Math.Round((decimal.Parse(importDefaultSelf.Special)), 2)), (Math.Round((decimal.Parse(importDefaultSelf.SpecialWC)), 2)), "Special", 14);
+                }
+            }
+        }
+        public void saveSelfEmployedWages(int SEid, decimal wi, decimal wc, string cat, int CategoryID)
+        {
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            SqlCommand cmddates = new SqlCommand("Self_Employed_Settings_Wages_Insert", staticConnection);
+            cmddates.CommandType = CommandType.StoredProcedure;
+            cmddates.Parameters.Add(new SqlParameter("@SESId", SqlDbType.Int, 6, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)SEid ?? (object)DBNull.Value));
+            cmddates.Parameters.Add(new SqlParameter("@WeeklyIncome", SqlDbType.Decimal, 9, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(Math.Round((wi), 2)) ?? (object)DBNull.Value));
+            cmddates.Parameters.Add(new SqlParameter("@WeeklyContribution", SqlDbType.Decimal, 9, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(Math.Round((wc), 2)) ?? (object)DBNull.Value));
+            cmddates.Parameters.Add(new SqlParameter("@Category", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)cat ?? (object)DBNull.Value));
+            cmddates.Parameters.Add(new SqlParameter("@catId", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)CategoryID ?? (object)DBNull.Value));
+
+            SqlDataAdapter sqlAdapterDates = new SqlDataAdapter(cmddates);
+            DataTable dtdates = new DataTable();
+            sqlAdapterDates.Fill(dtdates);
+        }
+
+
+        public void SettodateC3setting(DateTime? newFrom_date, DateTime? newTo_date, ImportDefaultSelfSaveVm importDefaultSelf)
+        {
+            SqlCommand cmd = null;
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            if (importDefaultSelf.param == 0)
+            {
+                cmd = new SqlCommand("SetSelfSettingTodate", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@From_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(DateTime)newFrom_date ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@To_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)newTo_date ?? (object)DBNull.Value));
+            }
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            sqlAdapter.Fill(dt);
+        }
+
+        public bool isC3Finilize(DateTime? sdate, DateTime? edate)
+        {
+            string CreatedC3For = null;
+            bool ret_uren = true;
+            int Start_y, end_y, start_m, end_m;
+            //string DateFormat = "dd-MM-yyyy HH:mm:ss";
+            try
+            {
+                Start_y = DateTime.ParseExact(((DateTime)sdate).ToString(Helper.DisplayDateFormat), Helper.DisplayDateFormat, System.Globalization.CultureInfo.InvariantCulture).Year;
+                end_y = edate == null ? 0 : DateTime.ParseExact(((DateTime)edate).ToString(Helper.DisplayDateFormat), Helper.DisplayDateFormat, System.Globalization.CultureInfo.InvariantCulture).Year;
+                start_m = DateTime.ParseExact(((DateTime)sdate).ToString(Helper.DisplayDateFormat), Helper.DisplayDateFormat, System.Globalization.CultureInfo.InvariantCulture).Month;
+                end_m = edate == null ? 0 : DateTime.ParseExact(((DateTime)edate).ToString(Helper.DisplayDateFormat), Helper.DisplayDateFormat, System.Globalization.CultureInfo.InvariantCulture).Month;
+                //Start_y = DateTime.ParseExact(sdate, "dd-MM-yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).Year;
+                //Start_y = DateTime.ParseExact(edate, "dd-MM-yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).Year;
+                //start_m = DateTime.ParseExact(edate, Helper.SQLDateFormat, System.Globalization.CultureInfo.InvariantCulture).Month;
+                //end_m = DateTime.ParseExact(edate, Helper.SQLDateFormat, System.Globalization.CultureInfo.InvariantCulture).Month;
+
+                // end_m = string.IsNullOrEmpty(edate) ? 0 : DateTime.ParseExact(edate, dateFormat, System.Globalization.CultureInfo.InvariantCulture).Month;
+
+                List<C3Header> listDVOC3Header = new List<C3Header>();
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                SqlCommand cmd = new SqlCommand("get_SelfGenrated_dataSettings", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                sqlAdapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        C3Header Obj = new C3Header();
+                        Obj.HeaderID = Convert.IsDBNull(row["SEC3ID"]) ? 0 : int.Parse(row["SEC3ID"].ToString());
+                        Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString()) + 1;
+                        Obj.P_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                        Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                        listDVOC3Header.Add(Obj);
+                    }
+                    bool exists = listDVOC3Header.Any(x => x.P_year >= Start_y && x.p_Month >= start_m);
+                    if (exists)
+                    {
+                        ret_uren = false;
+                        //C3WizardMessageBox.Show("C3 Wizard", "Self Employed Settings already used \n You can not delete this self employed settings");  DOUBT SECTION THIS LINES
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string controller = "UnknownController";
+                string action = "UnknownAction";
+                var context = ExceptionMiddleware1.GetActionInfo();
+                controller = context.Controller;
+                action = context.Action;
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                throw ex;
+
+            }
+            return ret_uren;
+        }
+
+        public string MonthName(string m_no)
+        {
+            string Month = "";
+            switch (m_no)
+            {
+                //case "1" or "0":
+                //    Month = "January";
+                //    break;
+                case "1":
+                    Month = "January";
+                    break;
+                case "2":
+                    Month = "February";
+                    break;
+                case "3":
+                    Month = "March";
+                    break;
+                case "4":
+                    Month = "April";
+                    break;
+                case "5":
+                    Month = "May";
+                    break;
+                case "6":
+                    Month = "June";
+                    break;
+                case "7":
+                    Month = "July";
+                    break;
+                case "8":
+                    Month = "August";
+                    break;
+                case "9":
+                    Month = "September";
+                    break;
+                case "10":
+                    Month = "October";
+                    break;
+                case "11":
+                    Month = "November";
+                    break;
+                case "12":
+                    Month = "December";
+                    break;
+                default:
+                    Month = string.Empty;
+                    break;
+            }
+
+
+            return Month;
+        }
+
+        //public string MonthName(string m_no)
+        //{
+        //    string Month = "";
+        //    switch (m_no)
+        //    {
+        //        case "0":
+        //            Month = "January";
+        //            break;
+        //        case "1":
+        //            Month = "February";
+        //            break;
+        //        case "2":
+        //            Month = "March";
+        //            break;
+        //        case "3":
+        //            Month = "April";
+        //            break;
+        //        case "4":
+        //            Month = "May";
+        //            break;
+        //        case "5":
+        //            Month = "June";
+        //            break;
+        //        case "6":
+        //            Month = "July";
+        //            break;
+        //        case "7":
+        //            Month = "August";
+        //            break;
+        //        case "8":
+        //            Month = "September";
+        //            break;
+        //        case "9":
+        //            Month = "October";
+        //            break;
+        //        case "10":
+        //            Month = "November";
+        //            break;
+        //        case "11":
+        //            Month = "December";
+        //            break;
+        //        default:
+        //            Month = string.Empty;
+        //            break;
+        //    }
+        //    return Month;
+        //}
+
+
+
+
+
+    }
+
+
+}

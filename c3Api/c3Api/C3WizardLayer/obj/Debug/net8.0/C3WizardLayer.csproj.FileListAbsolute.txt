@@ -1,0 +1,14 @@
+C:\Atul\c3Api\C3WizardLayer\bin\Debug\net8.0\C3WizardLayer.deps.json
+C:\Atul\c3Api\C3WizardLayer\bin\Debug\net8.0\C3WizardLayer.runtimeconfig.json
+C:\Atul\c3Api\C3WizardLayer\bin\Debug\net8.0\C3WizardLayer.dll
+C:\Atul\c3Api\C3WizardLayer\bin\Debug\net8.0\C3WizardLayer.pdb
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.csproj.AssemblyReference.cache
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.AssemblyInfoInputs.cache
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.AssemblyInfo.cs
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.csproj.CoreCompileInputs.cache
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.dll
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\refint\C3WizardLayer.dll
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.pdb
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\C3WizardLayer.genruntimeconfig.cache
+C:\Atul\c3Api\C3WizardLayer\obj\Debug\net8.0\ref\C3WizardLayer.dll

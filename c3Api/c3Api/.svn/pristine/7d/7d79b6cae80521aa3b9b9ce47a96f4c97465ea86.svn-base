@@ -1,0 +1,3297 @@
+﻿using C3WizardData.Models;
+using C3WizardHelper.ViewModels;
+using C3WizardLayer.BusinessObjects;
+using C3WizardLayer.DataObjects;
+using C3WizardRepository.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using System.Data;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Net;
+using System.Text.RegularExpressions;
+using static C3WIZARDWebApi.Controllers.C3Controller;
+using static C3WizardRepository.Repository.RepoRegisterCompany;
+using System.Net.Http.Headers;
+using System.Text;
+using C3Wizard.COMMONPROP;
+using static System.Net.Mime.MediaTypeNames;
+using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Globalization;
+using System.Configuration;
+using C3WizardRepository.Repository;
+using System.Text.Json;
+using System.ComponentModel.Design;
+using Microsoft.SqlServer.Server;
+using Azure.Messaging;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Azure;
+using System;
+using Microsoft.AspNetCore.Authorization;
+using RazorLight;
+using CrystalDecisions.ReportAppServer.DataDefModel;
+using Com.CloudRail.SI.Types;
+using iText.Commons.Utils;
+using Microsoft.IdentityModel.Logging;
+using C3WizardRepository.Interface;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Linq;
+
+namespace C3WIZARDWebApi.Controllers
+{
+  [Route("api/[controller]")]
+  [ApiController]
+  //[Authorize]
+  public class AdministrationController : ControllerBase
+  {
+    private readonly IConfiguration _configuration;
+    private readonly C3wizardContext _context;
+    private readonly RepoC3 _c3;
+    private Microsoft.AspNetCore.Hosting.IHostingEnvironment _environment;
+    PasswordAlgorithns EncryptDecryptPassword = new PasswordAlgorithns();
+    EncryptDecryptPasswordReset encryptDecrypt = new EncryptDecryptPasswordReset();
+    public AdministrationController(IConfiguration configuration, C3wizardContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment Environment, RepoC3 c3)
+    {
+      _configuration = configuration;
+      _context = context;
+      _environment = Environment;
+      _c3 = c3;
+    }
+    [HttpGet]
+    [Route("LoadUsers")]
+    public async Task<IActionResult> LoadUsers(int CompanyId, int RoleId)
+    {
+      try
+      {
+        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+        List<BLSECUsers> userlist = new List<BLSECUsers>();
+        BLMasterEmployee blemp = new BLMasterEmployee();
+        var roleIds = new[] { 1, 2, 6, 7, 8, 9 };
+
+        userlist = BLSECUsers.SECUsersCollection_grid(CompanyId).ToList();
+
+        var data = userlist.Where(e => e.RoleId == 1 && e.RoleId == RoleId).ToList();
+        var data1 = userlist.Where(e => e.RoleId.HasValue && roleIds.Contains(e.RoleId.Value)).ToList();
+        if (data.Count != 0)
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data Get successfully.",
+            Data = data,
+            Statuscode = 200
+          });
+        }
+        else if (data1.Count != 0)
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data Get successfully.",
+            Data = data1,
+            Statuscode = 200
+          });
+        }
+        else
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data Get successfully.",
+            Data = userlist,
+            Statuscode = 200
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+    //private static String GetDestinationPath(string filename, string foldername)
+    //{
+    //    String appStartPath = System.IO.Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+
+    //    appStartPath = String.Format(appStartPath + "\\" + foldername + "\\" + filename);
+    //    return appStartPath;
+    //}
+    [HttpPost]
+    [Route("SaveUser/UpdateUser")]
+    public async Task<IActionResult> SaveUserandUpdateUser([FromForm] UserViewModel userViewModel)
+    {
+      HashPassword HashPassword = new HashPassword();
+
+      if (userViewModel == null)
+      {
+        return BadRequest(new ResponseModel
+        {
+          Status = false,
+          Message = "Invalid input.",
+          Data = null,
+          Statuscode = 400
+        });
+      }
+      if (_environment == null)
+      {
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = "Server environment not initialized.",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+      string password = "Admin@123";
+      string Imagename = null;
+
+
+      var secuser = new BLSECUsers
+      {
+        FirstName = userViewModel.FirstName,
+        MiddleName = userViewModel.MiddleName,
+        LastName = userViewModel.LastName,
+        LoginId = userViewModel.LoginId,
+        //Password = EncryptDecryptPassword.PasswordAlgorithns.Encrypt(userViewModel.Password.Trim()),
+        Password = string.IsNullOrWhiteSpace(userViewModel.Password) ? EncryptDecryptPassword.Encrypt(password) : EncryptDecryptPassword.Encrypt(userViewModel.Password.Trim()),
+        //Password = HashPassword.EncodePasswordToBase64(password.Trim()),
+        EmailId = userViewModel.EmailId,
+        EmpId = userViewModel.CompanyId.ToString(),
+        RoleId = userViewModel.UserRole,
+        Status = true,
+        IsLoggedIn = false,
+        IsPPOC = false
+      };
+
+      try
+      {
+        //if (userViewModel.ProfileImage != null && userViewModel.ProfileImage.Length > 0)
+        //{
+        //    string applicationPath = AppContext.BaseDirectory;  // Safer way to get the application's base path
+        //    string userImageFolder = Path.Combine(applicationPath, "UserImage");
+
+        //    if (!Directory.Exists(userImageFolder))
+        //    {
+        //        Directory.CreateDirectory(userImageFolder);
+        //    }
+
+        //    string fileName = Path.GetFileName(userViewModel.ProfileImage.FileName);
+        //    string destinationPath = Path.Combine(userImageFolder, fileName);
+
+        //    using (var fileStream = new FileStream(destinationPath, FileMode.Create))
+        //    {
+        //        await userViewModel.ProfileImage.CopyToAsync(fileStream);
+        //    }
+
+        //    secuser.ProfileImage = fileName;
+        //}
+
+        if (userViewModel.UserImage != null && userViewModel.UserImage.Length > 0)
+        {
+          string uploadsFolder = Path.Combine(_environment.WebRootPath, "UserImage");
+          Directory.CreateDirectory(uploadsFolder);
+          Imagename = Guid.NewGuid().ToString() + Path.GetExtension(userViewModel.UserImage.FileName);
+          string filePath = Path.Combine(uploadsFolder, Imagename);
+          using (var fileStream = new FileStream(filePath, FileMode.Create))
+          {
+            userViewModel.UserImage.CopyTo(fileStream);
+          }
+          secuser.ProfileImage = Imagename;
+        }
+
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Error processing the profile image: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+
+      try
+      {
+        if (userViewModel.mode == 1)
+        {
+          var res = _context.Secusers.Where(x => x.LoginId == userViewModel.LoginId).FirstOrDefault();
+          if (res == null)
+          {
+            var emaildata = _context.Secusers.Where(x => x.EmailId == userViewModel.EmailId).FirstOrDefault();
+            if (emaildata == null)
+            {
+              secuser.IsSelfEmployee = false;
+              secuser.InsertedBy = userViewModel.CompanyId;
+              secuser.InsertedOn = DateTime.UtcNow;
+              secuser.InsertedMachineInfo = userViewModel.MachineInfo;
+              secuser.IsActive = true;
+              secuser.parentuserid = userViewModel.ParentUserId;
+              secuser.IsPPOC = false;
+              secuser.SaveNew();
+              return Ok(new ResponseModel
+              {
+                Status = true,
+                Message = "User saved successfully.",
+                Data = secuser,
+                Statuscode = 200
+              });
+            }
+            else
+            {
+              return Conflict(new
+              {
+                message = "User email already exists"
+              });
+            }
+          }
+          {
+            return Conflict(new
+            {
+              message = "User name already exists"
+            });
+          }
+        }
+        else if (userViewModel.mode == 2)
+        {
+          bool isUserExist = _context.Secusers.Any(x => x.LoginId == userViewModel.LoginId);
+
+          if (isUserExist)
+          {
+            return Conflict(new
+            {
+              message = "User Name already exists"
+            });
+          }
+
+          var res = _context.Secusers.Where(x => x.LoginId == userViewModel.LoginId && x.UserId == userViewModel.UserId).FirstOrDefault();
+          if (res != null)
+          {
+            if (res.EmailId != userViewModel.EmailId)
+            {
+              var emaildata = _context.Secusers.Where(x => x.EmailId == userViewModel.EmailId).FirstOrDefault();
+              if (emaildata != null)
+              {
+                return Conflict(new
+                {
+                  message = "User email already exists"
+                });
+
+              }
+
+              secuser.UserId = userViewModel.UserId;
+              secuser.parentuserid = userViewModel.ParentUserId;
+              secuser.IsPPOC = false;
+              secuser.IsActive = true;
+              secuser.LoginId = res.LoginId;
+              secuser.UpdatedBy = userViewModel.CompanyId;
+              secuser.UpdatedOn = DateTime.UtcNow;
+              secuser.UpdatedMachineInfo = userViewModel.MachineInfo;
+              secuser.Update();
+
+              //Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+              Userimage = secuser.ProfileImage;
+              string imageUrl1 = $"{Request.Scheme}://{Request.Host}/UserImage/{Userimage}";
+
+              secuser.ProfileImage = imageUrl1;
+              return Ok(new ResponseModel
+              {
+                Status = true,
+                Message = "User update successfully.",
+                Data = secuser,
+                Statuscode = 200
+              });
+            }
+            secuser.UserId = userViewModel.UserId;
+            secuser.parentuserid = userViewModel.ParentUserId;
+            secuser.IsPPOC = false;
+            secuser.IsActive = true;
+            secuser.LoginId = res.LoginId;
+            secuser.UpdatedBy = userViewModel.CompanyId;
+            secuser.UpdatedOn = DateTime.UtcNow;
+            secuser.UpdatedMachineInfo = userViewModel.MachineInfo;
+            secuser.Update();
+
+            //Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+            Userimage = secuser.ProfileImage;
+            string imageUrl = $"{Request.Scheme}://{Request.Host}/UserImage/{Userimage}";
+
+            secuser.ProfileImage = imageUrl;
+            return Ok(new ResponseModel
+            {
+              Status = true,
+              Message = "User update successfully.",
+              Data = secuser,
+              Statuscode = 200
+            });
+
+          }
+          {
+            return Conflict(new
+            {
+              message = "User data not exists"
+            });
+          }
+        }
+        else
+        {
+          return BadRequest(new ResponseModel
+          {
+            Status = false,
+            Message = "Invalid mode.",
+            Data = null,
+            Statuscode = 400
+          });
+        }
+
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Error saving user: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+    [HttpGet]
+    [Route("GetEditUserManagement")]
+    public async Task<IActionResult> GetEditUserManagement(int Userid)
+    {
+      try
+      {
+        //ObjDashboardWindow = Application.Current.Windows.OfType<C3Wizard.Dashboard>().First();
+        // Application.Current.Properties["Currentform"] = "Edit User Management";
+        // Application.Current.Properties["TextChanged"] = 0;
+        // ObjDashboardWindow.cmbEmployer.IsEnabled = false;
+      }
+      catch (Exception ex)
+      {
+        //Login login = new Login();
+        //login.Error_Log(ex.Message);
+      }
+
+      //InitializeComponent();
+      // LoadUserRole();
+      List<BLSECUsers> blList = new List<BLSECUsers>();
+      //List<BLEmployeeProfessional> blempListpro = new List<BLEmployeeProfessional>();
+      // blemp.UserId = param;
+      blList_ALL = BLSECUsers.SECUsersCollection().ToList();
+      blList = blList_ALL.Where(t => t.UserId == Userid).ToList();
+      //    if (blList.Count == 1)
+      //    {
+      //        userRole.IsEnabled = Helper.UserID != param ? true : false;
+      //        Txt_FirstName.Text = string.IsNullOrEmpty(blList.ElementAt(0).FirstName) ? "" : blList.ElementAt(0).FirstName.ToString();
+      //        Txt_MiddleName.Text = string.IsNullOrEmpty(blList.ElementAt(0).MiddleName) ? "" : blList.ElementAt(0).MiddleName.ToString();
+      //        Txt_LastName.Text = string.IsNullOrEmpty(blList.ElementAt(0).LastName) ? "" : blList.ElementAt(0).LastName.ToString();
+      //        Txt_UserName.Text = string.IsNullOrEmpty(blList.ElementAt(0).LoginId) ? "" : blList.ElementAt(0).LoginId.ToString();
+      //        Txt_UserName.IsEnabled = false;
+      //        Txt_Email.Text = string.IsNullOrEmpty(blList.ElementAt(0).EmailId) ? "" : blList.ElementAt(0).EmailId.ToString();
+      //        activestatus.IsChecked = blList.ElementAt(0).Status;
+      //        activestatus.Visibility = Helper.RoleId != 1 ? Visibility.Visible : Visibility.Hidden;
+      //        Status.Visibility = Helper.RoleId != 1 ? Visibility.Visible : Visibility.Hidden;
+      //        userRole.SelectedValue = string.IsNullOrEmpty(blList.ElementAt(0).RoleId.ToString()) ? 0 : blList.ElementAt(0).RoleId;
+      //        parentuserid = blList.ElementAt(0).parentuserid == null ? 0 : (int)blList.ElementAt(0).parentuserid;
+      //        isPPOC = blList.ElementAt(0).IsPPOC == null ? true : (bool)blList.ElementAt(0).IsPPOC;
+      //        if (Helper.RoleId == 2)
+      //        {
+      //            Txt_FirstName.IsEnabled = false;
+      //            Txt_MiddleName.IsEnabled = false;
+      //            Txt_LastName.IsEnabled = false;
+      //            Txt_UserName.IsEnabled = false;
+      //            imagegrid.IsEnabled = false;
+      //            Txt_Email.IsEnabled = false;
+      //            activestatus.IsEnabled = false;
+      //            Save_button.IsEnabled = false;
+      //        }
+      //        try
+      //        {
+      //            Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+      //            if (Userimage != null && Userimage != "")
+      //            {
+      //                var applicationPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+      //                var uri = new Uri(applicationPath + "/UserImage/" + Userimage);
+      //                var bitmap = new BitmapImage(uri);
+      //                imgProfilePic.Source = bitmap;
+      //            }
+      //            else
+      //            {
+      //                var uri = new Uri("pack://application:,,,/Images/user.jpg");
+      //                var bitmap = new BitmapImage(uri);
+      //                imgProfilePic.Source = bitmap;
+      //            }
+      //        }
+      //        catch (Exception ex)
+      //        {
+      //            Login login = new Login();
+      //            login.Error_Log(ex.Message);
+
+      //        }
+
+      //        UserId = param;
+
+      //        Application.Current.Properties["TextChanged"] = 0;
+      //    }
+      //    Application.Current.Properties["TextChanged"] = 0;
+      //}
+      if (blList.Count == 1)
+      {
+        var data = new BLSECUsers();
+        data.UserId = blList.ElementAt(0).UserId ?? 0;
+        data.FirstName = string.IsNullOrEmpty(blList.ElementAt(0).FirstName) ? "" : blList.ElementAt(0).FirstName.ToString();
+        data.MiddleName = string.IsNullOrEmpty(blList.ElementAt(0).MiddleName) ? "" : blList.ElementAt(0).MiddleName.ToString();
+        data.LastName = string.IsNullOrEmpty(blList.ElementAt(0).LastName) ? "" : blList.ElementAt(0).LastName.ToString();
+        data.LoginId = string.IsNullOrEmpty(blList.ElementAt(0).LoginId) ? "" : blList.ElementAt(0).LoginId.ToString();
+        //Txt_UserName = false;
+        data.EmailId = string.IsNullOrEmpty(blList.ElementAt(0).EmailId) ? "" : blList.ElementAt(0).EmailId.ToString();
+        data.RoleId = blList.ElementAt(0).RoleId ?? 0;
+        data.EmpId = string.IsNullOrEmpty(blList.ElementAt(0).EmpId) ? "" : blList.ElementAt(0).EmpId.ToString();
+        //userRole.IsEnabled = false;
+        data.Status = string.IsNullOrEmpty(blList.ElementAt(0).Status.ToString()) ? false : (bool)blList.ElementAt(0).Status;
+        //activestatus.Visibility = Helper.RoleId != 1 ? Visibility.Visible : Visibility.Hidden;
+        //Status.Visibility = Helper.RoleId != 1 ? Visibility.Visible : Visibility.Hidden;
+        data.parentuserid = blList.ElementAt(0).parentuserid == null ? 0 : (int)blList.ElementAt(0).parentuserid;
+        data.IsPPOC = blList.ElementAt(0).IsPPOC == null ? true : (bool)blList.ElementAt(0).IsPPOC;
+        if (data.RoleId == 2)
+        {
+          return Ok(data);
+
+        }
+        try
+        {
+          Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+          string imageUrl = $"{Request.Scheme}://{Request.Host}/UserImage/{Userimage}";
+
+          data.ProfileImage = imageUrl;
+
+
+          return Ok(new { Message = "Data get successfully", Data = data });
+
+          //Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+          //if (Userimage != null && Userimage != "")
+          //{
+          //    var applicationPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+          //    var uri = new Uri(applicationPath + "/UserImage/" + Userimage);
+          //    //var bitmap = new BitmapImage(uri);
+          //    //imgProfilePic.Source = bitmap;
+          //}
+          //else
+          //{
+          //    var uri = new Uri("pack://application:,,,/Images/user.jpg");
+          //    //var bitmap = new BitmapImage(uri);
+          //    //imgProfilePic.Source = bitmap;
+          //}
+        }
+        catch (Exception ex)
+        {
+          var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+          LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+          //Login login = new Login();
+          // login.Error_Log(ex.Message);
+
+        }
+        //UserId = param;
+
+      }
+      return Ok(Userid);
+    }
+    //private bool ValidateLoginDetails(string NewPassword,string ConfirmPassword)
+    //{
+    //    string errormessage = "";
+    //    //if (string.IsNullOrEmpty(Txt_YourPassword.Password.Trim()))
+    //    //{ errormessage = errormessage + "Your Password" + "\n"; }
+    //    //else
+    //    //{
+    //    //    if(EncryptDecryptPassword.PasswordAlgorithns.Encrypt(Txt_YourPassword.Password.Trim())!=Helper.User_Password)
+    //    //    {
+    //    //        errormessage = errormessage + "Your Password Is Not Correct" + "\n";
+    //    //    }
+    //    //}
+    //    if (string.IsNullOrEmpty(NewPassword.Trim()))
+    //    { errormessage = errormessage + "New Password" + "\n"; }
+    //    else if (!Regex.IsMatch(NewPassword.Trim(), @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,40}$"))
+    //    {
+    //        errormessage = errormessage + "New Password  must be between 8 and 40 characters long, must contain at least one number,at least one uppercase letter & at least one special character" + "\n";
+
+    //    }
+    //    if (string.IsNullOrEmpty(ConfirmPassword.Trim()))
+    //    { errormessage = errormessage + "Confirm Password" + "\n"; }
+    //    else if (!Regex.IsMatch(ConfirmPassword.Trim(), @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,40}$"))
+    //    {
+    //        errormessage = errormessage + "Confirm Password  must be between 8 and 40 characters long, must contain at least one number,at least one uppercase letter & at least one special character" + "\n";
+
+    //    }
+    //    if (errormessage != "")
+    //    {
+    //        //C3WizardMessageBox.Show("C3 Wizard", "Please enter required field value." + "\n" + "\n" + errormessage);
+    //        return false;
+    //    }
+    //    if (ConfirmPassword != NewPassword)
+    //    {
+    //       // C3WizardMessageBox.Show("C3 Wizard", "Confirm password must be same as new password." + "\n" + errormessage);
+    //        return false;
+    //    }
+    //    return true;
+    //}
+    private string ValidateLoginDetails(string NewPassword, string ConfirmPassword)
+    {
+      StringBuilder errorMessage = new StringBuilder();
+
+      if (string.IsNullOrEmpty(NewPassword?.Trim()))
+      {
+        errorMessage.AppendLine("New Password is required.");
+      }
+      else if (!Regex.IsMatch(NewPassword.Trim(), @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,40}$"))
+      {
+        //errorMessage.AppendLine("New Password must be between 8 and 40 characters long, contain at least one number, one uppercase letter, and one special character.");
+        errorMessage.AppendLine("New Password must be 8-40 characters, with at least one uppercase letter, number, and special character.");
+      }
+      if (string.IsNullOrEmpty(ConfirmPassword?.Trim()))
+      {
+        errorMessage.AppendLine("Confirm Password is required.");
+      }
+      //else if (!Regex.IsMatch(ConfirmPassword.Trim(), @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,40}$"))
+      //{
+      //    errorMessage.AppendLine("Confirm Password must be between 8 and 40 characters long, contain at least one number, one uppercase letter, and one special character.");
+      //}
+      if (NewPassword != ConfirmPassword)
+      {
+        errorMessage.AppendLine("Confirm Password must be the same as New Password.");
+      }
+      return errorMessage.ToString().Trim();
+    }
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("ResetSendMail")]
+    public async Task<IActionResult> ResetSendMail(int UserId)
+    {
+      ResponseModel response = new ResponseModel();
+      var data = _context.Secusers.FirstOrDefault(e => e.UserId == UserId);
+
+      try
+      {
+        if (data != null)
+        {
+          var data1 = _context.MasterCompanies.Where(e => e.CompanyId == Convert.ToInt32(data.EmpId)).FirstOrDefault();
+
+          var data2 = _context.SelfEmployees.Where(e => e.EmployeeId == Convert.ToInt32(data.SelfEmpId)).FirstOrDefault();
+
+
+
+          var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+          {
+            Port = int.Parse(_configuration["EmailSettings:Port"]),
+            Credentials = new NetworkCredential(
+                                                  _configuration["EmailSettings:SenderEmail"],
+                                                  _configuration["EmailSettings:SenderPassword"]
+                                                   ),
+            EnableSsl = true
+          };
+          var engine = new RazorLightEngineBuilder()
+            .UseFileSystemProject(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Email"))
+            .UseMemoryCachingProvider()
+            .Build();
+          engine.Options.EnableDebugMode = true;
+          //string ResetPasswordUrl = $"{Request.Scheme}://{Request.Host}/ResetPassword";
+          string ResetPasswordUrl = _configuration["weburl"];
+          string encryptedUserId = encryptDecrypt.Encrypt(data.UserId.ToString());
+          //Registred  User  Send Email
+          string subject = "Welcome To C3 Wizard Reset Your Password!";
+          var model = new
+          {
+            Name = data.FirstName + " " + data.LastName,
+            EmailId = data.EmailId,
+            Id = data.UserId,
+            Country = !string.IsNullOrEmpty(data1?.Country) ? data1.Country : data2?.Country,
+            ResetPasswordUrl = $"{ResetPasswordUrl}?id={encryptedUserId}"
+          };
+          string htmlContentCustomer = await engine.CompileRenderAsync("WelcomeCustomerResetMail.cshtml", model);
+          var mail = new MailMessage
+          {
+            From = new MailAddress(_configuration["EmailSettings:SenderEmail"]),
+            Subject = subject,
+            Body = htmlContentCustomer,
+            IsBodyHtml = true
+          };
+          mail.To.Add(data.EmailId);
+          await smtpClient.SendMailAsync(mail);
+          response.Status = true;
+          response.Message = "Password reset email sent to registered email address";
+          response.Statuscode = 200;
+          response.Data = data.UserId;
+          return Ok(response);
+        }
+        else
+        {
+          response.Status = false;
+          response.Message = "Data not Found";
+          response.Statuscode = 404;
+          return BadRequest(response);
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(405, ex.Message);
+      }
+      return Ok(response);
+    }
+    [AllowAnonymous]
+    [HttpPost]
+    [Route("ResetPassword")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPasswordViewModel)
+    {
+      ResponseModel responsed = new ResponseModel();
+      HashPassword HashPassword = new HashPassword();
+      string validationMessage = ValidateLoginDetails(resetPasswordViewModel.NewPassword, resetPasswordViewModel.ConfirmPassword);
+
+      if (string.IsNullOrEmpty(validationMessage))
+      {
+        resetPasswordViewModel.UserId = resetPasswordViewModel.UserId == 0 ? Convert.ToInt32(encryptDecrypt.Decrypt(resetPasswordViewModel.EnUserId)) : resetPasswordViewModel.UserId;
+
+        var res = _context.Secusers.Where(e => e.UserId == resetPasswordViewModel.UserId && e.Password == EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword)).FirstOrDefault();
+
+        if (res == null)
+        {
+          //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+          SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+          //Check the user for which password need to reset
+          SqlCommand CurrentCompany = new SqlCommand("SELECT Password,RoleId FROM SecUsers WHERE UserId =" + resetPasswordViewModel.UserId, staticConnection);
+          if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+
+          SqlDataReader dr = CurrentCompany.ExecuteReader();
+          string targetUserPassword = "";
+          string targetUserRoleId = "";
+          while (dr.Read())
+          {
+            targetUserPassword = dr["Password"].ToString();
+            targetUserRoleId = dr["RoleId"].ToString();
+          }
+          staticConnection.Close();
+
+          //Check the loggedin user
+          SqlCommand LoggedInUserDetails = new SqlCommand("SELECT Password,RoleId FROM SecUsers WHERE UserId =" + resetPasswordViewModel.Id, staticConnection);
+          if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+
+          SqlDataReader drLoggedInUser = LoggedInUserDetails.ExecuteReader();
+          string LoggedInUserPassword = "";
+          string LoggedInUserRole = "";
+          while (drLoggedInUser.Read())
+          {
+            LoggedInUserPassword = drLoggedInUser["Password"].ToString();
+            LoggedInUserRole = drLoggedInUser["RoleId"].ToString();
+          }
+          staticConnection.Close();
+
+          try
+          {
+            //BLSECUsers blemp = new BLSECUsers();
+            //List<BLSECUsers> bluserList_ALL = new List<BLSECUsers>();
+            //BLSECUsers bluser = new BLSECUsers();
+
+            //bluserList_ALL = BLSECUsers.SECUsersCollection().ToList();
+            //bluser = bluserList_ALL.Any(t => t.UserId == resetPasswordViewModel.UserId) ? bluserList_ALL.FirstOrDefault(t => t.UserId == resetPasswordViewModel.UserId) : null;
+            //List<BLMasterCompany> mclist = new List<BLMasterCompany>();
+            //mclist = BLMasterCompany.MasterCompanyCollection().ToList();
+            //BLMasterCompany mc = new BLMasterCompany();
+            //int? empid = (int?)int.Parse(bluser.EmpId);
+            //mc = mclist.FirstOrDefault(x => x.CompanyId == empid);
+            //ResetPasswordModel FPM = new ResetPasswordModel();
+            //FPM.regNo = mc.RegNumber;
+            //FPM.userName = bluser.LoginId;
+            //FPM.userOldPass = bluser.Password;
+            //FPM.userNewPass = EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword.Trim());
+
+          }
+          catch (Exception ex)
+          {
+            var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+            LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+            // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            // C3WizardMessageBox.Show("C3 Wizard", "" + ex);
+          }
+
+          //Employer - 3 
+          if (ConnectionInfom.HasConnection() && (targetUserRoleId == "3"))
+          {
+            try
+            {
+              BLSECUsers blemp = new BLSECUsers();
+              List<BLSECUsers> bluserList_ALL = new List<BLSECUsers>();
+              BLSECUsers bluser = new BLSECUsers();
+
+              bluserList_ALL = BLSECUsers.SECUsersCollection().ToList();
+              bluser = bluserList_ALL.Any(t => t.UserId == resetPasswordViewModel.UserId) ? bluserList_ALL.FirstOrDefault(t => t.UserId == resetPasswordViewModel.UserId) : null;
+              List<BLMasterCompany> mclist = new List<BLMasterCompany>();
+              mclist = BLMasterCompany.MasterCompanyCollection().ToList();
+              BLMasterCompany mc = new BLMasterCompany();
+              int? empid = (int?)int.Parse(bluser.EmpId);
+              mc = mclist.FirstOrDefault(x => x.CompanyId == empid);
+              ResetPasswordModel FPM = new ResetPasswordModel();
+              FPM.regNo = mc.RegNumber;
+              FPM.userName = bluser.LoginId;
+              FPM.userOldPass = bluser.Password;
+              FPM.userNewPass = EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword.Trim());
+              string surl = _configuration["ServiceConfig:ServiceUriString"];
+              string sURL = surl + "/User/resetPassword/";
+
+              var myContent = JsonConvert.SerializeObject(FPM);
+              var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+              var byteContent = new ByteArrayContent(buffer);
+              byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+
+              HttpMessageHandler handler = new HttpClientHandler()
+              {
+              };
+
+              var httpClient = new HttpClient(handler)
+              {
+                BaseAddress = new Uri(sURL),
+                Timeout = new TimeSpan(0, 2, 0)
+              };
+              httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+              //This is the key section you were missing    
+              var userpass = _context.Secusers.FirstOrDefault(e => e.UserId == resetPasswordViewModel.UserId);
+              var plainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(userpass.LoginId + ":" + userpass.Password);
+              //var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(resetPasswordViewModel.NewPassword);
+              string val = System.Convert.ToBase64String(plainTextBytes);
+              httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+              HttpResponseMessage response = httpClient.PostAsync(sURL, byteContent).Result;
+
+              if (response.StatusCode == HttpStatusCode.OK)
+              {
+                SqlCommand CurrentCompanyId = new SqlCommand("UPDATE SECUsers SET Password='" + EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword) + "' WHERE UserId =" + resetPasswordViewModel.UserId, staticConnection);
+                if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                CurrentCompanyId.ExecuteNonQuery();
+                staticConnection.Close();
+                var customerJsonString = await response.Content.ReadAsStringAsync();
+                //var Emp_mod = JsonConvert.DeserializeObject<successpwd>(customerJsonString);
+                //return Ok(Emp_mod.Message);
+                customerJsonString = @"Code       : EUC1092
+                                    Message    : Password has been successfully reset
+                                    Resolution : Please contact Social Security experience in difficulty in login into C3Wizard";
+                var lines = customerJsonString.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                var result = new successpwd();
+                foreach (var line in lines)
+                {
+                  var parts = line.Split(new[] { ':' }, 2);
+                  if (parts.Length == 2)
+                  {
+                    var key = parts[0].Trim();
+                    var value = parts[1].Trim();
+
+                    switch (key)
+                    {
+                      case "Code":
+                        result.Code = value;
+                        break;
+                      case "Message":
+                        result.Message = value;
+                        break;
+                      case "Resolution":
+                        result.Resolution = value;
+                        break;
+                    }
+                  }
+                }
+                responsed.Status = true;
+                responsed.Message = result.Message;
+                responsed.Statuscode = 200;
+                return Ok(responsed);
+                //return Ok(new { message = result.Message });
+                // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                // var Emp_mod = JsonConvert.DeserializeObject<success>(customerJsonString);
+                //  C3WizardMessageBox.Show("C3 Wizard", customerJsonString);
+              }
+              else
+              {
+                var customerJsonString = await response.Content.ReadAsStringAsync();
+                var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                responsed.Status = false;
+                responsed.Message = Emp_model.message;
+                responsed.Statuscode = 400;
+                return NotFound(responsed);
+                //return NotFound(Emp_model.message);
+
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                //C3WizardMessageBox.Show("C3 Wizard", "" + Emp_model.message);
+                // return;
+
+              }
+            }
+            catch (Exception ex)
+            {
+              var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+              LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+              // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+              // C3WizardMessageBox.Show("C3 Wizard", "" + ex);
+            }
+
+            //C3WizardMessageBox.Show("C3 Wizard", "Password changed successfully, please login with your credentials");
+
+          }
+          //or Self Employee Person - 5
+          if (ConnectionInfom.HasConnection() && (targetUserRoleId == "5"))
+          {
+            try
+            {
+              BLSECUsers blemp = new BLSECUsers();
+              List<BLSECUsers> bluserList_ALL = new List<BLSECUsers>();
+              BLSECUsers bluser = new BLSECUsers();
+
+              bluserList_ALL = BLSECUsers.SECUsersCollection().ToList();
+              bluser = bluserList_ALL.Any(t => t.UserId == resetPasswordViewModel.UserId) ? bluserList_ALL.FirstOrDefault(t => t.UserId == resetPasswordViewModel.UserId) : null;
+              List<BLSelfEmployed> mclist = new List<BLSelfEmployed>();
+              //mclist = BLMasterCompany.MasterCompanyCollection().ToList();
+              mclist = BLSelfEmployed.SelfEmployedCollection().ToList();
+              BLSelfEmployed mc = new BLSelfEmployed();
+              int? empid = (int?)int.Parse(bluser.SelfEmpID);
+              mc = mclist.FirstOrDefault(x => x.EmployeeID == empid);
+              ResetPasswordModel FPM = new ResetPasswordModel();
+              FPM.regNo = mc.SocSecNum;
+              FPM.userName = bluser.LoginId;
+              FPM.userOldPass = bluser.Password;
+              FPM.userNewPass = EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword.Trim());
+              string surl = _configuration["ServiceConfig:ServiceUriString"];
+              string sURL = surl + "/User/resetPassword/";
+
+              var myContent = JsonConvert.SerializeObject(FPM);
+              var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+              var byteContent = new ByteArrayContent(buffer);
+              byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+
+              HttpMessageHandler handler = new HttpClientHandler()
+              {
+              };
+
+              var httpClient = new HttpClient(handler)
+              {
+                BaseAddress = new Uri(sURL),
+                Timeout = new TimeSpan(0, 2, 0)
+              };
+              httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+              //This is the key section you were missing    
+              var userpass = _context.Secusers.FirstOrDefault(e => e.UserId == resetPasswordViewModel.UserId);
+              var plainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(userpass.LoginId + ":" + userpass.Password);
+              //var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(resetPasswordViewModel.NewPassword);
+              string val = System.Convert.ToBase64String(plainTextBytes);
+              httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+              HttpResponseMessage response = httpClient.PostAsync(sURL, byteContent).Result;
+
+              if (response.StatusCode == HttpStatusCode.OK)
+              {
+                SqlCommand CurrentCompanyId = new SqlCommand("UPDATE SECUsers SET Password='" + EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword) + "' WHERE UserId =" + resetPasswordViewModel.UserId, staticConnection);
+                if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                CurrentCompanyId.ExecuteNonQuery();
+                staticConnection.Close();
+                var customerJsonString = await response.Content.ReadAsStringAsync();
+                //var Emp_mod = JsonConvert.DeserializeObject<successpwd>(customerJsonString);
+                //return Ok(Emp_mod.Message);
+                customerJsonString = @"Code       : EUC1092
+                                    Message    : Password has been successfully reset
+                                    Resolution : Please contact Social Security experience in difficulty in login into C3Wizard";
+                var lines = customerJsonString.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                var result = new successpwd();
+                foreach (var line in lines)
+                {
+                  var parts = line.Split(new[] { ':' }, 2);
+                  if (parts.Length == 2)
+                  {
+                    var key = parts[0].Trim();
+                    var value = parts[1].Trim();
+
+                    switch (key)
+                    {
+                      case "Code":
+                        result.Code = value;
+                        break;
+                      case "Message":
+                        result.Message = value;
+                        break;
+                      case "Resolution":
+                        result.Resolution = value;
+                        break;
+                    }
+                  }
+                }
+                responsed.Status = true;
+                responsed.Message = result.Message;
+                responsed.Statuscode = 200;
+                return Ok(responsed);
+                //return Ok(new { message = result.Message });
+                // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                // var Emp_mod = JsonConvert.DeserializeObject<success>(customerJsonString);
+                //  C3WizardMessageBox.Show("C3 Wizard", customerJsonString);
+              }
+              else
+              {
+                var customerJsonString = await response.Content.ReadAsStringAsync();
+                var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                responsed.Status = false;
+                responsed.Message = Emp_model.message;
+                responsed.Statuscode = 400;
+                return NotFound(responsed);
+                //return NotFound(Emp_model.message);
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                //C3WizardMessageBox.Show("C3 Wizard", "" + Emp_model.message);
+                // return;
+
+              }
+            }
+            catch (Exception ex)
+            {
+              var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+              LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+              // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+              // C3WizardMessageBox.Show("C3 Wizard", "" + ex);
+            }
+
+            //C3WizardMessageBox.Show("C3 Wizard", "Password changed successfully, please login with your credentials");
+
+          }
+          else // SSB Users
+          {
+            //HashPassword HashPassword = new HashPassword();
+            // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            //SqlCommand CurrentCompanyId = new SqlCommand("UPDATE SECUsers SET Password='" + EncryptDecryptPassword.PasswordAlgorithns.Encrypt(resetPasswordViewModel.NewPassword) + "' WHERE UserId =" + resetPasswordViewModel.UserId, staticConnection);
+            SqlCommand CurrentCompanyId = new SqlCommand("UPDATE SECUsers SET Password='" + EncryptDecryptPassword.Encrypt(resetPasswordViewModel.NewPassword) + "' WHERE UserId =" + resetPasswordViewModel.UserId, staticConnection);
+            if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+            CurrentCompanyId.ExecuteNonQuery();
+            staticConnection.Close();
+            responsed.Status = true;
+            responsed.Message = "Password updated successfully.";
+            responsed.Statuscode = 200;
+            return Ok(responsed);
+            //return Ok(new { message = "Password updated successfully." });
+            //C3WizardMessageBox.Show("C3 Wizard", "Password changed successfully at local");
+
+          }
+          // MyPopup.IsOpen = false;
+          // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+
+        }
+        else
+        {
+          return Conflict(new
+          {
+            message = "User password already exists"
+          });
+        }
+
+      }
+      return BadRequest(new { message = validationMessage, StatusCode = 400, }); ;
+    }
+
+    public class ResetPasswordModel
+    {
+      public string regNo { get; set; }
+      public string userName { get; set; }
+      public string userNewPass { get; set; }
+      public string userOldPass { get; set; }
+    }
+
+    //[HttpPost]
+    //[Route("ResetPassword")]
+    //public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordViewModel resetPasswordViewModel)
+    //{
+    //    if (resetPasswordViewModel == null ||
+    //        string.IsNullOrEmpty(resetPasswordViewModel.NewPassword) ||
+    //        string.IsNullOrEmpty(resetPasswordViewModel.ConfirmPassword))
+    //    {
+    //        return BadRequest(new { message = "Invalid input data" });
+    //    }
+
+    //    if (resetPasswordViewModel.NewPassword != resetPasswordViewModel.ConfirmPassword)
+    //    {
+    //        return BadRequest(new { message = "New Password and Confirm Password do not match." });
+    //    }
+
+    //    try
+    //    {
+    //        string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+    //        using (SqlConnection connection = new SqlConnection(connectionString))
+    //        {
+    //            await connection.OpenAsync();
+
+    //            string currentPasswordQuery = "SELECT Password FROM SecUsers WHERE UserId = @UserId";
+    //            string currentPassword = null;
+
+    //            using (SqlCommand command = new SqlCommand(currentPasswordQuery, connection))
+    //            {
+    //                command.Parameters.AddWithValue("@UserId", resetPasswordViewModel.UserId);
+    //                currentPassword = (string)await command.ExecuteScalarAsync();
+    //            }
+
+    //            if (string.IsNullOrEmpty(currentPassword))
+    //            {
+    //                return NotFound(new { message = "User not found" });
+    //            }
+
+    //            bool isExternalUpdateSuccessful = await UpdatePasswordInExternalService(resetPasswordViewModel);
+
+    //            if (!isExternalUpdateSuccessful)
+    //            {
+    //                string updatePasswordQuery = "UPDATE SecUsers SET Password = @NewPassword WHERE UserId = @UserId";
+
+    //                using (SqlCommand updateCommand = new SqlCommand(updatePasswordQuery, connection))
+    //                {
+    //                    string encryptedPassword = EncryptDecryptPassword.PasswordAlgorithns.Encrypt(resetPasswordViewModel.NewPassword);
+    //                    updateCommand.Parameters.AddWithValue("@NewPassword", encryptedPassword);
+    //                    updateCommand.Parameters.AddWithValue("@UserId", resetPasswordViewModel.UserId);
+    //                    await updateCommand.ExecuteNonQueryAsync();
+    //                }
+
+    //                return Ok(new { message = "Password updated successfully." });
+    //            }
+    //            else
+    //            {
+    //                return StatusCode(500, new { message = "Failed to update password in the external system." });
+    //            }
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new { message = "An error occurred while processing your request.", details = ex.Message });
+    //    }
+    //}
+
+    //private async Task<bool> UpdatePasswordInExternalService(ResetPasswordViewModel resetPasswordViewModel)
+    //{
+    //    try
+    //    {
+    //        var resetModel = new
+    //        {
+    //            //regNo = resetPasswordViewModel.RegNo,
+    //            //userName = resetPasswordViewModel.UserName,
+    //            //userOldPass = resetPasswordViewModel.OldPassword,
+    //            userNewPass = EncryptDecryptPassword.PasswordAlgorithns.Encrypt(resetPasswordViewModel.NewPassword)
+    //        };
+
+    //        string serviceUrl = "https://localhost:7178/Administration/ResetPassword";
+
+
+    //        using (var httpClient = new HttpClient())
+    //        {
+    //            string jsonContent = JsonConvert.SerializeObject(resetModel);
+
+    //            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+    //            string credentials = $"{resetPasswordViewModel.UserId}:{resetPasswordViewModel.NewPassword}";
+    //            string base64Credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials));
+    //            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
+
+    //            HttpResponseMessage response = await httpClient.PostAsync(serviceUrl, content);
+
+    //            return response.IsSuccessStatusCode;
+    //        }
+    //    }
+    //    catch
+    //    {
+    //        return false;
+    //    }
+    //}
+
+    [HttpGet]
+    [Route("GetUserAuditTrail")]
+    public async Task<IActionResult> GetUserAuditTrail(int CompanyId, int RoleId)
+    {
+      try
+      {
+        List<BLSECUsers> userlist = new List<BLSECUsers>();
+        BLMasterEmployee blemp = new BLMasterEmployee();
+        userlist = BLSECUsers.SECUsersCollection_grid(CompanyId).ToList();
+        List<C3Header> listDVOC3Header = new List<C3Header>();
+        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+        SqlCommand cmd = new SqlCommand("get_C3Genrated_data", staticConnection);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+        SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+        DataTable dt = new DataTable();
+        sqlAdapter.Fill(dt);
+        staticConnection.Close();
+        if (dt.Rows.Count > 0)
+        {
+          foreach (DataRow row in dt.Rows)
+          {
+            bool locked = Convert.IsDBNull(row["IsUnLocked"]) ? false : bool.Parse(row["IsUnLocked"].ToString());
+            bool isimportedbema = Convert.IsDBNull(row["IsImportFromBEMA"]) ? false : bool.Parse(row["IsImportFromBEMA"].ToString());
+            if (!locked && !isimportedbema)
+            {
+              C3Header Obj = new C3Header();
+              Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+              Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+              Obj.period_Month = Obj.period_Month + " " + Obj.Period_year;
+              //Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+              Obj.TOTAL_WAGES = row["TOTAL_WAGES"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_WAGES"]);
+              //Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+              Obj.TOTALSSCONTRIBUTIONS = row["TOTAL_SSCONTRIBUTIONS"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_SSCONTRIBUTIONS"]);
+              //Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+              Obj.TOTALLEVYEEEMPLOYEE = row["TOTAL_LEVYEEEMPLOYEE"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_LEVYEEEMPLOYEE"]);
+              //Obj.TOTALSERVAYANCE = Convert.IsDBNull(row["TOTAL_SERVAYANCE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SERVAYANCE"].ToString())));
+              Obj.TOTALSERVAYANCE = row["TOTAL_SERVAYANCE"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_SERVAYANCE"]);
+              Obj.C3_SubmittedBy = Convert.IsDBNull(row["C3_SubmittedBy"]) ? 0 : int.Parse(row["C3_SubmittedBy"].ToString());
+              Obj.C3_SubmittedByName = Obj.C3_SubmittedBy > 0 ? userlist.Any(x => x.UserId == Obj.C3_SubmittedBy) ? userlist.FirstOrDefault(x => x.UserId == Obj.C3_SubmittedBy).FirstName : null : null;
+              Obj.C3_SubmittedDate = Convert.IsDBNull(row["C3_SubmittedDate"]) ? null : ((DateTime)row["C3_SubmittedDate"]).ToString("dd-MM-yyyy");
+              Obj.C3_SubmittedDate = Obj.C3_SubmittedDate == "01-01-1900" ? null : Obj.C3_SubmittedDate;
+              Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : ((DateTime)row["Insert_Datetimeinfo"]).ToString("dd-MM-yyyy");
+              Obj.Insert_Datetimeinfo = Obj.Insert_Datetimeinfo == "01-01-1900" ? null : Obj.Insert_Datetimeinfo;
+              Obj.Inserted_By = Convert.IsDBNull(row["Inserted_By"]) ? 0 : int.Parse(row["Inserted_By"].ToString());
+              Obj.Inserted_ByName = Obj.Inserted_By > 0 ? userlist.Any(x => x.UserId == Obj.Inserted_By) ? userlist.FirstOrDefault(x => x.UserId == Obj.Inserted_By).FirstName : null : null;
+              Obj.Modified_On = Convert.IsDBNull(row["Modified_On"]) ? null : ((DateTime)row["Modified_On"]).ToString("dd-MM-yyyy");
+              Obj.Modified_On = Obj.Modified_On == "01-01-1900" ? null : Obj.Modified_On;
+              Obj.Modified_By = Convert.IsDBNull(row["Modified_By"]) ? 0 : int.Parse(row["Modified_By"].ToString());
+              Obj.Modified_ByName = Obj.Modified_By > 0 ? userlist.Any(x => x.UserId == Obj.Modified_By) ? userlist.FirstOrDefault(x => x.UserId == Obj.Modified_By).FirstName : null : null;
+              Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+              Obj.Is_submitted = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+              Obj.IssubmittedShow = (bool)Obj.Is_submitted ? "C3 Submitted" : "C3 Not Submitted";
+              Obj.Issubmittedcolor = (bool)Obj.Is_submitted ? "Black" : "Red";
+
+              Obj.IssubmittedShowimg = (bool)Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+              Obj.C3submittedShow = (bool)Obj.Is_submitted ? "Resubmit C3" : "Submit C3";
+              Obj.C3submittedShowimg = (bool)Obj.Is_submitted ? "/Images/restore.png" : "/Images/finalyze20x20.png";
+              var user = Obj.C3_SubmittedBy > 0 ? userlist.Any(x => x.UserId == Obj.C3_SubmittedBy) ? userlist.FirstOrDefault(x => x.UserId == Obj.C3_SubmittedBy) : null : null;
+
+              listDVOC3Header.Add(Obj);
+
+            }
+          }
+
+        }
+        var list1 = listDVOC3Header.Select(e => new C3HeaderUserManagementVM
+        {
+          period = e.period_Month,
+          totalWages = e.TOTAL_WAGES,
+          socialSecurity = e.TOTALSSCONTRIBUTIONS,
+          levy = e.TOTALLEVYEEEMPLOYEE,
+          serverance = e.TOTALSERVAYANCE,
+          schedule = e.Schedule_NO,
+          insertedOn = e.Insert_Datetimeinfo,
+          insertedBy = e.Inserted_ByName,
+          lastModifiedOn = e.Modified_On,
+          lastModifiedBy = e.Modified_ByName,
+          lastSubmittedOn = e.C3_SubmittedDate,
+          lastSubmittedBy = e.C3_SubmittedByName
+        }).ToList();
+
+        //return Ok(list1);
+        //return Ok(listDVOC3Header);
+        //C3EmpUserAuditTrail.ItemsSource = listDVOC3Header;
+        //C3EmpUserAuditTrail.SelectedIndex = -1;
+
+        List<C3Header> Director_listDVOC3Header = new List<C3Header>();
+        SqlConnection Director_staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection;
+        if (Director_staticConnection.State == System.Data.ConnectionState.Closed) Director_staticConnection.Open();
+        SqlCommand Director_cmd = new SqlCommand("Get_Director_C3_Genrated_data", staticConnection);
+        Director_cmd.CommandType = CommandType.StoredProcedure;
+        Director_cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+        SqlDataAdapter Director_sqlAdapter = new SqlDataAdapter(Director_cmd);
+        DataTable Director_dt = new DataTable();
+        Director_sqlAdapter.Fill(Director_dt);
+        Director_staticConnection.Close();
+        if (Director_dt.Rows.Count > 0)
+        {
+          foreach (DataRow row in Director_dt.Rows)
+          {
+            bool locked = Convert.IsDBNull(row["IsUnLocked"]) ? false : bool.Parse(row["IsUnLocked"].ToString());
+            bool isimportedbema = Convert.IsDBNull(row["IsImportFromBEMA"]) ? false : bool.Parse(row["IsImportFromBEMA"].ToString());
+            if (!locked && !isimportedbema)
+            {
+              C3Header Director_Obj = new C3Header();
+              Director_Obj.HeaderID = Convert.IsDBNull(row["C3HEADERID"]) ? 0 : int.Parse(row["C3HEADERID"].ToString());
+              Director_Obj.RegNo = Convert.IsDBNull(row["RegNo"]) ? null : row["RegNo"].ToString();
+              Director_Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+              Director_Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+              Director_Obj.period_Month = Director_Obj.period_Month + " " + Director_Obj.Period_year;
+              //Director_Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+              Director_Obj.TOTAL_WAGES = row["TOTAL_WAGES"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_WAGES"]);
+              //Director_Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+              Director_Obj.TOTALSSCONTRIBUTIONS = row["TOTAL_SSCONTRIBUTIONS"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_SSCONTRIBUTIONS"]);
+              //Director_Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+              Director_Obj.TOTALLEVYEEEMPLOYEE = row["TOTAL_LEVYEEEMPLOYEE"] == DBNull.Value ? 0.00m : Convert.ToDecimal(row["TOTAL_LEVYEEEMPLOYEE"]);
+              Director_Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+              Director_Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+              Director_Obj.Is_submitted = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+              Director_Obj.C3_IsFinalized = Convert.IsDBNull(row["C3_IsFinalized"]) ? false : bool.Parse(row["C3_IsFinalized"].ToString());
+              Director_Obj.C3_SubmittedBy = Convert.IsDBNull(row["C3_SubmittedBy"]) ? 0 : int.Parse(row["C3_SubmittedBy"].ToString());
+              Director_Obj.C3_SubmittedByName = Director_Obj.C3_SubmittedBy > 0 ? userlist.Any(x => x.UserId == Director_Obj.C3_SubmittedBy) ? userlist.FirstOrDefault(x => x.UserId == Director_Obj.C3_SubmittedBy).FirstName : null : null;
+              Director_Obj.C3_SubmittedDate = Convert.IsDBNull(row["C3_SubmittedDate"]) ? null : ((DateTime)row["C3_SubmittedDate"]).ToString("dd-MM-yyyy");
+              Director_Obj.C3_SubmittedDate = Director_Obj.C3_SubmittedDate == "01-01-1900" ? null : Director_Obj.C3_SubmittedDate;
+              Director_Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : ((DateTime)row["Insert_Datetimeinfo"]).ToString("dd-MM-yyyy");
+              Director_Obj.Insert_Datetimeinfo = Director_Obj.Insert_Datetimeinfo == "01-01-1900" ? null : Director_Obj.Insert_Datetimeinfo;
+              Director_Obj.Inserted_By = Convert.IsDBNull(row["Inserted_By"]) ? 0 : int.Parse(row["Inserted_By"].ToString());
+              Director_Obj.Inserted_ByName = Director_Obj.Inserted_By > 0 ? userlist.Any(x => x.UserId == Director_Obj.Inserted_By) ? userlist.FirstOrDefault(x => x.UserId == Director_Obj.Inserted_By).FirstName : null : null;
+              Director_Obj.Modified_On = Convert.IsDBNull(row["Modified_On"]) ? null : ((DateTime)row["Modified_On"]).ToString("dd-MM-yyyy");
+              Director_Obj.Modified_On = Director_Obj.Modified_On == "01-01-1900" ? null : Director_Obj.Modified_On;
+              Director_Obj.Modified_By = Convert.IsDBNull(row["Modified_By"]) ? 0 : int.Parse(row["Modified_By"].ToString());
+              Director_Obj.Modified_ByName = Director_Obj.Modified_By > 0 ? userlist.Any(x => x.UserId == Director_Obj.Modified_By) ? userlist.FirstOrDefault(x => x.UserId == Director_Obj.Modified_By).FirstName : null : null;
+              Director_Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+              Director_Obj.IssubmittedShow = (bool)Director_Obj.Is_submitted ? "C3 Submitted" : "C3 not Submitted";
+              Director_Obj.Issubmittedcolor = (bool)Director_Obj.Is_submitted ? "Black" : "Red";
+              Director_Obj.IssubmittedShowimg = (bool)Director_Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+              Director_Obj.C3submittedShow = (bool)Director_Obj.Is_submitted ? "Resubmit C3" : "Submit C3";
+              Director_Obj.C3submittedShowimg = (bool)Director_Obj.Is_submitted ? "/Images/restore.png" : "/Images/finalyze20x20.png";
+
+              Director_listDVOC3Header.Add(Director_Obj);
+            }
+          }
+
+          //Director_dashboard_list.ItemsSource = Director_listDVOC3Header;
+          // Director_dashboard_list.SelectedIndex = -1;
+          //return Ok(Director_listDVOC3Header);
+
+          //return Ok(list2);
+
+        }
+        var list2 = Director_listDVOC3Header.Select(e => new C3HeaderUserManagement2listVM
+        {
+          period = e.period_Month,
+          totalWages = e.TOTAL_WAGES,
+          levy = e.TOTALLEVYEEEMPLOYEE,
+          dateOfSubmission = e.C3_SubmittedDate,
+          schedule = e.Schedule_NO,
+          insertedOn = e.Insert_Datetimeinfo,
+          insertedBy = e.Inserted_ByName,
+          lastModifiedOn = e.Modified_On,
+          lastModifiedBy = e.Modified_ByName,
+          lastSubmittedOn = e.C3_SubmittedDate,
+          lastSubmittedBy = e.C3_SubmittedByName
+        }).ToList();
+        var response = new
+        {
+          RegularEmployeesSubmittedc3 = list1,
+          NonWorkingDirectorSubmittedc3 = list2
+        };
+        if ((list1.Count != 0 || list2.Count != 0) && (RoleId == 1 || RoleId == 2))
+        {
+          return Ok(response);
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, ex.Message);
+
+      }
+      return Ok("Null");
+    }
+
+
+
+    //[HttpGet]
+    //[Route("GetUSERAUDITTRAILs")]
+    //public async Task<IActionResult> GetUSERAUDITTRAILs(int CompanyId)
+    //{
+    //    try
+    //    {
+    //        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+
+    //        List<BLSECUsers> userlist = BLSECUsers.SECUsersCollection_grid(CompanyId).ToList();
+
+    //        List<C3Header> listDVOC3Header = FetchC3HeaderData(staticConnection, CompanyId, userlist);
+
+    //        List<C3Header> directorListDVOC3Header = FetchDirectorC3HeaderData(staticConnection, CompanyId, userlist);
+
+
+    //        var list1 = listDVOC3Header.Select(e => new
+    //        {
+    //            e.HeaderID,
+    //            e.EmployerID,
+    //            e.period_Month,
+    //            e.P_year,
+    //            e.RegNo,
+    //            e.Schedule_NO,
+    //            e.UsarName
+    //        });
+
+    //        var list2 = directorListDVOC3Header.Select(e => new
+    //        {
+    //            e.HeaderID,
+    //            e.EmployerID,
+    //            e.period_Month,
+    //            e.P_year,
+    //            e.RegNo,
+    //            e.Schedule_NO,
+    //            e.UsarName
+    //        });
+
+    //        var response = new
+    //        {
+    //            EmployeeC3Data = list1,
+    //            DirectorC3Data = list2
+    //        };
+
+    //        return Ok(new ResponseModel
+    //        {
+    //            Status = true,
+    //            Message = "Data retrieved successfully.",
+    //            Data = response,
+    //            Statuscode = 200
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new ResponseModel
+    //        {
+    //            Status = false,
+    //            Message = $"Internal server error: {ex.Message}",
+    //            Data = null,
+    //            Statuscode = 500
+    //        });
+    //    }
+    //}
+
+    //private List<C3Header> FetchC3HeaderData(SqlConnection connection, int companyId, List<BLSECUsers> userlist)
+    //{
+    //    List<C3Header> listDVOC3Header = new List<C3Header>();
+    //    using (SqlCommand cmd = new SqlCommand("get_C3Genrated_data", connection))
+    //    {
+    //        cmd.CommandType = CommandType.StoredProcedure;
+    //        cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int)
+    //        {
+    //            Value = companyId
+    //        });
+
+    //        using (SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd))
+    //        {
+    //            DataTable dt = new DataTable();
+    //            sqlAdapter.Fill(dt);
+
+    //            foreach (DataRow row in dt.Rows)
+    //            {
+    //                if (!IsLockedOrImported(row))
+    //                {
+    //                    listDVOC3Header.Add(MapC3Header(row, userlist));
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return listDVOC3Header;
+    //}
+
+    //private List<C3Header> FetchDirectorC3HeaderData(SqlConnection connection, int companyId, List<BLSECUsers> userlist)
+    //{
+    //    List<C3Header> directorListDVOC3Header = new List<C3Header>();
+    //    using (SqlCommand cmd = new SqlCommand("Get_Director_C3_Genrated_data", connection))
+    //    {
+    //        cmd.CommandType = CommandType.StoredProcedure;
+    //        cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int)
+    //        {
+    //            Value = companyId
+    //        });
+
+    //        using (SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd))
+    //        {
+    //            DataTable dt = new DataTable();
+    //            sqlAdapter.Fill(dt);
+
+    //            foreach (DataRow row in dt.Rows)
+    //            {
+    //                if (!IsLockedOrImported(row))
+    //                {
+    //                    directorListDVOC3Header.Add(MapC3Header(row, userlist, true));
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return directorListDVOC3Header;
+    //}
+
+    //private bool IsLockedOrImported(DataRow row)
+    //{
+    //    bool locked = Convert.IsDBNull(row["IsUnLocked"]) ? false : bool.Parse(row["IsUnLocked"].ToString());
+    //    bool isImported = Convert.IsDBNull(row["IsImportFromBEMA"]) ? false : bool.Parse(row["IsImportFromBEMA"].ToString());
+    //    return locked || isImported;
+    //}
+
+    //private C3Header MapC3Header(DataRow row, List<BLSECUsers> userlist, bool isDirector = false)
+    //{
+    //    return new C3Header
+    //    {
+    //        period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) ? null : MonthName(row["PERIODD_MONTH"].ToString()),
+    //        Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) ? null : row["PERIOD_YEAR"].ToString(),
+    //        TOTAL_WAGES = ParseDecimal(row, "TOTAL_WAGES"),
+    //        TOTALSSCONTRIBUTIONS = ParseDecimal(row, "TOTAL_SSCONTRIBUTIONS"),
+    //        TOTALLEVYEEEMPLOYEE = ParseDecimal(row, "TOTAL_LEVYEEEMPLOYEE"),
+    //        TOTALSERVAYANCE = isDirector ? 0 : ParseDecimal(row, "TOTAL_SERVAYANCE"),
+    //        C3_SubmittedBy = ParseInt(row, "C3_SubmittedBy"),
+    //        C3_SubmittedByName = GetUserName(userlist, ParseInt(row, "C3_SubmittedBy")),
+    //        C3_SubmittedDate = FormatDate(row, "C3_SubmittedDate"),
+    //        Insert_Datetimeinfo = FormatDate(row, "Insert_Datetimeinfo"),
+    //        Inserted_By = ParseInt(row, "Inserted_By"),
+    //        Inserted_ByName = GetUserName(userlist, ParseInt(row, "Inserted_By")),
+    //        Modified_On = FormatDate(row, "Modified_On"),
+    //        Modified_By = ParseInt(row, "Modified_By"),
+    //        Modified_ByName = GetUserName(userlist, ParseInt(row, "Modified_By")),
+    //        Schedule_NO = ParseInt(row, "Schedule_NO"),
+    //        Is_submitted = ParseBool(row, "Is_submitted"),
+    //        IssubmittedShow = ParseBool(row, "Is_submitted") ? "C3 Submitted" : "C3 Not Submitted",
+    //        Issubmittedcolor = ParseBool(row, "Is_submitted") ? "Black" : "Red",
+    //        IssubmittedShowimg = ParseBool(row, "Is_submitted") ? "/img/RightSine.png" : "/img/close.png",
+    //        C3submittedShow = ParseBool(row, "Is_submitted") ? "Resubmit C3" : "Submit C3",
+    //        C3submittedShowimg = ParseBool(row, "Is_submitted") ? "/Images/restore.png" : "/Images/finalyze20x20.png"
+    //    };
+    //}
+    //private decimal ParseDecimal(DataRow row, string columnName)
+    //{
+    //    return Convert.IsDBNull(row[columnName]) ? 0.00m : decimal.Parse(row[columnName].ToString());
+    //}
+
+    //private int ParseInt(DataRow row, string columnName)
+    //{
+    //    return Convert.IsDBNull(row[columnName]) ? 0 : int.Parse(row[columnName].ToString());
+    //}
+
+    //private bool ParseBool(DataRow row, string columnName)
+    //{
+    //    return Convert.IsDBNull(row[columnName]) && bool.Parse(row[columnName].ToString());
+    //}
+
+    //private string FormatDate(DataRow row, string columnName)
+    //{
+    //    return Convert.IsDBNull(row[columnName]) ? null : DateTime.Parse(row[columnName].ToString()).ToString("dd-MM-yyyy");
+    //}
+    //private string GetUserName(List<BLSECUsers> userlist, int userId)
+    //{
+    //    return userlist.FirstOrDefault(x => x.UserId == userId)?.FirstName;
+    //}
+    //private string MonthName(string m_no)
+    //{
+    //    string Month = "";
+    //    switch (m_no)
+    //    {
+    //        case "0":
+    //            Month = "January";
+    //            break;
+    //        case "1":
+    //            Month = "February";
+    //            break;
+    //        case "2":
+    //            Month = "March";
+    //            break;
+    //        case "3":
+    //            Month = "April";
+    //            break;
+    //        case "4":
+    //            Month = "May";
+    //            break;
+    //        case "5":
+    //            Month = "June";
+    //            break;
+    //        case "6":
+    //            Month = "July";
+    //            break;
+    //        case "7":
+    //            Month = "August";
+    //            break;
+    //        case "8":
+    //            Month = "September";
+    //            break;
+    //        case "9":
+    //            Month = "October";
+    //            break;
+    //        case "10":
+    //            Month = "November";
+    //            break;
+    //        case "11":
+    //            Month = "December";
+    //            break;
+    //        default:
+    //            Month = string.Empty;
+    //            break;
+    //    }
+    //    return Month;
+    //}
+    private string MonthName(string m_no)
+    {
+      string Month = "";
+      switch (m_no)
+      {
+        case "1":
+          Month = "January";
+          break;
+        case "2":
+          Month = "February";
+          break;
+        case "3":
+          Month = "March";
+          break;
+        case "4":
+          Month = "April";
+          break;
+        case "5":
+          Month = "May";
+          break;
+        case "6":
+          Month = "June";
+          break;
+        case "7":
+          Month = "July";
+          break;
+        case "8":
+          Month = "August";
+          break;
+        case "9":
+          Month = "September";
+          break;
+        case "10":
+          Month = "October";
+          break;
+        case "11":
+          Month = "November";
+          break;
+        case "12":
+          Month = "December";
+          break;
+        default:
+          Month = string.Empty;
+          break;
+      }
+
+
+      return Month;
+    }
+    //[HttpGet]
+    //[Route("LoggedInHistory")]
+    //public async Task<IActionResult> LoggedInHistory(int companyId, bool isSelfEmployed, int RoleId)
+    //{
+    //    try
+    //    {
+    //        // SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+
+    //        List<BLLoginLog> loginList = BLLoginLog.LoginCollection(companyId, isSelfEmployed).ToList();
+
+    //        if (loginList.Count != 0 && (RoleId == 1 || RoleId == 2))
+    //        {
+    //            return Ok(new ResponseModel
+    //            {
+    //                Status = true,
+    //                Message = "Login logs retrieved successfully.",
+    //                Data = loginList,
+    //                Statuscode = 200
+    //            });
+    //        }
+    //        else if (loginList.Count != 0)
+    //        {
+    //            return Ok(new ResponseModel
+    //            {
+    //                Status = true,
+    //                Message = "Login logs retrieved successfully.",
+    //                Data = loginList,
+    //                Statuscode = 200
+    //            });
+    //        }
+    //        else
+    //        {
+    //            return NotFound(new ResponseModel
+    //            {
+    //                Status = false,
+    //                Message = "No login logs found.",
+    //                Data = null,
+    //                Statuscode = 404
+    //            });
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new ResponseModel
+    //        {
+    //            Status = false,
+    //            Message = $"Internal server error: {ex.Message}",
+    //            Data = null,
+    //            Statuscode = 500
+    //        });
+    //    }
+    //}
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("LoggedInHistory")]
+    public async Task<IActionResult> LoggedInHistory(int companyId, bool isSelfEmployed, int RoleId, int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
+    {
+      try
+      {
+        // Validate page number and page size
+        //if (pageNumber < 1) pageNumber = 1;
+        //if (pageSize < 1) pageSize = 10;
+        if (pageNumber < 0) pageNumber = 0;
+        if (pageSize < 1) pageSize = 10;
+
+        // Fetch total records count
+        //int totalRecords = BLLoginLog.LoginCollection(companyId, isSelfEmployed).Count();
+
+        // Apply pagination using Skip() and Take()
+        //List<BLLoginLog> loginList = BLLoginLog.LoginCollection(companyId, isSelfEmployed)
+        //    .Skip((pageNumber - 1) * pageSize)
+        //    .Take(pageSize)
+        //    .ToList();
+        List<BLLoginLog> loginList = BLLoginLog.LoginCollection(companyId, isSelfEmployed).Where(e => (!fromDate.HasValue || e.LoginTime >= fromDate.Value) &&
+        (!toDate.HasValue || e.LoginTime <= toDate.Value)).Skip(pageNumber * pageSize).Take(pageSize).ToList();
+
+
+
+        var totalRecords = loginList.Count();
+        if (loginList.Any())
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Login logs retrieved successfully.",
+            Data = new
+            {
+              TotalRecords = totalRecords,
+              PageNumber = pageNumber,
+              PageSize = pageSize,
+              TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+              Records = loginList
+            },
+            Statuscode = 200
+          });
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No login logs found.",
+            Data = null,
+            Statuscode = 404
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+
+    [HttpPost]
+    [Route("Logout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Logout(int logId)
+    {
+      try
+      {
+        var loginLog = await _context.LoginLogs.FindAsync(logId);
+        if (loginLog == null)
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "Log entry not found.",
+            Data = null,
+            Statuscode = 404
+          });
+        }
+
+        // Update LogoutTime
+        loginLog.LogoutTime = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        return Ok(new ResponseModel
+        {
+          Status = true,
+          Message = "User logged out successfully.",
+          Data = loginLog,
+          Statuscode = 200
+        });
+      }
+
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+
+    [HttpGet]
+    [Route("GetContactList")]
+    public async Task<IActionResult> GetContactList(int userId, int companyId)
+    {
+      try
+      {
+        var contactUsList = new List<ContactUsListDetails>();
+
+        using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        {
+          using (SqlCommand cmd = new SqlCommand("Get_ContactUs_List", connection))
+          {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@UserId", userId == 0 ? DBNull.Value : (object)userId);
+            cmd.Parameters.AddWithValue("@CompanyId", companyId == 0 ? DBNull.Value : (object)companyId);
+
+            await connection.OpenAsync();
+            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+            {
+              while (await reader.ReadAsync())
+              {
+                contactUsList.Add(new ContactUsListDetails
+                {
+                  CUsId = reader["CUsId"] as int? ?? 0,
+                  UserId = reader["UserId"] as int? ?? 0,
+                  CompanyId = reader["CompanyId"] as int? ?? 0,
+                  RegistrationNo = reader["RegistrationNo"] as string,
+                  EmailId = reader["Emailid"] as string,
+                  Description = reader["Description"] as string,
+                  Year = reader["InsertDate"] == DBNull.Value ? 0 : ((DateTime)reader["InsertDate"]).Year,
+                  InsertDate = reader["InsertDate"] == DBNull.Value
+                        ? null
+                        : ((DateTime)reader["InsertDate"]).ToString("MM/dd/yyyy")
+                });
+              }
+            }
+            await connection.CloseAsync();
+          }
+        }
+        if (contactUsList != null && contactUsList.Any()) // Check if data exists
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Login logs retrieved successfully.",
+            Data = contactUsList,
+            Statuscode = 200
+          });
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No data found.",
+            Data = null,
+            Statuscode = 404
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+    [HttpGet]
+    [Route("GetContactByCompanyId")]
+    public async Task<IActionResult> ContactUs(int CompanyId)
+    {
+      var senderInfo = new SenderInfo();
+      try
+      {
+        //ObjDashboardWindow = Application.Current.Windows.OfType<C3Wizard.Dashboard>().First();
+        //Application.Current.Properties["Currentform"] = "";
+        //Application.Current.Properties["TextChanged"] = 0;
+        //ObjDashboardWindow.cmbEmployer.IsEnabled = false;
+
+        //InitializeComponent();
+        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+        SqlCommand CurrentCompany = new SqlCommand("SELECT mc.Company_Id, mc.REG_NUMBER, mc.Company_Name, mc.Email FROM MasterCompany mc WHERE mc.Isactive = 1 And  mc.Company_Id= " + CompanyId, staticConnection);
+        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+        //  string value = CurrentCompanyId.ExecuteScalar().ToString();
+        SqlDataReader dr = CurrentCompany.ExecuteReader();
+        //while (dr.Read())
+        //{
+        //    Txt_senderEmployer.Text = dr["Company_Name"].ToString();
+        //    Txt_senderReg.Text = dr["REG_NUMBER"].ToString();
+        //    Txt_senderEmail.Text += dr["Email"].ToString();
+        //}
+        while (await dr.ReadAsync())
+        {
+          senderInfo.SenderEmployer = dr["Company_Name"].ToString();
+          senderInfo.SenderReg = dr["REG_NUMBER"].ToString();
+          senderInfo.SenderEmail += dr["Email"].ToString(); // If you want to concatenate emails
+        }
+        staticConnection.Close();
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        return Ok(new
+        {
+          Status = true,
+          Message = "Data retrieved successfully.",
+          Data = senderInfo,
+          Statuscode = 200
+        });
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, ex.Message);
+
+        //Login login = new Login();
+        //login.Error_Log(ex.Message);
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+      }
+      return Ok("Null");
+
+    }
+    public static string ReplaceCharacter(string text)
+    {
+      return text.Replace("'", "");
+    }
+    [HttpPost("SaveContactUs")]
+    public async Task<IActionResult> SaveContactUs([FromBody] ContactUsRequest request)
+    {
+      var Email = "";
+      var IsTestMail = _configuration["IsTestMail"];
+      if (IsTestMail == "1")
+      {
+        Email = _configuration["TestMail"];
+      }
+      if (request == null)
+      {
+        return BadRequest("Invalid request");
+      }
+      try
+      {
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+        //Save_button.IsEnabled = false;
+        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+        SqlCommand CurrentCompany = new SqlCommand("SELECT mc.Company_Id, mc.REG_NUMBER, mc.Company_Name,mc.Email, mc.Contact_Person,mc.Mobile,mc.Landline FROM MasterCompany mc WHERE mc.Isactive = 1  And mc.Company_Id= " + request.CompanyId, staticConnection);
+        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+        //  string value = CurrentCompanyId.ExecuteScalar().ToString();
+        SqlDataReader dr = CurrentCompany.ExecuteReader();
+        string RegNo = "", ContactPerson = "", CompanyName = "", EmailId = "", Contectno = "";
+
+        while (dr.Read())
+        {
+          RegNo = dr["REG_NUMBER"].ToString();
+          ContactPerson = dr["Contact_Person"].ToString();
+          CompanyName = dr["Company_Name"].ToString();
+          EmailId = dr["Email"].ToString();
+          Contectno = dr["Mobile"].ToString() + " " + dr["Landline"].ToString();
+        }
+        //bool res = await Sendmailservice(RegNo, Helper.ReplaceCharacter(EmailId), Helper.ReplaceCharacter(CompanyName), Contectno, Helper.ReplaceCharacter(Txt_Description.Text));
+        //(string toEmail, string companyName, string description, string contactPerson, string mobile)
+        staticConnection.Close();
+        bool emailResult = await SendEmailAsync(Email, Helper.ReplaceCharacter(CompanyName), request.Description, ContactPerson, Contectno, RegNo);
+
+        if (emailResult)
+        {
+          var contactUsLog = new ContactUsLog
+          {
+            UserId = request.UserId,
+            CompanyId = request.CompanyId,
+            RegistrationNo = Convert.ToInt32(request.RegNo),
+            Emailid = Email,
+            Description = request.Description,
+            InsertDate = DateTime.Now
+          };
+
+          _context.ContactUsLogs.Add(contactUsLog);
+          await _context.SaveChangesAsync();
+          return Ok(new
+          {
+            Status = true,
+            Message = "The message has been sent successfully.",
+            Statuscode = 200
+          });
+          //return Ok("Mail sent successfully and SaveContactUs");
+        }
+        else
+        {
+          return Ok(new
+          {
+            Status = false,
+            Message = "Mail sending failed.",
+            Statuscode = 400
+          });
+          //return StatusCode(500, "Mail sending failed");
+        }
+        //var smtpServerName = ConfigurationManager.AppSettings["SmtpServer"];
+        //var port = ConfigurationManager.AppSettings["Port"];
+        //var senderEmailId = ConfigurationManager.AppSettings["SenderEmailId"];
+        //var senderPassword = ConfigurationManager.AppSettings["SenderPassword"];
+        //var Sentto = ConfigurationManager.AppSettings["Sentto"];
+        //var Sentcc = ConfigurationManager.AppSettings["Sentto"];
+
+        //var smptClient = new SmtpClient(smtpServerName, Convert.ToInt32(port))
+        //{
+        //    Credentials = new NetworkCredential(senderEmailId, senderPassword),
+        //    EnableSsl = true
+        //};
+        //string subject = "SSB. C3 Wizard - Complaint / Feedback";
+        //ContactPerson = ContactPerson == "" ? ContactPerson : "Contact Person Name: " + ContactPerson;
+        //string body = "Dear Support Team, \n\n" + Txt_Description.Text + "\n\nRegards \n\n" + ContactPerson + "\nReg No: " + RegNo + "\nCompany Name: " + companyname + "\nEmail: " + EmailId + "\nContact No: " + Contectno;
+        //string from = EmailId;
+        //SendEmail(from, subject, body);
+        //Contactus_Log(int.Parse(RegNo), EmailId, Txt_Description.Text);
+        //// smptClient.Send(from,Sentto, subject, body);
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        // C3WizardMessageBox.Show("C3 Wizard", "Mail sent successfully.");
+        //if (res)
+        //{
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        //Application.Current.Properties["TextChanged"] = 0;
+        //string ResPath = Directory.GetCurrentDirectory() + "\\Resources.resx";//same fileName
+        // var reader = new ResXResourceReader(Helper.ApplicationPath("Resources.resx"));
+        // var reader = new ResXResourceReader(Helper.ApplicationPath("Resources.resx"));
+        // var node = reader.GetEnumerator();
+        //  var writer = new ResXResourceWriter(@"D:\C3Wizard\C3Wizard\Properties\Resources.resx");//same fileName(not new)
+        // double width = 0.00;
+
+        // while (node.MoveNext())
+        //  {
+        //   width = (double)(node.Value);
+        // }
+        // ObjDashboardWindow.MainMdiContainer.Children.Clear();
+        // ObjDashboardWindow.MainMdiContainer.Children.Add(new MdiChild()
+        //{
+        //    Title = "Contact Us LIST",
+        //    Height = (System.Windows.SystemParameters.PrimaryScreenHeight) - 150,
+        //    Width = width,//(System.Windows.SystemParameters.PrimaryScreenWidth) - 350,
+        //    Style = null,
+        //    Content = new ContactUs_List()
+        //});
+        //}
+        //else
+        //{
+        //    //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        //    //Save_button.IsEnabled = true;
+        //}
+        // Cancel_button_Click(sender, e);
+        // Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return Ok(new
+        {
+          Status = false,
+          Message = "Mail sending failed.",
+          Statuscode = 400
+        });
+        //Login login = new Login();
+        //login.Error_Log(ex.Message);
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        //C3WizardMessageBox.Show("C3 Wizard", "Mail sending failed.");
+        //Save_button.IsEnabled = true;
+      }
+      return null;
+    }
+    //[HttpPost("SaveContactUs")]
+    //public async Task<IActionResult> SaveContactUs([FromBody] ContactUsRequest request)
+    //{
+    //    if (request == null)
+    //    {
+    //        return BadRequest("Invalid request");
+    //    }
+
+    //    try
+    //    {
+    //        var company = await _context.MasterCompanies
+    //            .Where(x => x.IsActive == true && x.CompanyId == request.CompanyId)
+    //            .FirstOrDefaultAsync();
+
+    //        if (company == null)
+    //        {
+    //            return NotFound("Company not found");
+    //        }
+
+    //        var emailResult = await SendEmailAsync(company.Email, company.CompanyName, request.Description, company.ContactPerson, company.Mobile,company.RegNumber);
+
+    //        if (emailResult)
+    //        {
+    //            var contactUsLog = new ContactUsLog
+    //            {
+    //                UserId = request.UserId,
+    //                CompanyId = request.CompanyId,
+    //                RegistrationNo = Convert.ToInt32(company.RegNumber),
+    //                Emailid = company.Email,
+    //                Description = request.Description,
+    //                InsertDate = DateTime.Now,
+    //                //InsertMachineInfo = request.MachineInfo // Optional field, can be included if needed
+    //            };
+
+    //            _context.ContactUsLogs.Add(contactUsLog);
+    //            await _context.SaveChangesAsync();
+
+    //            return Ok("Mail sent successfully and SaveContactUs");
+    //        }
+    //        else
+    //        {
+    //            return StatusCode(500, "Mail sending failed");
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"Internal server error: {ex.Message}");
+    //    }
+    //}
+    private async Task<bool> SendEmailAsync(string toEmail, string companyName, string description, string contactPerson, string mobile, string RegNo)
+    {
+      try
+      {
+        var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+        {
+          Port = int.Parse(_configuration["EmailSettings:Port"]),
+          Credentials = new NetworkCredential(_configuration["EmailSettings:SenderEmail"], _configuration["EmailSettings:SenderPassword"]),
+          EnableSsl = true
+        };
+
+        var mailMessage = new MailMessage
+        {
+          From = new MailAddress(_configuration["EmailSettings:SenderEmail"]),
+          Subject = "SSB. C3 Wizard - Complaint / Feedback",
+          Body = $"Dear Support Team,\n\n{description}\n\nRegards,\n{contactPerson}\nReg No: {companyName}\nMobile: {mobile}",
+          IsBodyHtml = false
+        };
+
+        mailMessage.To.Add(toEmail);
+        await smtpClient.SendMailAsync(mailMessage);
+        return true;
+      }
+      catch (Exception ex)
+      {
+        return false;
+      }
+    }
+    [HttpGet]
+    [Route("GetAboutUs")]
+    public async Task<IActionResult> GetAboutUs()
+    {
+      try
+      {
+        var aboutUs = new List<AboutUs>();
+
+        using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        {
+          using (SqlCommand cmd = new SqlCommand("select * from AboutUs", connection))
+          {
+
+            await connection.OpenAsync();
+            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+            {
+              while (await reader.ReadAsync())
+              {
+                aboutUs.Add(new AboutUs
+                {
+                  Id = Convert.ToInt32(reader["Id"]),
+                  Description = reader["Description"] as string
+                });
+              }
+            }
+            await connection.CloseAsync();
+          }
+        }
+        if (aboutUs != null && aboutUs.Any())
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data retrieved successfully.",
+            Data = aboutUs,
+            Statuscode = 200
+          });
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No data found.",
+            Data = null,
+            Statuscode = 404
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+    [HttpGet]
+    [Route("GetAboutUsById")]
+    public async Task<IActionResult> GetAboutUs(int id)
+    {
+      try
+      {
+        var aboutUs = await _context.AboutUs.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (aboutUs != null)
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data retrieved successfully.",
+            Data = aboutUs,
+            Statuscode = 200
+          });
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No data found for the given ID.",
+            Data = null,
+            Statuscode = 404
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+    [HttpPost("SaveAboutUs")]
+    public async Task<IActionResult> SaveAboutUs([FromBody] AboutUs request)
+    {
+      if (request == null)
+      {
+        return BadRequest("Invalid request");
+      }
+
+      try
+      {
+        var formattedDescription = request.Description.Replace("\\n", Environment.NewLine);
+        var aboutUs = new AboutUs
+        {
+          Id = request.Id,
+          Description = formattedDescription
+        };
+
+        _context.AboutUs.Add(aboutUs);
+        await _context.SaveChangesAsync();
+
+        return Ok(new ResponseModel
+        {
+          Status = true,
+          Message = "Data saved successfully.",
+          Data = aboutUs,
+          Statuscode = 200
+        });
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+      }
+    }
+    public static int MondaysInMonth(int CmbMonth, int CmbYear)
+    {
+      int weeks = 0;
+      int daysThisMonth = DateTime.DaysInMonth(CmbYear, CmbMonth);
+      DateTime beginingOfThisMonth = new DateTime(CmbYear, CmbMonth, 1);
+      for (int i = 0; i < daysThisMonth; i++)
+        if (beginingOfThisMonth.AddDays(i).DayOfWeek == DayOfWeek.Monday)
+          weeks++;
+      return weeks;
+    }
+    [HttpGet("ImportLastC3")]
+    public async Task<IActionResult> ImportLastC3(string email, string password, string companyid, int userid)
+    {
+      if (!ConnectionInfom.HasConnection() || !ConnectionInfom.APIConnection(_configuration))
+      {
+        return BadRequest(new { message = "Check your internet connection OR the server may not be responding. Please try again later or contact support." });
+      }
+
+      try
+      {
+        string regn = regno(companyid);
+        string baseUrl = _configuration["ServiceConfig:ServiceUriString"];
+        string requestUrl = $"{baseUrl}/C3/{regn}/C3Submitted/ER/1,NW";
+
+        using (var httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(2) })
+        {
+          httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+          string credentials = Convert.ToBase64String(_configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : Encoding.UTF8.GetBytes($"{email}:{password}"));
+          httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {credentials}");
+
+          HttpResponseMessage response = await httpClient.GetAsync(requestUrl);
+
+          if (!response.IsSuccessStatusCode)
+          {
+            string errorResponse = await response.Content.ReadAsStringAsync();
+            return StatusCode((int)response.StatusCode, new { message = "Unauthorized fetching data from C3", details = errorResponse });
+          }
+
+          string jsonString = await response.Content.ReadAsStringAsync();
+          var C3HeaderModel = System.Text.Json.JsonSerializer.Deserialize<c3Header>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+          if (C3HeaderModel == null || C3HeaderModel.payerType != "ER")
+          {
+            return NotFound(new { message = "No valid data found." });
+          }
+
+          int payMonth = DateTime.ParseExact(C3HeaderModel.period, Helper.DateFormat, CultureInfo.InvariantCulture).Month;
+          int payYear = DateTime.ParseExact(C3HeaderModel.period, Helper.DateFormat, CultureInfo.InvariantCulture).Year;
+
+          using (SqlConnection conn = C3WizardLayerConn_BaseData.StaticSqlConnection)
+          {
+            await conn.OpenAsync();
+            using (SqlCommand cmd = new SqlCommand("check_Director_C3Created", conn))
+            {
+              cmd.CommandType = CommandType.StoredProcedure;
+              cmd.Parameters.AddWithValue("@Month", payMonth - 1);
+              cmd.Parameters.AddWithValue("@Year", payYear);
+              cmd.Parameters.AddWithValue("@CompanyId", companyid);
+
+              using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+              {
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+
+                if (dt.Rows.Count > 0)
+                {
+                  return Ok(new { message = "C3 data already exists for this period." });
+                }
+              }
+            }
+            await conn.CloseAsync();
+            // Fetching Employee Submission Data
+            string empUrl = $"{baseUrl}/C3/{C3HeaderModel.payerId}/C3Submitted/{payMonth},{payYear},{C3HeaderModel.sequenceNo},{C3HeaderModel.payerType}";
+
+            using (var empClient = new HttpClient { Timeout = TimeSpan.FromMinutes(2) })
+            {
+              empClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+              empClient.DefaultRequestHeaders.Add("Authorization", $"Basic {credentials}");
+
+              HttpResponseMessage empResponse = await empClient.GetAsync(empUrl);
+
+              if (!empResponse.IsSuccessStatusCode)
+              {
+                string empErrorResponse = await empResponse.Content.ReadAsStringAsync();
+                return StatusCode((int)empResponse.StatusCode, new { message = "Error fetching employee submission data", details = empErrorResponse });
+              }
+
+              string empJsonString = await empResponse.Content.ReadAsStringAsync();
+              var submitC3Model = System.Text.Json.JsonSerializer.Deserialize<submitC3string>(empJsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+              if (submitC3Model == null || submitC3Model.c3Header == null)
+              {
+                return NotFound(new { message = "No employee data found." });
+              }
+
+              int isLocked = submitC3Model.c3Header.receivedBy != "c3svc" && submitC3Model.c3Header.c3Status == "VAC" ? 1 : 0;
+              decimal totalWages = submitC3Model.nonWorkingDirectorWages?.Sum(w => decimal.Parse(w.wages)) ?? 0;
+
+              using (SqlCommand insertCmd = new SqlCommand("INSERT INTO PROCESS_C3Header (RegNo, PERIODD_MONTH, PERIOD_YEAR, TOTAL_WAGES, EmployerID, Insert_Datetimeinfo, Is_Locked, UserName) VALUES (@RegNo, @Month, @Year, @Wages, @EmployerID, @InsertDate, @IsLocked, @UserName); SELECT SCOPE_IDENTITY();", conn))
+              {
+                insertCmd.Parameters.AddWithValue("@RegNo", C3HeaderModel.payerId);
+                insertCmd.Parameters.AddWithValue("@Month", payMonth - 1);
+                insertCmd.Parameters.AddWithValue("@Year", payYear);
+                insertCmd.Parameters.AddWithValue("@Wages", totalWages);
+                insertCmd.Parameters.AddWithValue("@EmployerID", companyid);
+                insertCmd.Parameters.AddWithValue("@InsertDate", DateTime.UtcNow);
+                insertCmd.Parameters.AddWithValue("@IsLocked", isLocked);
+                insertCmd.Parameters.AddWithValue("@UserName", submitC3Model.c3Header.submittedByName ?? "Unknown");
+
+                int C3HeaderId = Convert.ToInt32(await insertCmd.ExecuteScalarAsync());
+
+                if (C3HeaderId > 0 && submitC3Model.nonWorkingDirectorWages != null)
+                {
+                  foreach (var wage in submitC3Model.nonWorkingDirectorWages)
+                  {
+                    using (SqlCommand insertWagesCmd = new SqlCommand("INSERT INTO Process_Contributions (C3HEADERID, SSN, PERIODD_MONTH, PERIOD_YEAR, WAGES) VALUES (@HeaderId, @SSN, @Month, @Year, @Wages)", conn))
+                    {
+                      insertWagesCmd.Parameters.AddWithValue("@HeaderId", C3HeaderId);
+                      insertWagesCmd.Parameters.AddWithValue("@SSN", wage.ssn);
+                      insertWagesCmd.Parameters.AddWithValue("@Month", payMonth - 1);
+                      insertWagesCmd.Parameters.AddWithValue("@Year", payYear);
+                      insertWagesCmd.Parameters.AddWithValue("@Wages", decimal.Parse(wage.wages));
+
+                      await insertWagesCmd.ExecuteNonQueryAsync();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        return Ok(new { message = "Data imported successfully" });
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new { message = "An error occurred while processing the request", error = ex.Message });
+      }
+    }
+    private string regno(string companyid)
+    {
+      SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+      SqlCommand CurrentCompany = new SqlCommand("SELECT mc.Company_Id, mc.REG_NUMBER, mc.Address1, mc.Address2, mc.City, mc.State, mc.ZIP, mc.CompanyLogo, mc.IsLevyExempt, C.Name FROM MasterCompany mc, Country c WHERE mc.Isactive = 1 And mc.Company_Id = " + companyid + " And mc.Country=c.ConId", staticConnection);
+      if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+      //  string value = CurrentCompanyId.ExecuteScalar().ToString();
+      SqlDataReader dr = CurrentCompany.ExecuteReader();
+      string companyid_str = "", RegNo = "", Address = "", CompanyLogo = "";
+      while (dr.Read())
+      {
+        companyid_str = dr["Company_Id"].ToString();
+        RegNo = dr["REG_NUMBER"].ToString();
+        Address = dr["Address1"].ToString() + " " + dr["City"].ToString() + " " + dr["State"].ToString() + " " + dr["Name"].ToString() + " " + dr["ZIP"].ToString();
+        CompanyLogo = dr["CompanyLogo"].ToString();
+        //Application.Current.Properties["IsLevyExempt"] = dr["IsLevyExempt"];
+        // bool ise = Helper.IsLevyExempt;
+      }
+      staticConnection.Close();
+
+      return RegNo;
+    }
+    [HttpGet("GetYearList")]
+    public IActionResult GetYearList()
+    {
+      return Ok(GenerateYearList());
+    }
+
+    //private string[] GenerateYearList()
+    //{
+    //    int startYear = 2018;
+    //    int currentYear = DateTime.Now.Year;
+    //    int endYear = currentYear + 10;
+    //    int arrayLength = (endYear - startYear) >= 0 ? (endYear - startYear) : 0;
+    //    string[] years = new string[arrayLength + 1];
+    //    int index = 0;
+
+    //    for (int i = startYear; i <= endYear; i++)
+    //    {
+    //        years[index] = i.ToString();
+    //        index++;
+    //    } 
+
+    //    return years;
+    //}
+
+    private dynamic GenerateYearList()
+    {
+      try
+      {
+        //var dateRanges = _context.DeductionsTaxTableDetails.Where(x => x.startDate!=null && x.endDate != null)
+        //    //.Select(x => new { x.startDate, x.endDate })
+
+        //    .Select(x => $"{x.startDate:dd-MMM-yyyy} - {x.endDate:dd-MMM-yyyy}").Distinct()
+        //    .ToList();
+
+        //var dateRanges = _context.DeductionsTaxTableDetails
+        //  .Join(_context.DeductionsTaxTableHeaders,
+        //      detail => detail.TaxHeaderID,
+        //      header => header.TaxTabHid,
+        //      (detail, header) => new
+        //      {
+        //        header.TaxTabHid,
+        //        header.startDate,
+        //        header.endDate
+        //      })
+        //  .Where(x => x.startDate != null && x.endDate != null)
+        //  .Select(x => new
+        //  {
+        //    value = x.TaxTabHid,
+        //    key = $"{x.startDate:dd-MMM-yyyy} - {x.endDate:dd-MMM-yyyy}"
+        //  })
+        //  .Distinct();
+
+
+        // var dateRanges = _context.DeductionsTaxTableHeaders
+        //.Where(x => x.startDate != null && x.endDate != null)
+        //.Select(x => new
+        //{
+        //  showToYear=_context.DeductionsTaxTableDetails.Any(e=>e.TaxHeaderID==x.TaxTabHid),
+        //  value = x.TaxTabHid,
+        //  key = $"{x.startDate:dd-MMM-yyyy} - {x.endDate:dd-MMM-yyyy}"
+        //})
+        //.Distinct();
+        var dateRanges = (from header in _context.DeductionsTaxTableHeaders
+                          where header.startDate != null && header.endDate != null
+                          join detail in _context.DeductionsTaxTableDetails
+                              on header.TaxTabHid equals detail.TaxHeaderID into g
+                          select new
+                          {
+                            showToYear = g.Any(),
+                            value = header.TaxTabHid,
+                            key = $"{header.startDate:dd-MMM-yyyy} - {header.endDate:dd-MMM-yyyy}"
+                          })
+                   .Distinct()
+                   .ToList();
+
+
+        return dateRanges.ToArray();
+      }
+      catch (Exception ex)
+      {
+        return new string[0];
+      }
+    }
+    [HttpGet("GetEmployeesDropDown")]
+    public async Task<IActionResult> GetEmployees(int companyid)
+    {
+      try
+      {
+        var employees = new List<EmployeeDto>();
+
+        using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        await connection.OpenAsync();
+
+        string query = @"
+            SELECT EmployeeID, Soc_Sec_Num + '(' + Last_Name + ' ' + First_Name + ')' as Name
+            FROM MasterEmployee 
+            WHERE IsdirectorOnly = 0 AND Isactive = 1 AND CompanyId = @CompanyId";
+
+        using var command = new SqlCommand(query, connection);
+        command.Parameters.AddWithValue("@CompanyId", companyid);
+
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+          employees.Add(new EmployeeDto
+          {
+            EmployeeId = reader.GetInt32(0),
+            Name = reader.GetString(1)
+          });
+        }
+        await connection.CloseAsync();
+        return Ok(employees);
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+      }
+    }
+    int parentuserid = 0;
+    bool isPPOC = false;
+    string Userimage = null;
+    List<BLSECUsers> blList_ALL = new List<BLSECUsers>();
+    [HttpGet("GetUserProfile")]
+    public async Task<IActionResult> GetUserProfile(int userid)
+    {
+
+      try
+      {
+        //ObjDashboardWindow = Application.Current.Windows.OfType<C3Wizard.Dashboard>().First();
+        //Application.Current.Properties["Currentform"] = "Edit User Management";
+        //Application.Current.Properties["TextChanged"] = 0;
+        //ObjDashboardWindow.cmbEmployer.IsEnabled = false;
+      }
+      catch (Exception ex)
+      {
+        // Login login = new Login();
+        //login.Error_Log(ex.Message);
+      }
+
+      // InitializeComponent();
+      //LoadUserRole();
+      List<BLSECUsers> blList = new List<BLSECUsers>();
+      //List<BLEmployeeProfessional> blempListpro = new List<BLEmployeeProfessional>();
+      //UserId = param;
+      //form_d = formdashboard;
+      blList_ALL = BLSECUsers.SECUsersCollection().ToList();
+      blList = blList_ALL.Where(t => t.UserId == userid).ToList();
+
+
+      if (blList.Count == 1)
+      {
+        var data = new User();
+        data.userId = blList.ElementAt(0).UserId ?? 0;
+        data.firstName = string.IsNullOrEmpty(blList.ElementAt(0).FirstName) ? "" : blList.ElementAt(0).FirstName.ToString();
+        data.middleName = string.IsNullOrEmpty(blList.ElementAt(0).MiddleName) ? "" : blList.ElementAt(0).MiddleName.ToString();
+        data.lastName = string.IsNullOrEmpty(blList.ElementAt(0).LastName) ? "" : blList.ElementAt(0).LastName.ToString();
+        //data.FirstName = string.IsNullOrEmpty(blList.ElementAt(0).LoginId) ? "" : blList.ElementAt(0).LoginId.ToString();
+        //Txt_UserName = false;
+        data.emailId = string.IsNullOrEmpty(blList.ElementAt(0).EmailId) ? "" : blList.ElementAt(0).EmailId.ToString();
+        data.roleId = blList.ElementAt(0).RoleId ?? 0;
+        //userRole.IsEnabled = false;
+        data.status = string.IsNullOrEmpty(blList.ElementAt(0).Status.ToString()) ? false : (bool)blList.ElementAt(0).Status;
+        //activestatus.Visibility = Helper.RoleId != 1 ? Visibility.Visible : Visibility.Hidden;
+        //Status.Visibility = Helper.RoleId != 1 ? Visibility.Visible : Visibility.Hidden;
+        data.parentUserId = blList.ElementAt(0).parentuserid == null ? 0 : (int)blList.ElementAt(0).parentuserid;
+        data.isPPOC = blList.ElementAt(0).IsPPOC == null ? true : (bool)blList.ElementAt(0).IsPPOC;
+        if (data.roleId == 2)
+        {
+          return Ok(data);
+
+        }
+        try
+        {
+          Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+          string imageUrl = $"{Request.Scheme}://{Request.Host}/UserImage/{Userimage}";
+
+          data.profileImage = imageUrl;
+
+
+          return Ok(new { Message = "Data get successfully", Data = data });
+
+          //Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+          //if (Userimage != null && Userimage != "")
+          //{
+          //    var applicationPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+          //    var uri = new Uri(applicationPath + "/UserImage/" + Userimage);
+          //    //var bitmap = new BitmapImage(uri);
+          //    //imgProfilePic.Source = bitmap;
+          //}
+          //else
+          //{
+          //    var uri = new Uri("pack://application:,,,/Images/user.jpg");
+          //    //var bitmap = new BitmapImage(uri);
+          //    //imgProfilePic.Source = bitmap;
+          //}
+        }
+        catch (Exception ex)
+        {
+          var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+          LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+          return StatusCode(500, ex.Message);
+          //Login login = new Login();
+          // login.Error_Log(ex.Message);
+
+        }
+        //UserId = param;
+
+      }
+      return Ok(userid);
+    }
+    string filepath;
+    string Imagename = null;
+    [HttpPost("EditUserProfile")]
+    public async Task<IActionResult> EditUserProfile([FromForm] UserImagePost edituser)
+    {
+      var user = await _context.Secusers.FindAsync(edituser.userId);
+      var selfuser = await _context.SelfEmployees.FirstOrDefaultAsync(x => x.EmployeeId == Convert.ToInt32(user.SelfEmpId));
+      if (user == null)
+      {
+        return NotFound("User not found.");
+      }
+      if (selfuser != null)
+      {
+        selfuser.FirstName = edituser.firstName;
+        selfuser.LastName = edituser.lastName;
+        selfuser.Email = edituser.emailId;
+        _context.SelfEmployees.Update(selfuser);
+        await _context.SaveChangesAsync();
+      }
+      BLSECUsers secuser = new BLSECUsers();
+      secuser.FirstName = edituser.firstName;
+      //secuser.MiddleName = edituser.middleName;
+      secuser.LastName = edituser.lastName;
+      secuser.EmailId = edituser.emailId;
+      secuser.RoleId = user.RoleId;
+      secuser.Status = user.Status;
+      // secuser.EmpId = Helper.UserID.ToString();
+
+      try
+      {
+
+        if (edituser.profileImage != null && edituser.profileImage.Length > 0)
+        {
+          string uploadsFolder = Path.Combine(_environment.WebRootPath, "UserImage");
+          Directory.CreateDirectory(uploadsFolder);
+          Imagename = Guid.NewGuid().ToString() + Path.GetExtension(edituser.profileImage.FileName);
+          string filePath = Path.Combine(uploadsFolder, Imagename);
+          using (var fileStream = new FileStream(filePath, FileMode.Create))
+          {
+            edituser.profileImage.CopyTo(fileStream);
+          }
+          secuser.ProfileImage = Imagename;
+        }
+        else
+        {
+          secuser.ProfileImage = user.UserImage;
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, ex.Message);
+        //Login login = new Login();
+        //login.Error_Log(ex.Message);
+
+      }
+
+      secuser.IsLoggedIn = false;
+      try
+      {
+        var res = _context.Secusers.Where(x => x.UserId == edituser.userId).FirstOrDefault();
+        if (res != null)
+        {
+          if (res.EmailId != edituser.emailId)
+          {
+            var emaildata = _context.Secusers.Where(x => x.EmailId == edituser.emailId).FirstOrDefault();
+            if (emaildata != null)
+            {
+              return Conflict(new
+              {
+                message = "User email already exists"
+              });
+
+            }
+            secuser.IsActive = true;
+            secuser.UserId = edituser.userId;
+            secuser.parentuserid = edituser.parentUserId;
+            secuser.IsPPOC = edituser.isPPOC;
+            //secuser.UpdatedBy = Helper.CompanyId;
+            secuser.UpdatedOn = DateTime.Now;
+            secuser.UpdatedMachineInfo = Helper.MachineInfo;
+            secuser.Update();
+
+            List<BLSECUsers> blList1 = new List<BLSECUsers>();
+            blList_ALL = BLSECUsers.SECUsersCollection().ToList();
+            blList1 = blList_ALL.Where(t => t.UserId == secuser.UserId).ToList();
+
+            Userimage = string.IsNullOrEmpty(blList1.ElementAt(0).ProfileImage) ? "" : blList1.ElementAt(0).ProfileImage.ToString();
+            string imageUrl1 = $"{Request.Scheme}://{Request.Host}/UserImage/{Userimage}";
+
+            secuser.ProfileImage = imageUrl1;
+            return Ok(new { Message = "Data Update successfully", Data = secuser });
+          }
+          secuser.IsActive = true;
+          secuser.UserId = edituser.userId;
+          secuser.parentuserid = edituser.parentUserId;
+          secuser.IsPPOC = edituser.isPPOC;
+          //secuser.UpdatedBy = Helper.CompanyId;
+          secuser.UpdatedOn = DateTime.Now;
+          secuser.UpdatedMachineInfo = Helper.MachineInfo;
+          secuser.Update();
+
+          List<BLSECUsers> blList = new List<BLSECUsers>();
+          blList_ALL = BLSECUsers.SECUsersCollection().ToList();
+          blList = blList_ALL.Where(t => t.UserId == secuser.UserId).ToList();
+
+          Userimage = string.IsNullOrEmpty(blList.ElementAt(0).ProfileImage) ? "" : blList.ElementAt(0).ProfileImage.ToString();
+          string imageUrl = $"{Request.Scheme}://{Request.Host}/UserImage/{Userimage}";
+
+          secuser.ProfileImage = imageUrl;
+          return Ok(new { Message = "Data Update successfully", Data = secuser });
+        }
+        else
+        {
+          return Conflict(new
+          {
+            message = "User data not exists"
+          });
+        }
+        //Application.Current.Properties["TextChanged"] = 0;
+        // C3WizardMessageBox.Show("C3 Wizard", "User updated successfully.");
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, ex.Message);
+        //Login login = new Login();
+        //login.Error_Log(ex.Message);
+        //Helper.mWriteToLog(string.Format("Exception Message at " + System.Reflection.MethodBase.GetCurrentMethod().Name + " Method: {0}", ex.Message));
+        //Helper.mWriteToLog(string.Concat("Stack Trace: ", ex.StackTrace));
+        //if (ex.InnerException != null)
+        //{
+        //    Helper.mWriteToLog(string.Concat("Inner Message: ", ex.InnerException.Message));
+        //    Helper.mWriteToLog(string.Concat("Inner Message Stack: ", ex.InnerException.StackTrace));
+        //}
+        //C3WizardMessageBox.Show("C3 Wizard", "Error saving new record: system has detected a data exception.");
+      }
+
+      if (filepath != null && secuser.UserId == edituser.userId)
+      {
+        filepath = null;
+        try
+        {
+          return Ok(secuser);
+          //if (Imagename != null && Imagename != "")
+          //{
+          //    var applicationPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+          //    var uri = new Uri(applicationPath + "/UserImage/" + Imagename);
+          //    var bitmap = new BitmapImage(uri);
+          //    ObjDashboardWindow.image.ImageSource = bitmap;
+          //}
+          //else
+          //{
+          //    var uri = new Uri("pack://application:,,,/Images/user.jpg");
+          //    var bitmap = new BitmapImage(uri);
+          //    ObjDashboardWindow.image.ImageSource = bitmap;
+          //}
+
+        }
+        catch (Exception ex)
+        {
+          var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+          LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+          return StatusCode(500, ex.Message);
+          //Login login = new Login();
+          //login.Error_Log(ex.Message);
+
+        }
+      }
+      // Application.Current.Properties["TextChanged"] = 0;
+      // string ResPath = Directory.GetCurrentDirectory() + "\\Resources.resx";//same fileName
+      // var reader = new ResXResourceReader(Helper.ApplicationPath("Resources.resx"));
+      // var node = reader.GetEnumerator();
+      //  var writer = new ResXResourceWriter(@"D:\C3Wizard\C3Wizard\Properties\Resources.resx");//same fileName(not new)
+      // double width = 0.00;
+      // while (node.MoveNext())
+      //{
+      //  width = (double)(node.Value);
+      //}
+      //if (form_d)
+      //{
+      //    ObjDashboardWindow.MainMdiContainer.Children.Clear();
+      //    ObjDashboardWindow.MainMdiContainer.Children.Add(new MdiChild()
+      //    {
+      //        Title = "DASHBOARD",
+      //        Height = (System.Windows.SystemParameters.PrimaryScreenHeight) - 150,
+      //        Width = width,//(System.Windows.SystemParameters.PrimaryScreenWidth) - 350,
+      //        Style = null,
+      //        Content = new Home()
+      //    });
+      //}
+      //else
+      //{
+      //    ObjDashboardWindow.MainMdiContainer.Children.Clear();
+      //    ObjDashboardWindow.MainMdiContainer.Children.Add(new MdiChild()
+      //    {
+      //        Title = "USER LIST",
+      //        Height = (System.Windows.SystemParameters.PrimaryScreenHeight) - 150,
+      //        Width = width,//(System.Windows.SystemParameters.PrimaryScreenWidth) - 350,
+      //        Style = null,
+      //        Content = new UserManagementList()
+      //    });
+
+      //}
+      return Ok(secuser);
+    }
+
+
+
+
+
+    [HttpPost("SaveRole")]
+    public async Task<ResponseModel> SaveRole([FromBody] SaveroleVm saveroleVm)
+    {
+      var response = new ResponseModel();
+
+      try
+      {
+        var secrole = new Secrole
+        {
+          Role = saveroleVm.RoleName,
+          Description = saveroleVm.descreption,
+          roleCategory = saveroleVm.RoleCategory,
+          InsertedBy = saveroleVm.CreatedBy,
+          InsertedOn = DateTime.Now,
+          IsActive = true
+        };
+
+        _context.Secroles.Add(secrole);
+        await _context.SaveChangesAsync();
+
+        response.Status = true;
+        response.Statuscode = 200;
+        response.Message = "Role saved successfully.";
+        response.Data = secrole;
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        response.Status = false;
+        response.Statuscode = 500;
+        response.Message = $"Error saving role: {ex.Message}";
+      }
+
+      return response;
+    }
+    [HttpPost("UpdateRole")]
+    public async Task<IActionResult> UpdateRole([FromBody] SaveroleVm saveroleVm)
+    {
+      var response = new ResponseModel();
+
+      try
+      {
+        var data = await _context.Secroles.Where(x => x.RoleId == saveroleVm.RoleId).FirstOrDefaultAsync();
+        if (data != null)
+        {
+          data.Description = saveroleVm.descreption;
+          data.Role = saveroleVm.RoleName;
+          data.roleCategory = saveroleVm.RoleCategory;
+          _context.Secroles.Update(data);
+          await _context.SaveChangesAsync();
+
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data Updated successfully.",
+            Data = data,
+            Statuscode = 200
+          });
+
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No data found.",
+            Data = null,
+            Statuscode = 404
+
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+
+      }
+    }
+
+    //[HttpGet]
+    //[Route("GetAllRoles")]
+    //public async Task<IActionResult> GetAllRoles()
+    //{
+    //    try
+    //    {
+    //        var allRoles = new List<AllRoles>();
+
+    //        using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+    //        {
+    //            using (SqlCommand cmd = new SqlCommand("select * from SECRole", connection))
+    //            {
+
+    //                await connection.OpenAsync();
+    //                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+    //                {
+    //                    while (await reader.ReadAsync())
+    //                    {
+    //                        allRoles.Add(new AllRoles
+    //                        {
+    //                            RoleId = Convert.ToInt32(reader["RoleId"]),
+    //                            RoleName = reader["Role"] as string,
+    //                            Description = reader["Description"] as string
+    //                        });
+
+
+    //                    }
+    //                }
+    //                await connection.CloseAsync();
+    //            }
+    //        }
+    //        if (allRoles != null && allRoles.Any())
+    //        {
+    //            return Ok(new ResponseModel
+    //            {
+    //                Status = true,
+    //                Message = "Data retrieved successfully.",
+    //                Data = allRoles,
+    //                Statuscode = 200
+    //            });
+    //        }
+    //        else
+    //        {
+    //            return NotFound(new ResponseModel
+    //            {
+    //                Status = false,
+    //                Message = "No data found.",
+    //                Data = null,
+    //                Statuscode = 404
+    //            });
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new ResponseModel
+    //        {
+    //            Status = false,
+    //            Message = $"Internal server error: {ex.Message}",
+    //            Data = null,
+    //            Statuscode = 500
+    //        });
+    //    }
+    //}
+
+    [HttpGet]
+    [Route("GetAllRoles")]
+    public async Task<IActionResult> GetAllRoles()
+    {
+      try
+      {
+        var allRoles = new List<AllRoles>();
+
+        // Get roleCategory enum list
+
+
+        using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        {
+          using (SqlCommand cmd = new SqlCommand("select * from SECRole", connection))
+          {
+            await connection.OpenAsync();
+            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+            {
+              while (await reader.ReadAsync())
+              {
+                allRoles.Add(new AllRoles
+                {
+                  RoleId = Convert.ToInt32(reader["RoleId"]),
+                  RoleName = reader["Role"] as string,
+                  Description = reader["Description"] as string,
+                  roleCategory = reader["roleCategory"] as string
+                });
+              }
+            }
+            await connection.CloseAsync();
+          }
+        }
+
+        if (allRoles != null && allRoles.Any())
+        {
+
+          var roleCategoryList = Enum.GetValues(typeof(roleCategory))
+               .Cast<roleCategory>()
+               .Select(e => new
+               {
+                 Id = e.ToString(),
+                 Name = e.ToString(),
+                 RoleName = allRoles.Where(x => x.roleCategory == e.ToString()).ToList()
+               }).ToList();
+
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Message = "Data retrieved successfully.",
+            Data = new
+            {
+              //RolesFromDb = allRoles,
+              RoleCategories = roleCategoryList
+            },
+            Statuscode = 200
+
+          });
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No data found.",
+            Data = null,
+            Statuscode = 404
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+    }
+
+    [HttpGet("GetLoggedExceptionsReport")]
+    public async Task<IActionResult> GetLoggedExceptionsReport(int pageNumber, int pageSize, DateTime? fromDate, DateTime? toDate)
+    {
+      try
+      {
+
+        var (pagedData, totalRecords, totalPages) = await _c3.GetLoggedExceptionsReportData(pageNumber, pageSize, fromDate, toDate);
+        if (pagedData != null && pagedData.Count != 0)
+        {
+          return Ok(new
+          {
+            status = true,
+            message = "Data fetched successfully.",
+            totalRecords = totalRecords,
+            currentPage = pageNumber,
+            pageSize = pageSize,
+            totalPages = totalPages,
+            data = pagedData
+
+          });
+        }
+        else
+        {
+          return BadRequest(new
+          {
+            status = false,
+            msg = "data not found",
+            data = "[]"
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, ex.Message);
+      }
+    }
+    //[HttpGet("FilterLoggedExceptionsReport")]
+    //public async Task<IActionResult> FilterLoggedExceptionsReport(DateTime? fromDate, DateTime? toDate)
+    //{
+    //    try
+    //    {
+    //        if (!fromDate.HasValue || !toDate.HasValue)
+    //        {
+    //            return BadRequest(new
+    //            {
+    //                status = false,
+    //                message = "Both fromDate and toDate are required."
+    //            });
+    //        }
+
+
+    //        DateTime from = fromDate.Value.Date;
+    //        DateTime to = toDate.Value.Date.AddDays(1).AddTicks(-1);
+
+    //        var data = await _c3.FilterLoggedExceptionsReport(from, to);
+
+    //        if (data != null && data.Count != 0)
+    //        {
+    //            return Ok(new
+    //            {
+    //                status = true,
+    //                message = "Data fetched successfully.",
+    //                data = data
+    //            });
+    //        }
+    //        else
+    //        {
+    //            return NotFound(new
+    //            {
+    //                status = false,
+    //                message = "No data found for the selected date range.",
+    //                data = "[]"
+    //            });
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+    //        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+    //        return StatusCode(500, new
+    //        {
+    //            status = false,
+    //            message = "Internal server error.",
+    //            error = ex.Message
+    //        });
+    //    }
+    //}
+
+
+    [HttpGet("GetRoleById")]
+    public async Task<IActionResult> GetRoleById(int Roleid)
+    {
+      var response = new ResponseModel();
+
+      try
+      {
+
+
+        var data = await _context.Secroles.Where(x => x.RoleId == Roleid).FirstOrDefaultAsync();
+        if (data != null)
+        {
+          return Ok(new ResponseModel
+          {
+            Status = true,
+            Statuscode = 200,
+            Message = "Role Fetch successfully.",
+            Data = data
+          });
+        }
+        else
+        {
+          return NotFound(new ResponseModel
+          {
+            Status = false,
+            Message = "No data found.",
+            Data = null,
+            Statuscode = 404
+
+          });
+        }
+
+
+
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        return StatusCode(500, new ResponseModel
+        {
+          Status = false,
+          Message = $"Internal server error: {ex.Message}",
+          Data = null,
+          Statuscode = 500
+        });
+      }
+
+
+    }
+    //[HttpGet("DivideByZero")]
+    //public IActionResult DivideByZero()
+    //{
+    //    try
+    //    {
+    //        int a = 10;
+    //        int b = 0;
+    //        int result = a / b;
+    //        return Ok(result);
+    //    }
+    //    catch (Exception ex)
+    //    {
+
+    //        throw ex;
+    //    }
+
+    //}
+
+
+    [HttpGet("DeleteRole/{roleId}")]
+    public async Task<IActionResult> DeleteRole(int roleId)
+    {
+      var response = new ResponseModel();
+
+      try
+      {
+
+        if (roleId <= 6)
+        {
+          response.Status = false;
+          response.Statuscode = 403;
+          response.Message = "You are not allowed to delete system default roles.";
+          return StatusCode(403, response);
+        }
+
+        var role = await _context.Secroles.FindAsync(roleId);
+
+        if (role == null)
+        {
+          response.Status = false;
+          response.Statuscode = 404;
+          response.Message = "Role not found.";
+          return NotFound(response);
+        }
+
+        _context.Secroles.Remove(role);
+        await _context.SaveChangesAsync();
+
+        response.Status = true;
+        response.Statuscode = 200;
+        response.Message = "Role deleted successfully.";
+        return Ok(response);
+      }
+      catch (Exception ex)
+      {
+        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+        response.Status = false;
+        response.Statuscode = 500;
+        response.Message = $"Error deleting role: {ex.Message}";
+        return StatusCode(500, response);
+      }
+    }
+
+
+
+
+
+  }
+}

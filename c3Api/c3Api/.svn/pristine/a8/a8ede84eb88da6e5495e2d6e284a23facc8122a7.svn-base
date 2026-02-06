@@ -1,0 +1,2622 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json;
+
+namespace C3WizardData.Models;
+
+public partial class C3wizardContext : DbContext
+{
+
+    public C3wizardContext()
+    {
+    }
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public string CurrentUserId { get; private set; }
+    public C3wizardContext(DbContextOptions<C3wizardContext> options, IHttpContextAccessor httpContextAccessor)
+        : base(options)
+    {
+        _httpContextAccessor = httpContextAccessor;
+        var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId");
+        CurrentUserId = userIdClaim?.Value;
+    }
+    public virtual DbSet<AboutUs> AboutUs { get; set; }
+    public virtual DbSet<BonusPayDetail> BonusPayDetails { get; set; }
+
+    public virtual DbSet<City> Cities { get; set; }
+
+    public virtual DbSet<ContactUsLog> ContactUsLogs { get; set; }
+
+    public virtual DbSet<Country> Countries { get; set; }
+
+    public virtual DbSet<CustomErrorLog> CustomErrorLogs { get; set; }
+
+    public virtual DbSet<DecemberBonusExemptedContribution> DecemberBonusExemptedContributions { get; set; }
+
+    public virtual DbSet<DeductionsTaxTableDetail> DeductionsTaxTableDetails { get; set; }
+
+    public virtual DbSet<DeductionsTaxTableHeader> DeductionsTaxTableHeaders { get; set; }
+
+    public virtual DbSet<EmployeeTcardDetail> EmployeeTcardDetails { get; set; }
+
+    public virtual DbSet<EmployeeTcardHeader> EmployeeTcardHeaders { get; set; }
+
+    public virtual DbSet<EmployeeWorkDurationDetail> EmployeeWorkDurationDetails { get; set; }
+
+    public virtual DbSet<ErrorLog> ErrorLogs { get; set; }
+
+    public virtual DbSet<ExceptionLog> ExceptionLogs { get; set; }
+
+    public virtual DbSet<HolidayPayDate> HolidayPayDates { get; set; }
+
+    public virtual DbSet<LoginLog> LoginLogs { get; set; }
+
+    public virtual DbSet<MasterCompany> MasterCompanies { get; set; }
+
+    public virtual DbSet<MasterDeductionCode> MasterDeductionCodes { get; set; }
+
+    public virtual DbSet<MasterEmpType> MasterEmpTypes { get; set; }
+
+    public virtual DbSet<MasterEmployee> MasterEmployees { get; set; }
+
+    public virtual DbSet<MasterEmployeeDeduction> MasterEmployeeDeductions { get; set; }
+
+    public virtual DbSet<MasterEmployeeIncome> MasterEmployeeIncomes { get; set; }
+
+    public virtual DbSet<MasterEmployeeObligation> MasterEmployeeObligations { get; set; }
+
+    public virtual DbSet<MasterEmployerCode> MasterEmployerCodes { get; set; }
+
+    public virtual DbSet<MasterHolidayPayDetail> MasterHolidayPayDetails { get; set; }
+
+    public virtual DbSet<MasterIncCode> MasterIncCodes { get; set; }
+
+    public virtual DbSet<MasterObligationCode> MasterObligationCodes { get; set; }
+
+    public virtual DbSet<MasterRateSetting> MasterRateSettings { get; set; }
+
+    public virtual DbSet<NwdMasterRateSetting> NwdMasterRateSettings { get; set; }
+
+    public virtual DbSet<OtpRequest> OtpRequests { get; set; }
+
+    public virtual DbSet<PayrollProcessDetail> PayrollProcessDetails { get; set; }
+
+    public virtual DbSet<PayrollProcessHeader> PayrollProcessHeaders { get; set; }
+
+    public virtual DbSet<ProcessC3header> ProcessC3headers { get; set; }
+
+    public virtual DbSet<ProcessContribution> ProcessContributions { get; set; }
+
+    public virtual DbSet<ProcessPayDeduction> ProcessPayDeductions { get; set; }
+
+    public virtual DbSet<ProcessPayEmployee> ProcessPayEmployees { get; set; }
+
+    public virtual DbSet<ProcessPayIncome> ProcessPayIncomes { get; set; }
+
+    public virtual DbSet<ProcessPayobligation> ProcessPayobligations { get; set; }
+
+    public virtual DbSet<ProcessSelfEmployedC3> ProcessSelfEmployedC3s { get; set; }
+
+    public virtual DbSet<Secmodule> Secmodules { get; set; }
+
+    public virtual DbSet<Secrole> Secroles { get; set; }
+
+    public virtual DbSet<SecurityQuestionAnswer> SecurityQuestionAnswers { get; set; }
+
+    public virtual DbSet<Secuser> Secusers { get; set; }
+
+    public virtual DbSet<SecuserModule> SecuserModules { get; set; }
+
+    public virtual DbSet<SelfEmployedSetting> SelfEmployedSettings { get; set; }
+
+    public virtual DbSet<SelfEmployee> SelfEmployees { get; set; }
+
+    public virtual DbSet<State> States { get; set; }
+
+    public virtual DbSet<Table> Tables { get; set; }
+
+    public virtual DbSet<UserPermission> UserPermissions { get; set; }
+
+    public virtual DbSet<WageCategory> WageCategories { get; set; }
+
+    public virtual DbSet<WagesPayDetail> WagesPayDetails { get; set; }
+    public virtual DbSet<OnlinePayments> OnlinePayments { get; set; }
+
+    public virtual DbSet<TestOnlinePayments> TestOnlinePayments { get; set; }
+    public virtual DbSet<ReconciliationPayment_Details> ReconciliationPayments { get; set; }
+    public virtual DbSet<BankPaymentsMain> BankPayments { get; set; }
+    public virtual DbSet<SiteSettings> SiteSetting { get; set; }
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+    public virtual DbSet<ReconciliationCyberSpace> ReconciliationCyberSpaces { get; set; }
+
+    public virtual DbSet<ReconciliationCyberSpaceColumn> ReconciliationCyberSpaceColumns { get; set; }
+    public virtual DbSet<UserCardDetail> UserCardDetails { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            //entity.HasNoKey();
+            entity.HasKey(e => e.Id).HasName("PK_AuditLog");
+            entity.Property(e => e.Action).HasMaxLength(50);
+            entity.Property(e => e.ColumnName).HasMaxLength(50);
+            entity.Property(e => e.Controller).HasMaxLength(50);
+            entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.EventType).HasMaxLength(10);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Ipaddress).HasColumnName("IPAddress");
+            entity.Property(e => e.ModifiedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.TableName).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<UserCardDetail>(entity =>
+        {
+            entity.ToTable("UserCardDetail");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.CardNumber)
+              .IsRequired()
+              .HasMaxLength(50);
+            entity.Property(e => e.UserId)
+              .IsRequired()
+              .HasMaxLength(50);
+
+            entity.Property(e => e.CardMonthExpiry)
+              .IsRequired()
+              .HasMaxLength(10);
+
+            entity.Property(e => e.CardHolderName)
+              .IsRequired()
+              .HasMaxLength(100);
+
+            entity.Property(e => e.CVV)
+              .IsRequired()
+              .HasMaxLength(10);
+
+            entity.Property(e => e.IsActive);
+
+
+            entity.Property(e => e.InsertedOn)
+              .HasDefaultValueSql("GETDATE()");
+        });
+
+        modelBuilder.Entity<OnlinePayments>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__OnlinePa__3214EC07DF368239");
+
+            entity.Property(e => e.C3HeaderId).HasColumnName("C3HeaderId");
+            entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.ExcangeRate).HasColumnType("decimal(18, 6)");
+            entity.Property(e => e.FromAccountAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.ModifiedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.PaymentAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.PaymentAmountUSD)
+            .HasColumnType("decimal(18, 2)")
+            .HasColumnName("PaymentAmountUSD");
+            entity.Property(e => e.PaymentGatewayTransactionID).HasColumnName("PaymentGatewayTransactionID");
+            entity.Property(e => e.ReasonForPayment).HasMaxLength(100);
+        });
+
+        //modelBuilder.Entity<SiteSettings>(entity =>
+        //{
+        //  entity.ToTable("SiteSettings");
+
+        //  entity.HasKey(e => e.SiteSettings_Id);
+
+        //  entity.Property(e => e.SiteSettings_Id)
+        //      .HasColumnName("SiteSettings_Id");
+        //      //.ValueGeneratedOnAdd();
+
+        //  entity.Property(e => e.MerchantId)
+        //      .IsRequired()
+        //      .HasMaxLength(2083);
+
+        //  entity.Property(e => e.KeyId)
+        //      .IsRequired()
+        //      .HasMaxLength(2083);
+
+        //  entity.Property(e => e.SecretKey)
+        //      .IsRequired()
+        //      .HasMaxLength(2083);
+
+        //  entity.Property(e => e.BaseUrl)
+        //      .IsRequired()
+        //      .HasMaxLength(2083);
+
+        //  entity.Property(e => e.Environment)
+        //      .IsRequired()
+        //      .HasMaxLength(100);
+
+        //  entity.Property(e => e.InsertedBy);
+
+        //  entity.Property(e => e.InsertedOn);
+
+        //  entity.Property(e => e.InsertedMachineInfo)
+        //      .HasMaxLength(50);
+
+        //  entity.Property(e => e.UpdatedBy);
+
+        //  entity.Property(e => e.UpdatedOn);
+
+        //  entity.Property(e => e.UpdatedMachineInfo)
+        //      .HasMaxLength(50);
+
+        //  entity.Property(e => e.IsActive);
+        //      //.IsRequired();
+        //});
+
+        modelBuilder.Entity<SiteSettings>(entity =>
+        {
+            entity.ToTable("SiteSettings", "dbo");
+
+            entity.HasKey(e => e.SiteSettings_Id);
+
+            entity.Property(e => e.SiteSettings_Id)
+              .HasColumnName("SiteSettings_Id");
+
+            entity.Property(e => e.MerchantId)
+              .IsRequired()
+              .HasMaxLength(2083);
+
+            entity.Property(e => e.KeyId)
+              .IsRequired()
+              .HasMaxLength(2083);
+
+            entity.Property(e => e.SecretKey)
+              .IsRequired()
+              .HasMaxLength(2083);
+
+            entity.Property(e => e.BaseUrl)
+              .IsRequired()
+              .HasMaxLength(2083);
+
+            entity.Property(e => e.Environment)
+              .IsRequired()
+              .HasMaxLength(100);
+
+            entity.Property(e => e.InsertedBy)
+              .IsRequired(false);
+
+            entity.Property(e => e.InsertedOn)
+              .IsRequired(false);
+
+            entity.Property(e => e.InsertedMachineInfo)
+              .HasMaxLength(50);
+
+            entity.Property(e => e.UpdatedBy)
+              .IsRequired(false);
+
+            entity.Property(e => e.UpdatedOn)
+              .IsRequired(false);
+
+            entity.Property(e => e.UpdatedMachineInfo)
+              .HasMaxLength(50);
+
+            entity.Property(e => e.IsActive)
+              .IsRequired();
+        });
+        modelBuilder.Entity<CustomErrorLog>(entity =>
+        {
+            entity.Property(e => e.ControllerName).HasMaxLength(100);
+            entity.Property(e => e.LogDate).HasColumnType("datetime");
+            entity.Property(e => e.MethodName).HasMaxLength(100);
+        });
+        modelBuilder.Entity<TestOnlinePayments>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__OnlinePa__3214EC07DF368239");
+
+                entity.Property(e => e.C3HeaderId).HasColumnName("C3HeaderId");
+                entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
+                entity.Property(e => e.ExcangeRate).HasColumnType("decimal(18, 6)");
+                entity.Property(e => e.FromAccountAmount).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.ModifiedOn).HasColumnType("smalldatetime");
+                entity.Property(e => e.PaymentAmount).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.PaymentAmountUSD)
+            .HasColumnType("decimal(18, 2)")
+            .HasColumnName("PaymentAmountUSD");
+                entity.Property(e => e.PaymentGatewayTransactionID).HasColumnName("PaymentGatewayTransactionID");
+                entity.Property(e => e.ReasonForPayment).HasMaxLength(100);
+            });
+
+        modelBuilder.Entity<BonusPayDetail>(entity =>
+            {
+                entity.HasKey(e => e.BonusPayId);
+
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.BonusPayDate).HasColumnType("datetime");
+                entity.Property(e => e.CompanyId).HasColumnName("company_ID");
+                entity.Property(e => e.EmployeeId).HasColumnName("employeeID");
+                entity.Property(e => e.EndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("end_Date");
+                entity.Property(e => e.Insertedby).HasColumnName("insertedby");
+                entity.Property(e => e.Insertedmachineinfo).HasColumnName("insertedmachineinfo");
+                entity.Property(e => e.Insertedon)
+                .HasColumnType("datetime")
+                .HasColumnName("insertedon");
+                entity.Property(e => e.PeriodYear)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("PERIOD_YEAR");
+                entity.Property(e => e.PerioddMonth)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("PERIODD_MONTH");
+                entity.Property(e => e.StartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("start_Date");
+                entity.Property(e => e.Updateby).HasColumnName("updateby");
+                entity.Property(e => e.Updatemachineinfo).HasColumnName("updatemachineinfo");
+                entity.Property(e => e.Updateon)
+                .HasColumnType("datetime")
+                .HasColumnName("updateon");
+            });
+
+        modelBuilder.Entity<City>(entity =>
+        {
+            entity.HasKey(e => e.Cid)
+                .HasName("CId")
+                .IsClustered(false);
+
+            entity.ToTable("City");
+
+            entity.Property(e => e.Cid).HasColumnName("CId");
+            entity.Property(e => e.Deletable).HasMaxLength(1);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Sid).HasColumnName("SId");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<ReconciliationPayment_Details>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_ReconciliationPayment");
+
+            entity.ToTable("ReconciliationPayment_Details");
+
+            entity.HasIndex(e => e.TransactionId, "ConstraintName").IsUnique();
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 3)");
+            entity.Property(e => e.MainId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.PaymentStatus)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.ReconciliationStatus)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TransactionDate).HasColumnType("datetime");
+            entity.Property(e => e.TransactionId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+
+
+
+        modelBuilder.Entity<BankPaymentsMain>(entity =>
+        {
+            entity.HasKey(e => e.MainId);
+
+            entity.ToTable("BankPaymentsMain");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.FilePath).IsUnicode(false);
+            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+        });
+
+
+
+
+
+        modelBuilder.Entity<ContactUsLog>(entity =>
+        {
+            entity.HasKey(e => e.CusId);
+
+            entity.ToTable("ContactUs_Log");
+
+            entity.Property(e => e.CusId).HasColumnName("CUsId");
+            entity.Property(e => e.Emailid)
+                .HasMaxLength(100)
+                .IsFixedLength();
+            entity.Property(e => e.InsertDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<ReconciliationCyberSpace>(entity =>
+        {
+            entity.ToTable("Reconciliation_Cyber_Space");
+
+
+            entity.HasKey(e => e.Id).HasName("PK_ReconciliationCyberSpace");
+
+            entity.Property(e => e.Id)
+    .HasColumnName("Id")
+    .ValueGeneratedOnAdd();
+            entity.Property(e => e.CyberSourceMerchantId)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("CyberSourceMerchantID");
+
+            entity.Property(e => e.AccountPrefix)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("AccountPrefix");
+
+            entity.Property(e => e.AccountSuffix)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("AccountSuffix");
+
+            entity.Property(e => e.AcquirerAccountId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("AcquirerAccountID");
+
+            entity.Property(e => e.Amount)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.Applications)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.AuthorisationCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("AuthorisationCode");
+
+            entity.Property(e => e.AuthorisationIndicator)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("AuthorisationIndicator");
+
+            entity.Property(e => e.BillingAddress1)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BillingAddress1");
+
+            entity.Property(e => e.BillingCity)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BillingCity");
+
+            entity.Property(e => e.BillingCountry)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BillingCountry");
+
+            entity.Property(e => e.BillingCountyRegion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BillingCounty_Region");
+
+            entity.Property(e => e.BillingPhoneNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BillingPhoneNumber");
+
+            entity.Property(e => e.BillingPostalCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BillingPostalCode");
+
+            entity.Property(e => e.BusinessApplicationId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("BusinessApplicationID");
+
+            entity.Property(e => e.ClientApplication)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ClientApplication");
+
+            entity.Property(e => e.ClientUser)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ClientUser");
+
+            entity.Property(e => e.CommerceIndicator)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("CommerceIndicator");
+
+            entity.Property(e => e.Currency)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.CustomerId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CustomerID");
+
+            //entity.Property(e => e.DateAndTime)
+            //    .HasColumnType("datetime")
+            //    .HasColumnName("Date and Time");
+
+            entity.Property(e => e.DateAndTime)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("DateandTime");
+
+            entity.Property(e => e.DeviceFingerprint)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("DeviceFingerprint");
+
+            entity.Property(e => e.DeviceId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("DeviceID");
+
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FirstName");
+
+            entity.Property(e => e.IcsRcode)
+                .HasColumnName("ICSRcode");
+
+            entity.Property(e => e.IcsRflag)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("ICSRflag");
+
+            entity.Property(e => e.InstalmentIdentifier)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("InstalmentIdentifier");
+
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("IPAddress");
+
+            entity.Property(e => e.JccaTerminalId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("JCCATerminalID");
+
+            entity.Property(e => e.LastName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("LastName");
+
+            entity.Property(e => e.MerchantDefinedData1)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.MerchantDefinedData2)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.MerchantDefinedData3)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.MerchantDefinedData4)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.MerchantReferenceNumber)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("MerchantReferenceNumber");
+
+            entity.Property(e => e.PaTransactionId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PATransactionID");
+
+            entity.Property(e => e.PartnerOriginalTransactionId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PartnerOriginalTransactionID");
+
+            entity.Property(e => e.PartnerSolutionId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PartnerSolutionID");
+
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PaymentMethod");
+
+            entity.Property(e => e.PaymentSolution)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PaymentSolution");
+
+            entity.Property(e => e.Processor)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.Property(e => e.ProviderTransactionId)
+                .HasColumnName("ProviderTransactionId");
+
+            entity.Property(e => e.ReasonCode)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("ReasonCode");
+
+            entity.Property(e => e.RequestId)
+                .HasColumnName("RequestID");
+
+            entity.Property(e => e.RetrievalReferenceNumber)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("RetrievalReferenceNumber");
+
+            entity.Property(e => e.SalesSlipNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("SalesSlipNumber");
+
+            entity.Property(e => e.ShippingAddress1)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingAddress1");
+
+            entity.Property(e => e.ShippingCity)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingCity");
+
+            entity.Property(e => e.ShippingCountry)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingCountry");
+
+            entity.Property(e => e.ShippingCountyRegion)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingCounty_Region");
+
+            entity.Property(e => e.ShippingFirstName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingFirstName");
+
+            entity.Property(e => e.ShippingLastName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingLastName");
+
+            entity.Property(e => e.ShippingPhoneNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingPhoneNumber");
+
+            entity.Property(e => e.ShippingPostalCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ShippingPostalCode");
+
+            entity.Property(e => e.TerminalId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("TerminalID");
+
+            entity.Property(e => e.TerminalSerialNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("TerminalSerialNumber");
+
+            entity.Property(e => e.TokenId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("TokenID");
+
+            entity.Property(e => e.TransactionReferenceNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("TransactionReferenceNumber");
+
+            entity.Property(e => e.Xid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("XID");
+        });
+
+
+
+        modelBuilder.Entity<Country>(entity =>
+        {
+            entity.HasKey(e => e.ConId)
+                .HasName("ConId")
+                .IsClustered(false);
+
+            entity.ToTable("Country");
+
+            entity.Property(e => e.Deletable).HasMaxLength(1);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        //======================
+        modelBuilder.Entity<ReconciliationCyberSpaceColumn>(entity =>
+        {
+            entity.ToTable("Reconciliation_Cyber_Space_Column");
+
+            entity.Property(e => e.Columns)
+                .HasMaxLength(4000)
+                .IsUnicode(false);
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<DecemberBonusExemptedContribution>(entity =>
+        {
+            entity.HasKey(e => e.Dbsid);
+
+            entity.ToTable("DECEMBER_BONUS_EXEMPTED_CONTRIBUTION");
+
+            entity.Property(e => e.Dbsid).HasColumnName("DBSId");
+            entity.Property(e => e.Deletable).HasMaxLength(1);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Year).HasColumnType("numeric(18, 0)");
+        });
+
+        modelBuilder.Entity<DeductionsTaxTableDetail>(entity =>
+        {
+            entity.HasKey(e => e.TaxTabId)
+                .HasName("aaaaaDeductions_Tax_Table_Details_PK")
+                .IsClustered(false);
+
+            entity.ToTable("Deductions_Tax_Table_Details");
+
+            entity.Property(e => e.TaxTabId).HasColumnName("TaxTabID");
+            entity.Property(e => e.BaseAmt)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Base_Amt");
+            entity.Property(e => e.DedCode)
+                .HasMaxLength(50)
+                .HasColumnName("Ded_Code");
+            entity.Property(e => e.MaritalStat)
+                .HasMaxLength(1)
+                .HasColumnName("Marital_Stat");
+            entity.Property(e => e.OrderNo).HasColumnName("Order_No");
+            entity.Property(e => e.OverAmt)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Over_Amt");
+            entity.Property(e => e.PayPeriod)
+                .HasMaxLength(1)
+                .HasColumnName("Pay_Period");
+            entity.Property(e => e.TaxRate)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Tax_Rate");
+            entity.Property(e => e.TaxYear)
+                .HasMaxLength(4)
+                .HasColumnName("Tax_Year");
+        });
+
+        modelBuilder.Entity<DeductionsTaxTableHeader>(entity =>
+        {
+            entity.HasKey(e => e.TaxTabHid)
+                .HasName("aaaaaDeductions_Tax_Table_Header_PK")
+                .IsClustered(false);
+
+            entity.ToTable("Deductions_Tax_Table_Header");
+
+            entity.Property(e => e.TaxTabHid).HasColumnName("TaxTabHID");
+            entity.Property(e => e.AllowOrLimit)
+                .HasMaxLength(1)
+                .HasColumnName("Allow_or_Limit");
+            entity.Property(e => e.BiweekAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Biweek_Allow");
+            entity.Property(e => e.DedCode)
+                .HasMaxLength(50)
+                .HasColumnName("Ded_Code");
+            entity.Property(e => e.HrsBiweekAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Biweek_Allow");
+            entity.Property(e => e.HrsMiscAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Misc_Allow");
+            entity.Property(e => e.HrsMonthAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Month_Allow");
+            entity.Property(e => e.HrsQuarterAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Quarter_Allow");
+            entity.Property(e => e.HrsSmonthAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Smonth_Allow");
+            entity.Property(e => e.HrsSyearAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Syear_Allow");
+            entity.Property(e => e.HrsWeekAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Week_Allow");
+            entity.Property(e => e.HrsYearAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("HRS_Year_Allow");
+            entity.Property(e => e.MiscAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Misc_Allow");
+            entity.Property(e => e.MonthAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Month_Allow");
+            entity.Property(e => e.QuarterAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Quarter_Allow");
+            entity.Property(e => e.SmonthAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Smonth_Allow");
+            entity.Property(e => e.SyearAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Syear_Allow");
+            entity.Property(e => e.TaxYear)
+                .HasMaxLength(6)
+                .HasColumnName("Tax_Year");
+            entity.Property(e => e.WeekAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Week_Allow");
+            entity.Property(e => e.YearAllow)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("Year_Allow");
+        });
+
+        modelBuilder.Entity<EmployeeTcardDetail>(entity =>
+        {
+            entity.ToTable("EmployeeTCard_Details");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AcctNo).HasColumnName("acct_no");
+            entity.Property(e => e.BonusAmt)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Bonus_Amt");
+            entity.Property(e => e.CardNo).HasColumnName("card_no");
+            entity.Property(e => e.EmpTcardId).HasColumnName("EmpTcardID");
+            entity.Property(e => e.HolidayAmount)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Holiday_Amount");
+            entity.Property(e => e.IncCode)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("inc_code");
+            entity.Property(e => e.IncHours)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("inc_hours");
+            entity.Property(e => e.IncNumber)
+                .HasColumnType("decimal(18, 10)")
+                .HasColumnName("inc_number");
+            entity.Property(e => e.IncRate)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("inc_rate");
+            entity.Property(e => e.LineNo).HasColumnName("line_no");
+        });
+
+        modelBuilder.Entity<EmployeeTcardHeader>(entity =>
+        {
+            entity.HasKey(e => e.EmpTcardId);
+
+            entity.ToTable("EmployeeTCard_Header");
+
+            entity.Property(e => e.EmpTcardId).HasColumnName("EmpTcardID");
+            entity.Property(e => e.CardNo).HasColumnName("card_no");
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("empl_code");
+            entity.Property(e => e.EmplName)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasColumnName("empl_name");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("end_date");
+            entity.Property(e => e.Pybatchid).HasColumnName("pybatchid");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("start_date");
+            entity.Property(e => e.UsedFlag)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("used_flag");
+        });
+
+        modelBuilder.Entity<EmployeeWorkDurationDetail>(entity =>
+        {
+            entity.Property(e => e.EndDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.PayPeriod).HasMaxLength(50);
+            entity.Property(e => e.RegNo).HasMaxLength(50);
+            entity.Property(e => e.Ssn)
+                .HasMaxLength(50)
+                .HasColumnName("SSN");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Wage).HasColumnType("decimal(18, 4)");
+        });
+
+        modelBuilder.Entity<ErrorLog>(entity =>
+        {
+            entity.HasKey(e => e.ErrorId);
+
+            entity.ToTable("ErrorLog");
+
+            entity.Property(e => e.ErrorTime).HasColumnType("datetime");
+            entity.Property(e => e.IsSelfEmployed).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<ExceptionLog>(entity =>
+        {
+            entity.HasKey(e => e.RowId);
+
+            entity.ToTable("Exception_log");
+
+            entity.Property(e => e.RowId).HasColumnName("RowID");
+            entity.Property(e => e.ErrorDescription)
+                .HasMaxLength(7000)
+                .IsUnicode(false)
+                .IsFixedLength();
+            entity.Property(e => e.InsertBy).HasDefaultValue(-1);
+            entity.Property(e => e.InsertDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.InsertMachineInfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("App")
+                .IsFixedLength();
+            entity.Property(e => e.IsSelfEmployed).HasDefaultValue(false);
+            entity.Property(e => e.UpdateBy).HasDefaultValue(-1);
+            entity.Property(e => e.UpdateDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdateMachineInfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("App")
+                .IsFixedLength();
+        });
+
+        modelBuilder.Entity<HolidayPayDate>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HolidayP__3214EC075998471F");
+
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("amount");
+            entity.Property(e => e.CompanyId).HasColumnName("company_ID");
+            entity.Property(e => e.EmployeeId).HasColumnName("employeeID");
+            entity.Property(e => e.HolidayPayDate1)
+                .HasColumnType("datetime")
+                .HasColumnName("holidayPay_Date");
+            entity.Property(e => e.HolidayPayId).HasColumnName("holidayPayId");
+        });
+
+        modelBuilder.Entity<LoginLog>(entity =>
+        {
+            entity.HasKey(e => e.LogId);
+
+            entity.ToTable("LoginLog");
+
+            entity.Property(e => e.IsSelfEmployed).HasDefaultValue(false);
+            entity.Property(e => e.LoginId).HasMaxLength(200);
+            entity.Property(e => e.LoginTime).HasColumnType("datetime");
+            entity.Property(e => e.LogoutTime).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<MasterCompany>(entity =>
+        {
+            entity.HasKey(e => e.CompanyId)
+                .HasName("aaaaaCompany_Master_PK")
+                .IsClustered(false);
+
+            entity.ToTable("MasterCompany");
+
+            entity.Property(e => e.CompanyId).HasColumnName("Company_Id");
+            entity.Property(e => e.Address1).HasMaxLength(50);
+            entity.Property(e => e.Address2).HasMaxLength(50);
+            entity.Property(e => e.City).HasMaxLength(50);
+            entity.Property(e => e.CompanyLogo).HasColumnType("ntext");
+            entity.Property(e => e.CompanyName)
+                .HasMaxLength(50)
+                .HasColumnName("Company_Name");
+            entity.Property(e => e.ContactPerson)
+                .HasMaxLength(50)
+                .HasColumnName("Contact_Person");
+            entity.Property(e => e.Country).HasMaxLength(50);
+            entity.Property(e => e.Email).HasMaxLength(50);
+            entity.Property(e => e.Fax)
+                .HasMaxLength(20)
+                .HasColumnName("FAX");
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Landline).HasMaxLength(20);
+            entity.Property(e => e.Mobile).HasMaxLength(20);
+            entity.Property(e => e.ParentId).HasColumnName("Parent_Id");
+            entity.Property(e => e.RegNumber)
+                .HasMaxLength(6)
+                .HasColumnName("REG_NUMBER");
+            entity.Property(e => e.State).HasMaxLength(50);
+            entity.Property(e => e.Tokan).HasMaxLength(150);
+            entity.Property(e => e.TradeName)
+                .HasMaxLength(50)
+                .HasColumnName("Trade_Name");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.Zip)
+                .HasMaxLength(50)
+                .HasColumnName("ZIP");
+        });
+
+        modelBuilder.Entity<MasterDeductionCode>(entity =>
+        {
+            entity.HasKey(e => e.DedCodeId);
+
+            entity.Property(e => e.DedCodeId).HasColumnName("ded_code_id");
+            entity.Property(e => e.DedCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ded_code");
+            entity.Property(e => e.DedTaxred)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ded_taxred");
+            entity.Property(e => e.DedType)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ded_type");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("description");
+            entity.Property(e => e.DfltApply)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("dflt_apply");
+            entity.Property(e => e.DfltHiDedAmt)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_hi_ded_amt");
+            entity.Property(e => e.DfltLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_limit");
+            entity.Property(e => e.DfltLoDedAmt)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_lo_ded_amt");
+            entity.Property(e => e.DfltPayLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_pay_limit");
+            entity.Property(e => e.DfltRate)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_rate");
+            entity.Property(e => e.FromDate).HasColumnType("datetime");
+            entity.Property(e => e.StateEin)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("state_ein");
+            entity.Property(e => e.TaxJur)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("tax_jur");
+            entity.Property(e => e.ToDate).HasColumnType("datetime");
+            entity.Property(e => e.Yearrollover)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("yearrollover");
+        });
+
+        modelBuilder.Entity<MasterEmpType>(entity =>
+        {
+            entity.HasKey(e => e.EmpTypeId)
+                .HasName("aaaaaMasterEmpType_PK")
+                .IsClustered(false);
+
+            entity.ToTable("MasterEmpType");
+
+            entity.Property(e => e.EmpTypeId).HasColumnName("Emp_Type_Id");
+            entity.Property(e => e.Description).HasMaxLength(50);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.TypeCode)
+                .HasMaxLength(6)
+                .HasColumnName("Type_Code");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<MasterEmployee>(entity =>
+        {
+            entity.HasKey(e => e.EmployeeId)
+                .HasName("aaaaaMasterEmployee_PK")
+                .IsClustered(false);
+
+            entity.ToTable("MasterEmployee");
+
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+            entity.Property(e => e.Address1).HasMaxLength(100);
+            entity.Property(e => e.Address2).HasMaxLength(100);
+            entity.Property(e => e.AppintDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Appint_Date");
+            entity.Property(e => e.BankAcctNo)
+                .HasMaxLength(17)
+                .HasColumnName("Bank_Acct_No");
+            entity.Property(e => e.BirthDate).HasColumnType("datetime");
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.Country).HasMaxLength(100);
+            entity.Property(e => e.Department)
+                .HasMaxLength(250)
+                .HasColumnName("department");
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .HasColumnName("Empl_Code");
+            entity.Property(e => e.EmplStatus)
+                .HasMaxLength(1)
+                .HasColumnName("Empl_Status");
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(100)
+                .HasColumnName("First_Name");
+            entity.Property(e => e.FlexDeptAcctType).HasMaxLength(6);
+            entity.Property(e => e.Gender).HasMaxLength(1);
+            entity.Property(e => e.HoldPymnt)
+                .HasMaxLength(1)
+                .HasColumnName("Hold_Pymnt");
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(300);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.IsemployeeDirector).HasColumnName("isemployeeDirector");
+            entity.Property(e => e.LastIncDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Last_Inc_Date");
+            entity.Property(e => e.LastName)
+                .HasMaxLength(100)
+                .HasColumnName("Last_Name");
+            entity.Property(e => e.LastPayDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Last_Pay_Date");
+            entity.Property(e => e.MaritalStat)
+                .HasMaxLength(2)
+                .HasColumnName("Marital_Stat");
+            entity.Property(e => e.MiddleName)
+                .HasMaxLength(100)
+                .HasColumnName("Middle_Name");
+            entity.Property(e => e.Mobile).HasMaxLength(100);
+            entity.Property(e => e.Occupation)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("occupation");
+            entity.Property(e => e.PayPeriod)
+                .HasMaxLength(1)
+                .HasColumnName("Pay_Period");
+            entity.Property(e => e.Phone).HasMaxLength(100);
+            entity.Property(e => e.SocSecNum)
+                .HasMaxLength(15)
+                .HasColumnName("Soc_Sec_Num");
+            entity.Property(e => e.State).HasMaxLength(100);
+            entity.Property(e => e.StateAllow).HasColumnName("State_Allow");
+            entity.Property(e => e.StateUdf)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("State_udf");
+            entity.Property(e => e.Terminated).HasColumnType("datetime");
+            entity.Property(e => e.Tin)
+                .HasMaxLength(100)
+                .HasColumnName("TIN");
+            entity.Property(e => e.TypeCode)
+                .HasMaxLength(6)
+                .HasColumnName("Type_Code");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(300);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.WagesPayDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Wages_Pay_Date");
+            entity.Property(e => e.Zip).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<MasterEmployeeDeduction>(entity =>
+        {
+            entity.HasKey(e => e.EmpDeductionId)
+                .HasName("aaaaaMasterEmployeeDeductions_PK")
+                .IsClustered(false);
+
+            entity.Property(e => e.EmpDeductionId).HasColumnName("EmpDeductionID");
+            entity.Property(e => e.AcctNo).HasColumnName("Acct_no");
+            entity.Property(e => e.BalanceAmt).HasColumnType("decimal(18, 8)");
+            entity.Property(e => e.DedApply)
+                .HasMaxLength(1)
+                .HasColumnName("Ded_apply");
+            entity.Property(e => e.DedCode)
+                .HasMaxLength(6)
+                .HasColumnName("Ded_Code");
+            entity.Property(e => e.DedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Ded_date");
+            entity.Property(e => e.DedLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_limit");
+            entity.Property(e => e.DedQtd1)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_qtd1");
+            entity.Property(e => e.DedQtd2)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_qtd2");
+            entity.Property(e => e.DedQtd3)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_qtd3");
+            entity.Property(e => e.DedQtd4)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_qtd4");
+            entity.Property(e => e.DedRate)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_rate");
+            entity.Property(e => e.DedYtd)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_ytd");
+            entity.Property(e => e.Department).HasMaxLength(3);
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .HasColumnName("Empl_Code");
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+            entity.Property(e => e.HiDedAmt)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Hi_ded_amt");
+            entity.Property(e => e.LineNo).HasColumnName("Line_no");
+            entity.Property(e => e.LoDedAmt)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Lo_ded_amt");
+            entity.Property(e => e.PayLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Pay_limit");
+        });
+
+        modelBuilder.Entity<MasterEmployeeIncome>(entity =>
+        {
+            entity.HasKey(e => e.EmpIncomeId)
+                .HasName("aaaaaMasterEmployeeIncomes_PK")
+                .IsClustered(false);
+
+            entity.Property(e => e.EmpIncomeId).HasColumnName("EmpIncomeID");
+            entity.Property(e => e.AcctNo).HasColumnName("Acct_no");
+            entity.Property(e => e.Department).HasMaxLength(3);
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .HasColumnName("Empl_Code");
+            entity.Property(e => e.EmployeeId).HasColumnName("Employee_ID");
+            entity.Property(e => e.HiIncAmt)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Hi_inc_amt");
+            entity.Property(e => e.IncCode)
+                .HasMaxLength(6)
+                .HasColumnName("Inc_code");
+            entity.Property(e => e.IncHours)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_hours");
+            entity.Property(e => e.IncNumber)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_number");
+            entity.Property(e => e.IncQtd1)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_qtd1");
+            entity.Property(e => e.IncQtd2)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_qtd2");
+            entity.Property(e => e.IncQtd3)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_qtd3");
+            entity.Property(e => e.IncQtd4)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_qtd4");
+            entity.Property(e => e.IncRate)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_rate");
+            entity.Property(e => e.IncYtd)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Inc_ytd");
+            entity.Property(e => e.LineNo).HasColumnName("Line_no");
+            entity.Property(e => e.LoIncAmt)
+                .HasColumnType("decimal(18, 4)")
+                .HasColumnName("Lo_inc_amt");
+            entity.Property(e => e.WageAmt).HasColumnType("decimal(18, 4)");
+        });
+
+        modelBuilder.Entity<MasterEmployeeObligation>(entity =>
+        {
+            entity.HasKey(e => e.EmpOblId)
+                .HasName("aaaaaMasterEmployeeObligations_PK")
+                .IsClustered(false);
+
+            entity.Property(e => e.EmpOblId).HasColumnName("EmpOblID");
+            entity.Property(e => e.AcctNo).HasColumnName("Acct_no");
+            entity.Property(e => e.BalAcctNo).HasColumnName("Bal_acct_no");
+            entity.Property(e => e.DedRate)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Ded_rate");
+            entity.Property(e => e.Department).HasMaxLength(3);
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .HasColumnName("Empl_Code");
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+            entity.Property(e => e.LineNo).HasColumnName("Line_no");
+            entity.Property(e => e.OblApply)
+                .HasMaxLength(1)
+                .HasColumnName("Obl_apply");
+            entity.Property(e => e.OblCode)
+                .HasMaxLength(6)
+                .HasColumnName("Obl_Code");
+            entity.Property(e => e.OblLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Obl_limit");
+            entity.Property(e => e.OblQtd1)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Obl_qtd1");
+            entity.Property(e => e.OblQtd2)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Obl_qtd2");
+            entity.Property(e => e.OblQtd3)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Obl_qtd3");
+            entity.Property(e => e.OblQtd4)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Obl_qtd4");
+            entity.Property(e => e.OblYtd)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Obl_ytd");
+            entity.Property(e => e.PayLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Pay_limit");
+        });
+
+        modelBuilder.Entity<MasterEmployerCode>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__MasterEm__3214EC07D2559DD9");
+
+            entity.Property(e => e.BonusRate)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("bonusRate");
+            entity.Property(e => e.EmployerLevyee)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("employer_Levyee");
+            entity.Property(e => e.EmployerSeverence)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("employer_Severence");
+            entity.Property(e => e.EmployerYearDedRate)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("employer_YearDedRate");
+            entity.Property(e => e.MaxAge).HasColumnName("maxAge");
+            entity.Property(e => e.MinAge).HasColumnName("minAge");
+            entity.Property(e => e.Rate1)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("rate1");
+            entity.Property(e => e.Rate2)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("rate2");
+            entity.Property(e => e.Rate3)
+                .HasColumnType("numeric(18, 2)")
+                .HasColumnName("rate3");
+        });
+
+        modelBuilder.Entity<MasterHolidayPayDetail>(entity =>
+        {
+            entity.HasKey(e => e.HolidayPayId).HasName("PK__MasterHo__31F74AC3DB183670");
+
+            entity.Property(e => e.HolidayPayId).HasColumnName("holidayPayId");
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.CompanyId).HasColumnName("company_ID");
+            entity.Property(e => e.EmployeeId).HasColumnName("employeeID");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("end_Date");
+            entity.Property(e => e.Insertedby).HasColumnName("insertedby");
+            entity.Property(e => e.Insertedmachineinfo).HasColumnName("insertedmachineinfo");
+            entity.Property(e => e.Insertedon)
+                .HasColumnType("datetime")
+                .HasColumnName("insertedon");
+            entity.Property(e => e.OtherHpaydes)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("otherHpaydes");
+            entity.Property(e => e.PeriodYear)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("PERIOD_YEAR");
+            entity.Property(e => e.PerioddMonth)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("PERIODD_MONTH");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("start_Date");
+            entity.Property(e => e.Updateby).HasColumnName("updateby");
+            entity.Property(e => e.Updatemachineinfo).HasColumnName("updatemachineinfo");
+            entity.Property(e => e.Updateon)
+                .HasColumnType("datetime")
+                .HasColumnName("updateon");
+        });
+
+        modelBuilder.Entity<MasterIncCode>(entity =>
+        {
+            entity.HasKey(e => e.IncCodeId)
+                .HasName("aaaaaMasterIncCodes_PK")
+                .IsClustered(false);
+            entity.Property(e => e.IncCodeId).HasColumnName("Inc_Code_ID");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.DfltAccountType).HasMaxLength(6);
+            entity.Property(e => e.DfltAcct).HasColumnName("Dflt_Acct");
+            entity.Property(e => e.DfltDept)
+                .HasMaxLength(3)
+                .HasColumnName("Dflt_Dept");
+            entity.Property(e => e.DfltHiIncAmt).HasColumnName("Dflt_hi_inc_amt");
+            entity.Property(e => e.DfltHours)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Dflt_Hours");
+            entity.Property(e => e.DfltLoIncAmt).HasColumnName("Dflt_lo_inc_amt");
+            entity.Property(e => e.DfltNum)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Dflt_Num");
+            entity.Property(e => e.DfltRate)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("Dflt_Rate");
+            entity.Property(e => e.IncCode)
+                .HasMaxLength(50)
+                .HasColumnName("Inc_Code");
+            entity.Property(e => e.IncType)
+                .HasMaxLength(10)
+                .HasColumnName("Inc_Type");
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.NonQual)
+                .HasMaxLength(1)
+                .HasColumnName("Non_qual");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<MasterObligationCode>(entity =>
+        {
+            entity.HasKey(e => e.OblCodeId);
+
+            entity.Property(e => e.OblCodeId).HasColumnName("Obl_Code_ID");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("description");
+            entity.Property(e => e.DfltLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_limit");
+            entity.Property(e => e.DfltPayLimit)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_pay_limit");
+            entity.Property(e => e.DfltRate)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("dflt_rate");
+            entity.Property(e => e.FromDate).HasColumnType("datetime");
+            entity.Property(e => e.OblCode)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("Obl_code");
+            entity.Property(e => e.OblType)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("obl_type");
+            entity.Property(e => e.ToDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<MasterRateSetting>(entity =>
+        {
+            entity.HasKey(e => e.Mrsid);
+
+            entity.ToTable("Master_Rate_Setting");
+
+            entity.Property(e => e.Mrsid).HasColumnName("MRSId");
+            entity.Property(e => e.AdditionalFineRate).HasColumnName("Additional_Fine_Rate");
+            entity.Property(e => e.AdditionalPenaltyRate).HasColumnName("Additional_Penalty_Rate");
+            entity.Property(e => e.BonusLevyEeRate).HasColumnName("Bonus_Levy_EE_Rate");
+            entity.Property(e => e.Eib).HasColumnName("EIB");
+            entity.Property(e => e.FineRate).HasColumnName("Fine_Rate");
+            entity.Property(e => e.FromDate).HasColumnType("datetime");
+            entity.Property(e => e.MaxAge).HasColumnName("Max_Age");
+            entity.Property(e => e.MinAge).HasColumnName("Min_Age");
+            entity.Property(e => e.PenaltyRate).HasColumnName("Penalty_Rate");
+            entity.Property(e => e.SocEeRate).HasColumnName("Soc_EE_Rate");
+            entity.Property(e => e.SocErRate).HasColumnName("Soc_ER_Rate");
+            entity.Property(e => e.ToDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<NwdMasterRateSetting>(entity =>
+        {
+            entity.HasKey(e => e.NwdsId);
+
+            entity.ToTable("NWD_Master_Rate_Settings");
+
+            entity.Property(e => e.NwdsId).HasColumnName("NWDS_Id");
+            entity.Property(e => e.AdditionalPenaltyRate).HasColumnName("Additional_Penalty_Rate");
+            entity.Property(e => e.FromDate)
+                .HasColumnType("datetime")
+                .HasColumnName("From_Date");
+            entity.Property(e => e.MaxAge).HasColumnName("Max_Age");
+            entity.Property(e => e.MinAge).HasColumnName("Min_Age");
+            entity.Property(e => e.NwdlevyRate).HasColumnName("NWDLevy_Rate");
+            entity.Property(e => e.PenalityRate).HasColumnName("Penality_Rate");
+            entity.Property(e => e.ToDate)
+                .HasColumnType("datetime")
+                .HasColumnName("To_Date");
+        });
+
+        modelBuilder.Entity<OtpRequest>(entity =>
+        {
+            entity.ToTable("Otp_Request");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.OtpNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Otp_Number");
+            entity.Property(e => e.UserEmail)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("userEmail");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.UserNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("userNumber");
+        });
+
+        modelBuilder.Entity<PayrollProcessDetail>(entity =>
+        {
+            entity.HasKey(e => e.Pybatchid);
+
+            entity.ToTable("Payroll_Process_Details");
+
+            entity.Property(e => e.Pybatchid).HasColumnName("pybatchid");
+            entity.Property(e => e.Batchprocessid).HasColumnName("batchprocessid");
+            entity.Property(e => e.Companyid).HasColumnName("companyid");
+            entity.Property(e => e.Employeetype)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("employeetype");
+            entity.Property(e => e.Insertby).HasColumnName("insertby");
+            entity.Property(e => e.Insertdate).HasColumnType("datetime");
+            entity.Property(e => e.Insertmachineinfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("insertmachineinfo");
+            entity.Property(e => e.Processendedon)
+                .HasColumnType("datetime")
+                .HasColumnName("processendedon");
+            entity.Property(e => e.Processname)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("processname");
+            entity.Property(e => e.Recordsprocessed).HasColumnName("recordsprocessed");
+            entity.Property(e => e.Searchcriteria)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("searchcriteria");
+            entity.Property(e => e.Updateby).HasColumnName("updateby");
+            entity.Property(e => e.Updatedate)
+                .HasColumnType("datetime")
+                .HasColumnName("updatedate");
+            entity.Property(e => e.Updatemachineinfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("updatemachineinfo");
+        });
+
+        modelBuilder.Entity<PayrollProcessHeader>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("Payroll_Process_Header");
+
+            entity.Property(e => e.Companyid).HasColumnName("companyid");
+            entity.Property(e => e.Employeetype)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("employeetype");
+            entity.Property(e => e.Endedon)
+                .HasColumnType("datetime")
+                .HasColumnName("endedon");
+            entity.Property(e => e.Endofperioddate)
+                .HasColumnType("datetime")
+                .HasColumnName("endofperioddate");
+            entity.Property(e => e.ErrorMessage).HasMaxLength(200);
+            entity.Property(e => e.InsertDate)
+                .HasMaxLength(10)
+                .IsFixedLength();
+            entity.Property(e => e.Insertby).HasColumnName("insertby");
+            entity.Property(e => e.Insertmachineinfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("insertmachineinfo");
+            entity.Property(e => e.Lastpayrolldate)
+                .HasColumnType("datetime")
+                .HasColumnName("lastpayrolldate");
+            entity.Property(e => e.Payperiod)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("payperiod");
+            entity.Property(e => e.Payrolldate)
+                .HasColumnType("datetime")
+                .HasColumnName("payrolldate");
+            entity.Property(e => e.Pybatchid)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("pybatchid");
+            entity.Property(e => e.Searchcriteria).HasMaxLength(50);
+            entity.Property(e => e.Startedon)
+                .HasColumnType("datetime")
+                .HasColumnName("startedon");
+            entity.Property(e => e.Updateby).HasColumnName("updateby");
+            entity.Property(e => e.Updatedate)
+                .HasColumnType("datetime")
+                .HasColumnName("updatedate");
+            entity.Property(e => e.Updatemachineinfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("updatemachineinfo");
+            entity.Property(e => e.Usedflag)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("usedflag");
+        });
+
+        modelBuilder.Entity<ProcessC3header>(entity =>
+        {
+            entity.HasKey(e => e.C3headerid);
+
+            entity.ToTable("PROCESS_C3Header");
+
+            entity.Property(e => e.C3FinalizedBy).HasColumnName("C3_FinalizedBy");
+            entity.Property(e => e.C3FinalizedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("C3_FinalizedDate");
+            entity.Property(e => e.C3IsFinalized).HasColumnName("C3_IsFinalized");
+            entity.Property(e => e.C3SubmittedBy).HasColumnName("C3_SubmittedBy");
+            entity.Property(e => e.C3SubmittedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("C3_SubmittedDate");
+            entity.Property(e => e.C3headerid)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("C3HEADERID");
+            entity.Property(e => e.EmployerId).HasColumnName("EmployerID");
+            entity.Property(e => e.ExportBy).HasColumnName("Export_By");
+            entity.Property(e => e.ExportOn)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Export_On");
+            entity.Property(e => e.InsertDatetimeinfo)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Insert_Datetimeinfo");
+            entity.Property(e => e.InsertMachineinfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Insert_Machineinfo");
+            entity.Property(e => e.InsertedBy).HasColumnName("Inserted_By");
+            entity.Property(e => e.IsFianalize).HasColumnName("Is_Fianalize");
+            entity.Property(e => e.IsImportFromBema).HasColumnName("IsImportFromBEMA");
+            entity.Property(e => e.IsSubmitted).HasColumnName("Is_submitted");
+            entity.Property(e => e.ModifiedBy).HasColumnName("Modified_By");
+            entity.Property(e => e.ModifiedMachineinfo)
+                .HasMaxLength(50)
+                .HasColumnName("Modified_Machineinfo");
+            entity.Property(e => e.ModifiedOn)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Modified_On");
+            entity.Property(e => e.PeriodYear)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("PERIOD_YEAR");
+            entity.Property(e => e.PerioddMonth)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("PERIODD_MONTH");
+            entity.Property(e => e.PrintBy).HasColumnName("Print_By");
+            entity.Property(e => e.PrintDatetimeinfo)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("PRINT_Datetimeinfo");
+            entity.Property(e => e.RegNo)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.ScheduleNo).HasColumnName("Schedule_NO");
+            entity.Property(e => e.TotalLevyeeemployee).HasColumnName("TOTAL_LEVYEEEMPLOYEE");
+            entity.Property(e => e.TotalLevyeeemployer).HasColumnName("TOTAL_LEVYEEEMPLOYER");
+            entity.Property(e => e.TotalLevyeepenalty).HasColumnName("TOTAL_LEVYEEPENALTY");
+            entity.Property(e => e.TotalPepenalty).HasColumnName("TOTAL_PEPENALTY");
+            entity.Property(e => e.TotalServayance).HasColumnName("TOTAL_SERVAYANCE");
+            entity.Property(e => e.TotalSscontributions).HasColumnName("TOTAL_SSCONTRIBUTIONS");
+            entity.Property(e => e.TotalSspenalty).HasColumnName("TOTAL_SSPENALTY");
+            entity.Property(e => e.TotalWages).HasColumnName("TOTAL_WAGES");
+            entity.Property(e => e.UserName).HasMaxLength(50);
+
+
+            // **Newly Added Columns**
+            entity.Property(e => e.OrderName)
+                .HasMaxLength(50)
+                .IsUnicode(true)
+                .HasColumnName("OrderName");
+
+            entity.Property(e => e.OrderKey)
+                .HasMaxLength(50)
+                .IsUnicode(true)
+                .HasColumnName("OrderKey");
+
+            entity.Property(e => e.isNilReturn).HasColumnName("isNilReturn");
+            entity.Property(e => e.Notes).HasColumnName("Notes");
+            entity.Property(e => e.SentOnForEdit).HasColumnName("SentOnForEdit");
+            entity.Property(e => e.IsSentForEdit).HasColumnName("IsSentForEdit");
+            entity.Property(e => e.EditPermittedBy).HasColumnName("EditPermittedBy");
+        });
+
+        modelBuilder.Entity<ProcessContribution>(entity =>
+        {
+            entity.HasKey(e => e.ContId);
+            entity.ToTable("Process_Contributions");
+
+            entity.Property(e => e.Bonus).HasColumnName("BONUS");
+            entity.Property(e => e.C3FinalizedBy).HasColumnName("C3_FinalizedBy");
+            entity.Property(e => e.C3FinalizedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("C3_FinalizedDate");
+            entity.Property(e => e.C3IsFinalized).HasColumnName("C3_IsFinalized");
+            entity.Property(e => e.C3SubmittedBy).HasColumnName("C3_SubmittedBy");
+            entity.Property(e => e.C3SubmittedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("C3_SubmittedDate");
+            entity.Property(e => e.C3headerid).HasColumnName("C3HEADERID");
+            entity.Property(e => e.ContId)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("CONT_ID");
+            entity.Property(e => e.DateJoining)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Date_joining");
+            entity.Property(e => e.DateTerminated)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Date_terminated");
+            entity.Property(e => e.Hpay).HasColumnName("HPay");
+            entity.Property(e => e.HpayWeek1).HasColumnName("HPay_Week1");
+            entity.Property(e => e.HpayWeek2).HasColumnName("HPay_Week2");
+            entity.Property(e => e.HpayWeek3).HasColumnName("HPay_Week3");
+            entity.Property(e => e.HpayWeek4).HasColumnName("HPay_Week4");
+            entity.Property(e => e.HpayWeek5).HasColumnName("HPay_Week5");
+            entity.Property(e => e.IsFianalize).HasColumnName("Is_Fianalize");
+            entity.Property(e => e.IsSubmitted).HasColumnName("Is_submitted");
+            entity.Property(e => e.LevyEr)
+                .HasDefaultValue(0.0)
+                .HasColumnName("LEVY_ER");
+            entity.Property(e => e.PayFreq)
+                .HasMaxLength(6)
+                .IsUnicode(false);
+            entity.Property(e => e.PeriodYear)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("PERIOD_YEAR");
+            entity.Property(e => e.PerioddMonth)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("PERIODD_MONTH");
+            entity.Property(e => e.Remarks)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.ServayanceEe)
+                .HasDefaultValue(0.0)
+                .HasColumnName("SERVAYANCE_EE");
+            entity.Property(e => e.ServayanceEr)
+                .HasDefaultValue(0.0)
+                .HasColumnName("SERVAYANCE_ER");
+            entity.Property(e => e.SocialSecurityEe)
+                .HasDefaultValue(0.0)
+                .HasColumnName("SocialSecurity_EE");
+            entity.Property(e => e.SocialSecurityEr)
+                .HasDefaultValue(0.0)
+                .HasColumnName("SocialSecurity_ER");
+            entity.Property(e => e.Ssn)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("SSN");
+            entity.Property(e => e.Ssnd)
+                .HasMaxLength(50)
+                .HasColumnName("SSND");
+            entity.Property(e => e.Wages1).HasColumnName("WAGES1");
+            entity.Property(e => e.Wages2).HasColumnName("WAGES2");
+            entity.Property(e => e.Wages3).HasColumnName("WAGES3");
+            entity.Property(e => e.Wages4).HasColumnName("WAGES4");
+            entity.Property(e => e.Wages5).HasColumnName("WAGES5");
+            entity.Property(e => e.Week1).HasColumnName("WEEK1");
+            entity.Property(e => e.Week2).HasColumnName("WEEK2");
+        });
+
+        modelBuilder.Entity<ProcessPayDeduction>(entity =>
+        {
+            entity.HasKey(e => e.PayDedId);
+
+            entity.ToTable("Process_PayDeductions");
+
+            entity.Property(e => e.PayDedId).HasColumnName("Pay_Ded_ID");
+            entity.Property(e => e.AcctNo).HasColumnName("acct_no");
+            entity.Property(e => e.AddCode)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("add_code");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("amount");
+            entity.Property(e => e.DedCode)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("ded_code");
+            entity.Property(e => e.DedRate)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("ded_rate");
+            entity.Property(e => e.Department)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .HasColumnName("department");
+            entity.Property(e => e.DocNo).HasColumnName("doc_no");
+            entity.Property(e => e.HiDedAmt)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("hi_ded_amt");
+            entity.Property(e => e.LineNo).HasColumnName("line_no");
+            entity.Property(e => e.LoDedAmt)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("lo_ded_amt");
+            entity.Property(e => e.ModFlag).HasColumnName("mod_flag");
+        });
+
+        modelBuilder.Entity<ProcessPayEmployee>(entity =>
+        {
+            entity.HasKey(e => e.PayProcessId)
+                .HasName("aaaaaProcess_PayEmployee_PK")
+                .IsClustered(false);
+
+            entity.ToTable("Process_PayEmployee");
+
+            entity.Property(e => e.PayProcessId).HasColumnName("PayProcess_ID");
+            entity.Property(e => e.AccureStick)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("Accure_Stick");
+            entity.Property(e => e.AccureVac)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("Accure_Vac");
+            entity.Property(e => e.Bonus).HasColumnType("decimal(18, 3)");
+            entity.Property(e => e.CashAccNo).HasColumnName("Cash_Acc_No");
+            entity.Property(e => e.CashAmount)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Cash_Amount");
+            entity.Property(e => e.CheckNo)
+                .HasMaxLength(20)
+                .HasColumnName("Check_No");
+            entity.Property(e => e.DedFedTax)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Ded_FedTax");
+            entity.Property(e => e.DedFica)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Ded_Fica");
+            entity.Property(e => e.DedLocTax)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Ded_LocTax");
+            entity.Property(e => e.DedMedicare)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Ded_Medicare");
+            entity.Property(e => e.DedOther)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Ded_Other");
+            entity.Property(e => e.DedStaTax)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Ded_StaTax");
+            entity.Property(e => e.Department).HasMaxLength(3);
+            entity.Property(e => e.Deposit)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength();
+            entity.Property(e => e.DocDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Doc_Date");
+            entity.Property(e => e.DocNo).HasColumnName("Doc_No");
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .HasColumnName("Empl_Code");
+            entity.Property(e => e.EopDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("EOP_Date");
+            entity.Property(e => e.IncExpense)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Inc_Expense");
+            entity.Property(e => e.IncGross)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Inc_Gross");
+            entity.Property(e => e.IncNet)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Inc_Net");
+            entity.Property(e => e.IncTaxable)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Inc_Taxable");
+            entity.Property(e => e.OblFica)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Obl_Fica");
+            entity.Property(e => e.OblFuta)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Obl_Futa");
+            entity.Property(e => e.OblMedicare)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Obl_Medicare");
+            entity.Property(e => e.OblOther)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Obl_Other");
+            entity.Property(e => e.OblTotal)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Obl_Total");
+            entity.Property(e => e.OkToPost)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("Ok_To_Post");
+            entity.Property(e => e.PayDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Pay_Date");
+            entity.Property(e => e.PayStartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Pay_Start_Date");
+            entity.Property(e => e.PrintCheck)
+                .HasMaxLength(1)
+                .HasColumnName("Print_Check");
+            entity.Property(e => e.Pybatchid).HasColumnName("pybatchid");
+            entity.Property(e => e.TotalHours)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Total_Hours");
+        });
+
+        modelBuilder.Entity<ProcessPayIncome>(entity =>
+        {
+            entity.HasKey(e => e.ProcessPayIncId)
+                .HasName("aaaaaProcess_PayIncomes_PK")
+                .IsClustered(false);
+
+            entity.ToTable("Process_PayIncomes");
+
+            entity.Property(e => e.ProcessPayIncId).HasColumnName("Process_PayInc_ID");
+            entity.Property(e => e.AcctNo).HasColumnName("Acct_No");
+            entity.Property(e => e.AddCode)
+                .HasMaxLength(1)
+                .HasColumnName("Add_Code");
+            entity.Property(e => e.Amount)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)");
+            entity.Property(e => e.Department).HasMaxLength(3);
+            entity.Property(e => e.DocNo).HasColumnName("Doc_No");
+            entity.Property(e => e.HiIncAmt)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Hi_Inc_Amt");
+            entity.Property(e => e.Hours)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)");
+            entity.Property(e => e.IncCode)
+                .HasMaxLength(6)
+                .HasColumnName("Inc_Code");
+            entity.Property(e => e.IncRate)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Inc_Rate");
+            entity.Property(e => e.LineNo).HasColumnName("Line_No");
+            entity.Property(e => e.LoIncAmt)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("Lo_Inc_Amt");
+            entity.Property(e => e.ModFlag).HasColumnName("Mod_Flag");
+            entity.Property(e => e.Number)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(18, 3)");
+        });
+
+        modelBuilder.Entity<ProcessPayobligation>(entity =>
+        {
+            entity.HasKey(e => e.PayOblId);
+
+            entity.ToTable("Process_Payobligations");
+
+            entity.Property(e => e.PayOblId).HasColumnName("Pay_obl_id");
+            entity.Property(e => e.AcctNo).HasColumnName("acct_no");
+            entity.Property(e => e.AddCode)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .HasColumnName("add_code");
+            entity.Property(e => e.Amount)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("amount");
+            entity.Property(e => e.BalAcctNo).HasColumnName("bal_acct_no");
+            entity.Property(e => e.BalDept)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .HasColumnName("bal_dept");
+            entity.Property(e => e.Department)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .HasColumnName("department");
+            entity.Property(e => e.DocNo).HasColumnName("doc_no");
+            entity.Property(e => e.LineNo).HasColumnName("line_no");
+            entity.Property(e => e.ModFlag).HasColumnName("mod_flag");
+            entity.Property(e => e.OblCode)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("obl_code");
+            entity.Property(e => e.OblRate)
+                .HasColumnType("decimal(18, 3)")
+                .HasColumnName("obl_rate");
+        });
+
+        modelBuilder.Entity<ProcessSelfEmployedC3>(entity =>
+        {
+            entity.HasKey(e => e.Sec3id);
+            entity.ToTable("PROCESS_Self_EmployedC3");
+
+            entity.Property(e => e.C3FinalizedBy).HasColumnName("C3_FinalizedBy");
+            entity.Property(e => e.C3FinalizedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("C3_FinalizedDate");
+            entity.Property(e => e.C3IsFinalized).HasColumnName("C3_IsFinalized");
+            entity.Property(e => e.C3SubmittedBy).HasColumnName("C3_SubmittedBy");
+            entity.Property(e => e.C3SubmittedDate)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("C3_SubmittedDate");
+            entity.Property(e => e.CategoryType)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("Category_Type");
+            entity.Property(e => e.ExportBy).HasColumnName("Export_By");
+            entity.Property(e => e.ExportOn)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Export_On");
+            entity.Property(e => e.InsertDatetimeinfo)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Insert_Datetimeinfo");
+            entity.Property(e => e.InsertMachineinfo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Insert_Machineinfo");
+            entity.Property(e => e.InsertedBy).HasColumnName("Inserted_By");
+            entity.Property(e => e.IsFianalize).HasColumnName("Is_Fianalize");
+            entity.Property(e => e.IsImportFromBema).HasColumnName("IsImportFromBEMA");
+            entity.Property(e => e.IsSubmitted).HasColumnName("Is_submitted");
+            entity.Property(e => e.ModifiedBy).HasColumnName("Modified_By");
+            entity.Property(e => e.ModifiedMachineinfo)
+                .HasMaxLength(50)
+                .HasColumnName("Modified_Machineinfo");
+            entity.Property(e => e.ModifiedOn)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Modified_On");
+            entity.Property(e => e.PeriodYear)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("PERIOD_YEAR");
+            entity.Property(e => e.PerioddMonth)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("PERIODD_MONTH");
+            entity.Property(e => e.PrintBy).HasColumnName("Print_By");
+            entity.Property(e => e.PrintDatetimeinfo)
+                .HasColumnType("smalldatetime")
+                .HasColumnName("PRINT_Datetimeinfo");
+            entity.Property(e => e.Remarks)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.ScheduleNo).HasColumnName("Schedule_NO");
+            entity.Property(e => e.Sec3id)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("SEC3ID");
+            entity.Property(e => e.SelectedTypeWeek1).HasColumnName("SelectedTypeWEEK1");
+            entity.Property(e => e.SelectedTypeWeek2).HasColumnName("SelectedTypeWEEK2");
+            entity.Property(e => e.SelectedTypeWeek3).HasColumnName("SelectedTypeWEEK3");
+            entity.Property(e => e.SelectedTypeWeek4).HasColumnName("SelectedTypeWEEK4");
+            entity.Property(e => e.SelectedTypeWeek5).HasColumnName("SelectedTypeWEEK5");
+            entity.Property(e => e.Ssn)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .HasColumnName("SSN");
+            entity.Property(e => e.TotalContributions).HasColumnName("TOTAL_CONTRIBUTIONS");
+            entity.Property(e => e.TotalFine).HasColumnName("TOTAL_Fine");
+            entity.Property(e => e.TotalWages).HasColumnName("TOTAL_WAGES");
+            entity.Property(e => e.UserName).HasMaxLength(50);
+            entity.Property(e => e.Wages1).HasColumnName("WAGES1");
+            entity.Property(e => e.Wages2).HasColumnName("WAGES2");
+            entity.Property(e => e.Wages3).HasColumnName("WAGES3");
+            entity.Property(e => e.Wages4).HasColumnName("WAGES4");
+            entity.Property(e => e.Wages5).HasColumnName("WAGES5");
+            entity.Property(e => e.Week1).HasColumnName("WEEK1");
+            entity.Property(e => e.Week2).HasColumnName("WEEK2");
+        });
+
+        modelBuilder.Entity<Secmodule>(entity =>
+        {
+            entity.HasKey(e => e.ModuleId)
+                .HasName("aaaaaSECModule_PK")
+                .IsClustered(false);
+
+            entity.ToTable("SECModule");
+
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.FormName).HasMaxLength(255);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Module).HasMaxLength(100);
+            entity.Property(e => e.Option).HasMaxLength(10);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Secrole>(entity =>
+        {
+            entity.HasKey(e => e.RoleId)
+                .HasName("aaaaaSECRole_PK")
+                .IsClustered(false);
+
+            entity.ToTable("SECRole");
+
+            entity.Property(e => e.Deletable).HasMaxLength(1);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Role).HasMaxLength(50);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.roleCategory).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<SecurityQuestionAnswer>(entity =>
+        {
+            entity.HasKey(e => e.SecurityId).HasName("PK__Security__C4953A2CD4845037");
+
+            entity.ToTable("SecurityQuestionAnswer");
+
+            entity.Property(e => e.SecurityId).HasColumnName("Security_Id");
+            entity.Property(e => e.Answer1).HasMaxLength(200);
+            entity.Property(e => e.Answer2).HasMaxLength(200);
+            entity.Property(e => e.CompanyName).HasMaxLength(50);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Question1).HasMaxLength(200);
+            entity.Property(e => e.Question2).HasMaxLength(200);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.UserName).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Secuser>(entity =>
+        {
+            entity.HasKey(e => e.UserId)
+                .HasName("aaaaaSECUsers_PK")
+                .IsClustered(false);
+
+            entity.ToTable("SECUsers");
+
+            entity.Property(e => e.Department).HasMaxLength(100);
+            entity.Property(e => e.EmailId).HasMaxLength(100);
+            entity.Property(e => e.EmpId).HasMaxLength(50);
+            entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.IsPpoc).HasColumnName("IsPPOC");
+            entity.Property(e => e.LastLoginTime).HasColumnType("datetime");
+            entity.Property(e => e.LastName).HasMaxLength(50);
+            entity.Property(e => e.LastPwdUpddate).HasColumnType("smalldatetime");
+            entity.Property(e => e.LoginId).HasMaxLength(20);
+            entity.Property(e => e.MiddleName).HasMaxLength(50);
+            entity.Property(e => e.Parentuserid).HasColumnName("parentuserid");
+            entity.Property(e => e.Password).HasMaxLength(200);
+            entity.Property(e => e.PwdExpiresOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.SelfEmpId)
+                .HasMaxLength(50)
+                .HasColumnName("SelfEmpID");
+            entity.Property(e => e.REG_NUMBER).HasColumnName("REG_NUMBER").HasMaxLength(100);
+
+            entity.Property(e => e.Status).HasDefaultValue(true);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.UserExpiresOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.token).HasColumnType("token");
+            entity.Property(e => e.userstts).HasColumnType("userstts");
+        });
+
+        modelBuilder.Entity<SecuserModule>(entity =>
+        {
+            entity.HasKey(e => e.UserModuleId)
+                .HasName("aaaaaSECUserModule_PK")
+                .IsClustered(false);
+
+            entity.ToTable("SECUserModule");
+
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<SelfEmployedSetting>(entity =>
+        {
+            entity.HasKey(e => e.Sesid);
+
+            entity.ToTable("Self_Employed_Settings");
+
+            entity.Property(e => e.Sesid).HasColumnName("SESId");
+            entity.Property(e => e.FormDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Form_date");
+            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.ToDate)
+                .HasColumnType("datetime")
+                .HasColumnName("To_date");
+        });
+
+        modelBuilder.Entity<SelfEmployee>(entity =>
+        {
+            entity.HasKey(e => e.EmployeeId)
+                .HasName("aaaaaSelfEmployee_PK")
+                .IsClustered(false);
+
+            entity.ToTable("SelfEmployee");
+
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+            entity.Property(e => e.Address1).HasMaxLength(100);
+            entity.Property(e => e.Address2).HasMaxLength(100);
+            entity.Property(e => e.AppintDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Appint_Date");
+            entity.Property(e => e.BankAcctNo)
+                .HasMaxLength(17)
+                .HasColumnName("Bank_Acct_No");
+            entity.Property(e => e.BirthDate).HasColumnType("datetime");
+            entity.Property(e => e.CategoryType).HasColumnName("Category_Type");
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.Country).HasMaxLength(100);
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.EmplCode)
+                .HasMaxLength(6)
+                .HasColumnName("Empl_Code");
+            entity.Property(e => e.EmplStatus)
+                .HasMaxLength(1)
+                .HasColumnName("Empl_Status");
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(100)
+                .HasColumnName("First_Name");
+            entity.Property(e => e.FlexDeptAcctType).HasMaxLength(6);
+            entity.Property(e => e.Gender).HasMaxLength(1);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(300);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.IsemployeeDirector).HasColumnName("isemployeeDirector");
+            entity.Property(e => e.IswageCategoryfromApi).HasColumnName("IswageCategoryfromAPI");
+            entity.Property(e => e.LastIncDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Last_Inc_Date");
+            entity.Property(e => e.LastName)
+                .HasMaxLength(100)
+                .HasColumnName("Last_Name");
+            entity.Property(e => e.LastPayDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Last_Pay_Date");
+            entity.Property(e => e.MaritalStat)
+                .HasMaxLength(2)
+                .HasColumnName("Marital_Stat");
+            entity.Property(e => e.MiddleName)
+                .HasMaxLength(100)
+                .HasColumnName("Middle_Name");
+            entity.Property(e => e.Mobile).HasMaxLength(100);
+            entity.Property(e => e.Occupation)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("occupation");
+            entity.Property(e => e.PayPeriod)
+                .HasMaxLength(1)
+                .HasColumnName("Pay_Period");
+            entity.Property(e => e.Phone).HasMaxLength(100);
+            entity.Property(e => e.SocSecNum)
+                .HasMaxLength(15)
+                .HasColumnName("Soc_Sec_Num");
+            entity.Property(e => e.State).HasMaxLength(100);
+            entity.Property(e => e.StateAllow).HasColumnName("State_Allow");
+            entity.Property(e => e.StateUdf)
+                .HasColumnType("decimal(18, 8)")
+                .HasColumnName("State_udf");
+            entity.Property(e => e.Terminated).HasColumnType("datetime");
+            entity.Property(e => e.Tin)
+                .HasMaxLength(100)
+                .HasColumnName("TIN");
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(300);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Zip).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<State>(entity =>
+        {
+            entity.HasKey(e => e.Sid)
+                .HasName("SId")
+                .IsClustered(false);
+
+            entity.ToTable("State");
+
+            entity.Property(e => e.Sid).HasColumnName("SId");
+            entity.Property(e => e.Deletable).HasMaxLength(1);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.InsertedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.InsertedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.UpdatedMachineInfo).HasMaxLength(50);
+            entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Table>(entity =>
+        {
+            entity.HasKey(e => e.Amount).HasName("PK__Table__0D2B290A69CFD09A");
+
+            entity.ToTable("Table");
+
+            entity.Property(e => e.Amount).HasColumnName("amount");
+        });
+
+        modelBuilder.Entity<UserPermission>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserPerm__3214EC077E693CCC");
+
+            entity.ToTable("UserPermission");
+
+            entity.Property(e => e.CompanyId).HasColumnName("Company_Id");
+        });
+
+        modelBuilder.Entity<WageCategory>(entity =>
+        {
+            entity.HasKey(e => e.Cid);
+
+            entity.Property(e => e.Cid).HasColumnName("CID");
+            entity.Property(e => e.Category).HasMaxLength(50);
+            entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+            entity.Property(e => e.Sesid).HasColumnName("SESId");
+            entity.Property(e => e.WeeklyContribution).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.WeeklyIncome).HasColumnType("decimal(18, 4)");
+        });
+
+        modelBuilder.Entity<WagesPayDetail>(entity =>
+        {
+            entity.HasKey(e => e.WagesPayId);
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.CompanyId).HasColumnName("company_ID");
+            entity.Property(e => e.EmployeeId).HasColumnName("employeeID");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("end_Date");
+            entity.Property(e => e.Insertedby).HasColumnName("insertedby");
+            entity.Property(e => e.Insertedmachineinfo).HasColumnName("insertedmachineinfo");
+            entity.Property(e => e.Insertedon)
+                .HasColumnType("datetime")
+                .HasColumnName("insertedon");
+            entity.Property(e => e.PeriodYear)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("PERIOD_YEAR");
+            entity.Property(e => e.PerioddMonth)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("PERIODD_MONTH");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("start_Date");
+            entity.Property(e => e.Updateby).HasColumnName("updateby");
+            entity.Property(e => e.Updatemachineinfo).HasColumnName("updatemachineinfo");
+            entity.Property(e => e.Updateon)
+                .HasColumnType("datetime")
+                .HasColumnName("updateon");
+            entity.Property(e => e.WagesPayDate).HasColumnType("datetime");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
+    List<string> tablesNames = null;
+    public override int SaveChanges()
+    {
+        using var transaction = Database.BeginTransaction();
+        try
+        {
+
+            AddAuditLogs();
+            foreach (var item in tablesNames.Distinct())
+            {
+                Database.ExecuteSqlRaw("DISABLE TRIGGER ALL ON " + item);
+            }
+
+            var result = base.SaveChanges();
+
+            foreach (var item in tablesNames.Distinct())
+            {
+                Database.ExecuteSqlRaw("ENABLE TRIGGER ALL ON " + item);
+            }
+
+            transaction.Commit();
+            tablesNames = null;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        int result = 0;
+
+        using var transaction = await Database.BeginTransactionAsync();
+
+        try
+        {
+            await AddAuditLogs();
+
+            foreach (var item in tablesNames.Distinct())
+            {
+                await Database.ExecuteSqlRawAsync("DISABLE TRIGGER ALL ON " + item);
+            }
+
+
+            result = await base.SaveChangesAsync(cancellationToken);
+
+            foreach (var item in tablesNames.Distinct())
+            {
+                await Database.ExecuteSqlRawAsync("ENABLE TRIGGER ALL ON " + item);
+            }
+
+
+            await transaction.CommitAsync();
+            tablesNames = null;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        return result;
+    }
+
+    private async Task AddAuditLogs()
+    {
+        // List of properties you want to ignore (from BaseEntity)
+        var baseEntityProps = new[]
+        {
+       "Id", "OldSystemId", "CreatedBy", "CreatedOn",
+       "ModifiedBy", "ModifiedOn", "SourceData"
+       };
+
+        // List of table names to exclude from audit logging
+        var excludedTables = new[] { "LoginLog" };
+
+        tablesNames = new List<string>();
+        var http = _httpContextAccessor.HttpContext;
+        var url = http?.Request.Path + http?.Request.QueryString;
+        var ipAddress = http?.Connection.RemoteIpAddress?.ToString();
+
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Modified || e.State == EntityState.Deleted);
+
+        foreach (var entry in entries)
+        {
+            var entityType = Model.FindEntityType(entry.Entity.GetType());
+            var tableName = entityType?.GetTableName() ?? entry.Entity.GetType().Name;
+
+            // Skip excluded tables
+            if (excludedTables.Contains(tableName, StringComparer.OrdinalIgnoreCase))
+                continue;
+
+            var primaryKey = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey());
+            var recordId = Convert.ToInt32(primaryKey?.CurrentValue ?? 0);
+
+            tablesNames.Add(tableName);
+
+            foreach (var prop in entry.Properties)
+            {
+                var propName = prop.Metadata.Name;
+
+                // Skip base entity properties
+                if (baseEntityProps.Contains(propName))
+                    continue;
+
+                // Only log modified properties in case of modification
+                if (entry.State == EntityState.Modified)
+                {
+                    if (!prop.IsModified || Equals(prop.OriginalValue, prop.CurrentValue))
+                        continue;
+                }
+
+                if (entry.State == EntityState.Deleted && prop.OriginalValue == null)
+                    continue;
+
+                var audit = new AuditLog
+                {
+                    TableName = tableName,
+                    EventType = entry.State.ToString(),
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = Convert.ToInt32(CurrentUserId ?? "0"),
+                    ModifiedBy = Convert.ToInt32(CurrentUserId ?? "0"),
+                    ModifiedOn = DateTime.Now,
+                    IsActive = true,
+                    SourceData = 1,
+                    Url = url,
+                    Ipaddress = ipAddress,
+                    ColumnName = propName,
+                    RecordId = recordId
+                };
+
+                if (entry.State == EntityState.Modified)
+                {
+                    audit.OldValue = Convert.ToString(prop.OriginalValue);
+                    audit.NewValue = Convert.ToString(prop.CurrentValue);
+                }
+                else if (entry.State == EntityState.Deleted)
+                {
+                    audit.OldValue = Convert.ToString(prop.OriginalValue);
+                }
+
+                AuditLogs.Add(audit);
+            }
+        }
+    }
+}
+

@@ -1,0 +1,61 @@
+{
+  "SubCompany": "",
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+
+  //SOCIAL_SECURITY_DATABASE
+  "ConnectionStrings": {
+    //"DefaultConnection": "Server=185.196.20.44;Database=SOCIAL_SECURITY_DATABASE;User Id=c3users;Password=c3user@123;TrustServerCertificate=true;"
+    "DefaultConnection": "Server=185.196.20.44;Database=SSB.Staging;User Id=c3users;Password=c3user@123;TrustServerCertificate=true;"
+  },
+  "ServiceConfig": {
+    "ServiceUriString": "http://www.ssbeservices.net:8080",
+    "AuthUser": "c3svc",
+    "AuthPass": "547698"
+  },
+  "Jwt": {
+    "Key": "HighlySecuritynarendramishainfotechcompany",
+    "Issuer": "https://localhost:7178",
+    "Audience": "https://localhost:7178",
+    "ExpireMinutes": "30"
+  },
+  "EmailSettings": {
+    "SmtpServer": "smtp.gmail.com",
+    "Port": "587",
+    "SenderEmail": "noreply.c3wizard@gmail.com",
+    "SenderPassword": "rnda jtrf uocj zell"
+  },
+  "PaymentUrl": {
+    "ReturnUrl": "https://c3wizardweb.digitalnoticeboard.biz/payment-success",
+    "CancelUrl": "https://c3wizardweb.digitalnoticeboard.biz/payment-success",
+    "ClientID": "AUOq-mJ_sITqceI619qTg7zSgxfJtwEwQd6A1Lp3COCltae_eN0mETVwYEtcFV0kC-ktV4YR-PgmGKxz",
+    "ClientSecret": "EEsMWwCNB-5JB7MRDKBrDJMm2NocOvfcHLV-SXVJoK9ZgrdhabPj4RqrNPNZGVqgBeMA0Mkv0GX79qAY"
+  },
+  "CyberSourceConfig": {
+    "merchantId": "4csonline_bon_socialsecurity",
+    "keyId": "7a132e2e-f1cd-42b8-a3e6-ca969843c727",
+    "secretKey": "9eGfS4fGs4rTr0DqsUthFv2EVnIKrxY+AWyKzDD9esw=",
+    //"resource": "/pts/v2/payments",
+    "baseUrl": "https://apitest.cybersource.com"
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "https://c3wizard.digitalnoticeboard.biz",
+      "https://c3wizardweb.digitalnoticeboard.biz"
+    ]
+  },
+
+  "IsBEMA_APIs_Integration": "1",
+  "IsTestMail": "1",
+  //"TestMail": "rohit.k@mipl.us",
+  "TestMail": "devid.k@mishainfotech.com",
+  "SSBMail": "neeraj.p@mishainfotech.com,devid.k@mishainfotech.com,krishnakant.s@mishainfotech.com",
+  //"TestMail": "krishnakant.s@mishainfotech.com",
+  "weburl": "https://c3wizard.digitalnoticeboard.biz/ResetPassword",
+  "AllowedHosts": "*"
+}

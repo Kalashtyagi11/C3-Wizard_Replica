@@ -1,0 +1,133 @@
+﻿using C3Wizard.COMMONPROP;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardHelper.ViewModels
+{
+
+  public class DirPayrollpreviewVM
+  {
+    //public string MonthName { get; set; }
+    public int MonthNum { get; set; }
+    public int CompanyId { get; set; }
+    public int Year { get; set; }
+    public List<PayPeriod1> CmbPayPeriod { get; set; } //= new List<PayPeriod1>();
+    public List<string> SelectList { get; set; } //= new List<string>();
+    public bool DirectorExistContinue { get; set; }
+    public int UserID { get; set; }
+    public string MachineInfo { get; set; }
+    public string UserName { get; set; }
+    public int HId { get; set; }
+    public bool IsPayPeriodChange { get; set; } = false;
+
+  }
+
+  public class DirPayrollpreviewSubmitVM
+  {
+    public string MonthName { get; set; }
+    public int MonthNum { get; set; }
+    public int CompanyId { get; set; }
+    public int Year { get; set; }
+    public List<PayPeriod1> CmbPayPeriod { get; set; } //= new List<PayPeriod1>();
+    public List<string> SelectList { get; set; } //= new List<string>();
+    public bool DirectorExistContinue { get; set; }
+    public int UserID { get; set; }
+    public string MachineInfo { get; set; }
+    public string UserName { get; set; }
+    public int HId { get; set; }
+    public bool IsPayPeriodChange { get; set; } = false;
+
+    public List<C3Contributions> list { get; set; }
+    public bool confirm { get; set; } = false;
+  }
+
+
+  public class EditDirPayrolVM
+  {
+    public string MonthName { get; set; }
+    public int MonthNum { get; set; }
+    public int CompanyId { get; set; }
+    public int Year { get; set; }
+    public List<PayPeriod1> CmbPayPeriod { get; set; }
+    public bool DirectorExistContinue { get; set; }
+    public int UserID { get; set; }
+    public string MachineInfo { get; set; }
+    public string User_Name { get; set; }
+    public int H_Id { get; set; }
+    public bool IsPayPeriodChange { get; set; } = false;
+
+    public EditDirPayrolListVM EditDirPayrolList { get; set; }
+  }
+  public class EditDirPayrolListVM
+  {
+    public decimal WAGES1 { get; set; }
+    public decimal WAGES2 { get; set; }
+    public decimal WAGES3 { get; set; }
+    public decimal WAGES4 { get; set; }
+    public decimal WAGES5 { get; set; }
+
+    public bool weeK1 { get; set; }
+    public bool weeK2 { get; set; }
+    public bool weeK3 { get; set; }
+    public bool weeK4 { get; set; }
+    public bool weeK5 { get; set; }
+    public string Remarks { get; set; }
+  }
+
+  public class saveDirPayrolVM
+  {
+    public string MonthName { get; set; }
+    public int MonthNum { get; set; }
+    public int CompanyId { get; set; }
+    public int Year { get; set; }
+    public List<PayPeriod1> CmbPayPeriod { get; set; }
+    public bool DirectorExistContinue { get; set; }
+    public int UserID { get; set; }
+    public string MachineInfo { get; set; }
+    public string User_Name { get; set; }
+    public int H_Id { get; set; }
+    public bool IsPayPeriodChange { get; set; } = false;
+    public List<string> SelectList { get; set; }
+  }
+
+
+  public class dirDataReportsVm
+  {
+    public string nameOfEmployer { get; set; }
+    public string tradeName { get; set; }
+    public string address { get; set; }
+    public string empRegNo { get; set; }
+    public string month { get; set; }
+    public bool? isNilReturn { get; set; }
+    public int noOfDir { get; set; }
+    public string AccountantGenreal { get; set; }
+    public string TotalLevy { get; set; }
+    public string totalFeesDir { get; set; }
+    public string leavyPanelty { get; set; }
+    public string totalDueAcGeneral { get; set; }
+    public string OrderKey { get; set; }
+    public string OrderName { get; set; }
+    public string date { get; set; }
+    public  List<dirReportsListVm?> dirReportsList { get; set; }
+
+  }
+
+  public class dirReportsListVm
+  {
+    public decimal WAGES1 { get; set; }
+    public decimal WAGES2 { get; set; }
+    public decimal WAGES3 { get; set; }
+    public decimal WAGES4 { get; set; }
+    public decimal WAGES5 { get; set; }
+
+    public string Remarks { get; set; }
+    public string nameOfDir { get; set; }
+    public string socialSecNum { get; set; }
+    public decimal deduct_leavy_wages { get; set; }
+    public decimal total_wages { get; set; }
+    public string pay_period { get; set; }
+  }
+}

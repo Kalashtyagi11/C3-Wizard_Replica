@@ -1,0 +1,102 @@
+﻿@model dynamic
+
+<!-- Use this HTML as the email body. Placeholders: {Name}, {ActivationCode}, {ActivationLink}, {SupportEmail}, {SupportPhone} -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: #0b64a0;
+      color: white;
+      padding: 18px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .content {
+      border: 1px solid #e0e0e0;
+      padding: 20px;
+      border-top: 0;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      background: #06a;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .footer {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    code {
+      background: #f3f3f3;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Parent–Child {Action} Notification</h2>
+    </div>
+
+    <div class="content">
+      <p>Hi <strong>@Model.Name</strong>,</p>
+
+      <p>The following company association has been <b>{Action}</b>:</p>
+      <ul>
+        <li><b>Parent Company:</b> {ParentCompany}</li>
+        <li><b>Child Company:</b> {ChildCompany}</li>
+        <li><b>Date:</b> {ActionDate}</li>
+      </ul>
+
+      <p>
+        You now have access to the companies mapped recently.
+        Please log in to view or manage the related data.
+      </p>
+
+      <p>
+        You no longer have access to the unmapped companies.
+        If you believe this was an error, please contact your administrator.
+      </p>
+
+      <p>If you experience any difficulties, please email us at <a href="mailto:eservices@socialsecurity.kn">eservices@socialsecurity.kn</a> or call us at (869)465-2535</p>
+
+      <p>
+        Administrator (C3 Remittances)<br />
+        St. Christopher & Nevis Social Security Board
+      </p>
+
+      <div class="footer">
+        <p class="small">This is an automated message — please do not reply to this mailbox.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

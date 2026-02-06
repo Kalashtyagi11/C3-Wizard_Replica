@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3Wizard.COMMONPROP
+{
+   public class DVOExceptionRecord :DVOBase
+    {
+        #region Stored-Procedures
+
+        public override string INSERT_SPNAME
+        {
+            get { return "USP_ExptionRcrdIns"; }
+        }
+
+        public override string UPDATE_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string DELETE_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string FIND_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string ALL_SPNAME
+        {
+            get { return ""; }
+        }
+        public override string TABLE_NAME
+        {
+            get { return ""; }
+        }
+
+        public override int UNIQUE_ID
+        {
+            get { return 0; }
+        }
+
+        //public override string NOTES_TABLE_RECORD_ID
+        //{
+        //    get { return string.Empty; }
+        //    set { throw new Exception("The method or operation is not implemented."); }
+        //}
+        public override string FIND_QUERY(ref Object[] parameters)
+        {
+            return "";
+        }
+
+        #endregion Stored-Procedures
+    }
+}

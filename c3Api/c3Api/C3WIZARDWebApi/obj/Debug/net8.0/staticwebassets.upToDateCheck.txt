@@ -1,0 +1,80 @@
+wwwroot\CompanyLogo\logo_a0a740f6300a4abca4252713449252c1.png
+wwwroot\Documents\16 Levy Tiers - June 2024 Test on version 4.0.0.33.PDF
+wwwroot\Documents\16 Levy Tiers - June 2024 Test on version 4.0.0.34.pdf
+wwwroot\Documents\Calculation of levy with salary 6500 and above (2).xlsx
+wwwroot\Documents\Conditions.xlsx
+wwwroot\Documents\EC3 Standard File Format.pdf
+wwwroot\Documents\Employers-Guide.pdf
+wwwroot\Documents\Employers-Guide-2018.pdf
+wwwroot\Documents\HSD LEVY THRESHOLD ADJUSTMENT as at 01 March 2024 Rev_01.pdf
+wwwroot\Documents\HSD LEVY THRESHOLD ADJUSTMENT as at 01 March 2024 Rev_01.pptx
+wwwroot\Documents\Information-for-the-SelfEmployed.pdf
+wwwroot\Documents\SCAN0001.PDF
+wwwroot\Draft.png
+wwwroot\Email\activationTemplate.cshtml
+wwwroot\Email\C3Report.cshtml
+wwwroot\Email\CompanyMappingNotification.cshtml
+wwwroot\Email\ForgetPassword.html
+wwwroot\Email\OtpVerificationLogin.cshtml
+wwwroot\Email\payment.cshtml
+wwwroot\Email\verifictionTemplate.cshtml
+wwwroot\Email\Welcome.cshtml
+wwwroot\Email\WelcomeCustomer.cshtml
+wwwroot\Email\WelcomeCustomerResetMail.cshtml
+wwwroot\imagedraft.png
+wwwroot\imagepaid.png
+wwwroot\ImportC3File\04b137169092451bbffc3fb62eed99c3.c3
+wwwroot\ImportC3File\111111012009 3 (2) - Copy (1).c3
+wwwroot\ImportC3File\111111012009 3 (2) - Copy 1.c3
+wwwroot\ImportC3File\111111012009 3 (2) - Copy 2.c3
+wwwroot\ImportC3File\111111012009.c3
+wwwroot\ImportC3File\111111012009A.c3
+wwwroot\ImportC3File\292da4e73aec40b2aead194878b1f00f.c3
+wwwroot\ImportC3File\2b5753a6ab1e48a1a0c8821b33250655.C3
+wwwroot\ImportC3File\2dc9aeae319d4c44bb38650bff4e8472.c3
+wwwroot\ImportC3File\301914129562401699522e85ed9fdf27.C3
+wwwroot\ImportC3File\347a6c72da8b4222b029b8adfd8e9661.c3
+wwwroot\ImportC3File\39af9b8f16bf495baa9967196c0463ec.c3
+wwwroot\ImportC3File\3c7e6f7db870464eb31fa1151984cd6a.C3
+wwwroot\ImportC3File\42f50e41cb5743a8892796d0f75147e4.C3
+wwwroot\ImportC3File\498d02e8fb274a91a2193b1b660f0ca7.c3
+wwwroot\ImportC3File\4ce6ec7ebef948459d89dc7bb6b3c15a.C3
+wwwroot\ImportC3File\656297-12025.C3
+wwwroot\ImportC3File\65f07eb7593e4e2e9e583bd32f88a8ee.c3
+wwwroot\ImportC3File\663990102025.C3
+wwwroot\ImportC3File\664003012025.C3
+wwwroot\ImportC3File\758ab073c4804d95872853ce49f29bd2.c3
+wwwroot\ImportC3File\797cf53485e642ccb14b8695b584afad.c3
+wwwroot\ImportC3File\8ff7370120a4482883f3a16cbc608fe0.c3
+wwwroot\ImportC3File\9f06f5ced2bb43a5b4d3e7a802d4da95.c3
+wwwroot\ImportC3File\a0396743df8845518211daf085215c9b.c3
+wwwroot\ImportC3File\a36ba48917f84e28a4952585141d7c87.c3
+wwwroot\ImportC3File\a412a32429e84284b16271bbabfc5974.c3
+wwwroot\ImportC3File\a6d5e173d4aa4666a89e681cbc93a0e8.c3
+wwwroot\ImportC3File\aba5ce823096470eb545774d00b89b74.c3
+wwwroot\ImportC3File\aebfbac608ee46f5aa465db63a4578df.c3
+wwwroot\ImportC3File\b719e27a61374b6d91d241a178fecd3b.c3
+wwwroot\ImportC3File\b9f652581cf9474fba0ae97f57bfea75.c3
+wwwroot\ImportC3File\ba4f074ac69d4ba89e5f393f696d99d3.c3
+wwwroot\ImportC3File\c1e10cdc673c4eceb8947eaefb5114f1.C3
+wwwroot\ImportC3File\c48014ecfefe45d49d36504710821ccf.c3
+wwwroot\ImportC3File\c8e5be933a024840afa5cd6fec89cd6f.C3
+wwwroot\ImportC3File\check.c3
+wwwroot\ImportC3File\d38d21e0c440474cae48d8a7f2a9cd22.c3
+wwwroot\ImportC3File\dac17660b26741fd84c4646f283cc686.c3
+wwwroot\ImportC3File\eeeeee.c3
+wwwroot\ImportC3File\ef913b6870dd44b1a024a356cc72c480.c3
+wwwroot\ImportC3File\fce4c97424914e6e86447fb6cdd09329.c3
+wwwroot\ImportC3File\qqqqaa.c3
+wwwroot\ImportC3File\qwerty 1 (3).c3
+wwwroot\ImportC3File\qwerty 1.c3
+wwwroot\ImportC3File\qwerty.c3
+wwwroot\ImportC3File\rrrrrrr.c3
+wwwroot\ImportC3File\testtttt.c3
+wwwroot\ImportC3File\xxxxxxxxx.c3
+wwwroot\Paid.png
+wwwroot\Report\DirectorC3more8Report.rdlc
+wwwroot\Report\DirectorC3Report.rdlc
+wwwroot\Report\EmployeeC3more5Report.rdlc
+wwwroot\Report\EmployeeC3Report.rdlc
+wwwroot\Report\SelfEmployedC3Report.rdlc

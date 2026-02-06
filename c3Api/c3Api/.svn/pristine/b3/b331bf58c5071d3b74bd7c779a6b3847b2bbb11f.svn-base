@@ -1,0 +1,147 @@
+﻿@model dynamic
+
+<!-- Use this HTML as the email body. Placeholders: {Name}, {ActivationCode}, {ActivationLink}, {SupportEmail}, {SupportPhone} -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: #0b64a0;
+      color: white;
+      padding: 18px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .content {
+      border: 1px solid #e0e0e0;
+      padding: 20px;
+      border-top: 0;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      background: #06a;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .footer {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    code {
+      background: #f3f3f3;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Parent–Child @Model.key Notification</h2>
+    </div>
+
+    <div class="content">
+      <p>Dear <strong>@Model.name</strong>,</p>
+
+      @{
+        if (Model.key == "Mapped")
+        {
+          <p>The following company association has been successfully <strong>established</strong>:</p>
+        }
+        else
+        {
+          <p>The following company association has been <strong>removed</strong>:</p>
+        }
+      }
+
+      <ul>
+        <li><strong>Parent Company:</strong> @Model.parentName</li>
+        <li><strong>Child Company:</strong> @Model.child</li>
+        <li><strong>Date:</strong> @DateTime.Now</li>
+      </ul>
+
+      @{
+        if (Model.key == "Mapped")
+        {
+          <p>
+            You now have access to the following company(ies) linked to <strong>@Model.parentName</strong>:
+          </p>
+
+          <ul>
+            @foreach (var childCompany in Model.child.Split('|'))
+            {
+              <li>@childCompany.Trim()</li>
+            }
+          </ul>
+
+          <p>
+            Please log in to your account to view or manage the related company information.
+          </p>
+        }
+        else
+        {
+          <p>
+            <strong>@Model.parentName</strong> is no longer associated with the following child company(ies):
+          </p>
+
+          <ul>
+            @foreach (var childCompany in Model.child.Split(','))
+            {
+              <li>@childCompany.Trim()</li>
+            }
+          </ul>
+
+          <p>
+            If you previously had access to any of these companies, your access has now been revoked.<br />
+            Please contact your system administrator if you believe this change was made in error.
+          </p>
+        }
+      }
+
+      <br />
+      If you experience any difficulties, please email us at eservices@socialsecurity.kn
+      or call us at (869)465-2535
+
+      <br />
+      <br />
+      <b>Sincerely</b>,
+      <br />
+      <br />
+      Administrator (C3 Remittances)
+      <br />
+
+      St. Christopher & Nevis Social Security Board
+
+      
+
+    </div>
+
+  </div>
+</body>
+</html>
+

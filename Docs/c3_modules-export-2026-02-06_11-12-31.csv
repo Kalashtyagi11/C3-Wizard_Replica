@@ -1,0 +1,67 @@
+id;module_code;module_name;description;parent_id;module_level;page_url;icon;form_name;display_order;role_id;is_deleted;created_at;created_by;updated_at;updated_by;legacy_id
+133;dashboard_1;DASHBOARD;DASHBOARD;;0;/apps/dashboard;<Icon.Home />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;1
+134;employer_details_2;EMPLOYER DETAILS;EMPLOYER DETAILS;;1;/apps/employerdetails;<Icon.User />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;2
+135;c3_3;C3;C3;;2;/C3;<Icon.DollarSign />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;3
+136;non_working_director_9;NON WORKING DIRECTOR;NON WORKING DIRECTOR;;8;/director;<Icon.User />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;9
+137;settings_13;SETTINGS;SETTINGS;;12;;;;;;true;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;13
+138;administration_16;ADMINISTRATION;ADMINISTRATION;;15;/administration;<Icon.Users/>;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;16
+139;payments_details_20;PAYMENTS DETAILS;PAYMENTS DETAILS;;9;/apps/paymentdetails;<Icon.CreditCard />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;20
+140;about_us_21;ABOUT US;ABOUT US;;20;/apps/aboutus;<Icon.Info />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;21
+141;contact_us_22;CONTACT US;CONTACT US;;21;/apps/contacts;<Icon.Headphones />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;22
+142;dashboard_23;DASHBOARD;DASHBOARD;;0;/apps/dashboards;<Icon.Home />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;23
+143;personal_details_24;PERSONAL DETAILS;PERSONAL DETAILS;;1;/apps/personalDetails;<Icon.Users />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;24
+144;self_employee_contribution_25;SELF EMPLOYEE CONTRIBUTION;SELF EMPLOYEE CONTRIBUTION;;2;/apps/selfEmployeeContribution;<Icon.DollarSign />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;25
+145;reports_26;REPORTS;REPORTS;;8;/apps/report;<Icon.FileText />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;26
+146;user_profile_27;USER PROFILE;USER PROFILE;;5;/apps/Profile;<Icon.User />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;27
+147;user_audit_trail_28;USER AUDIT TRAIL;USER AUDIT TRAIL;;6;/apps/userAuditTrails;<Icon.BarChart />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;28
+148;logged_in_history_29;LOGGED IN HISTORY;LOGGED IN HISTORY;;7;/apps/loggedInHistorys;<Icon.Activity />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;29
+149;payments_details_30;PAYMENTS DETAILS;PAYMENTS DETAILS;;4;/apps/paymentdetails;<Icon.CreditCard />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;30
+150;contact_us_31;CONTACT US;CONTACT US;;8;/apps/contacts;<Icon.Headphones />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;31
+151;about_us_32;ABOUT US;ABOUT US;;9;/apps/aboutUs;<Icon.Info />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;32
+152;dashboard_33;DASHBOARD;DASHBOARD;;0;/admin-dashboard;<Icon.Home />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;33
+153;employer_details_34;EMPLOYER DETAILS;EMPLOYER DETAILS;;1;/admin/employer-details;<Icon.User />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;34
+154;c3_details_35;C3 DETAILS;C3 DETAILS;;3;/C3;<Icon.DollarSign />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;35
+155;payments_details_39;PAYMENTS DETAILS;PAYMENTS DETAILS;;4;/admin/c3/report;<Icon.Disc />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;39
+156;settings_40;SETTINGS;SETTINGS;;6;/settings;<Icon.Settings />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;40
+157;manage_users_45;MANAGE USERS;MANAGE USERS;;7;/manage-users;<Icon.Users />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;45
+158;reconciliation_52;RECONCILIATION;RECONCILIATION;;5;admin/reconciliation/Reconciliation;<Icon.Clock/>;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;52
+159;self_employed_details_56;SELF EMPLOYED DETAILS;SELF EMPLOYED DETAILS;;2;/admin/self-employed-details;<Icon.Disc />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;56
+160;logs_58;LOGS;LOGS;;9;/apps/administration/ExceptionLogs;<Icon.FileText />;;;;false;2026-01-29 13:31:27.510235+00;;2026-01-29 13:31:27.510235+00;;58
+161;employee_4;EMPLOYEE;EMPLOYEE;135;3;/apps/C3/Employee;<Icon.User />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;4
+162;holiday/other_payment_5;HOLIDAY/OTHER PAYMENT;HOLIDAY/OTHER PAYMENT;135;4;/apps/C3/Holiday;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;5
+163;c3_generation_6;C3 GENERATION;C3 GENERATION;135;5;/apps/C3/C3Generation;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;6
+164;bonus_7;BONUS;BONUS;135;6;/apps/C3/Bonus;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;7
+165;reports_8;REPORTS;REPORTS;135;7;/apps/C3/Reports;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;8
+166;nw_director_10;NW DIRECTOR;NW DIRECTOR;136;9;/apps/director/NwDirector;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;10
+167;nw_director_payroll_11;NW DIRECTOR PAYROLL;NW DIRECTOR PAYROLL;136;10;/apps/director/NwDirectorPayroll;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;11
+168;nw_director_reports_12;NW DIRECTOR REPORTS;NW DIRECTOR REPORTS;136;11;/apps/director/NwDirectorReports;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;12
+169;c3_settings_14;C3 SETTINGS;C3 SETTINGS;137;13;;;;;;true;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;14
+170;bonus_settings_15;BONUS SETTINGS;BONUS SETTINGS;137;14;;;;;;true;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;15
+171;user_management_17;USER MANAGEMENT;USER MANAGEMENT;138;16;/apps/administration/UserManagement;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;17
+172;user_audit_trail_18;USER AUDIT TRAIL;USER AUDIT TRAIL;138;17;/apps/administration/UserAuditTrail;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;18
+173;logged_in_history_19;LOGGED IN HISTORY;LOGGED IN HISTORY;138;18;/apps/administration/LoggedInHistory;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;19
+174;c3_contribution_36;C3 CONTRIBUTION;C3 CONTRIBUTION;154;4;/admin/c3/c3-contribution;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;36
+175;nw_director_37;NW DIRECTOR;NW DIRECTOR;154;5;/admin/c3/nw-director;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;37
+176;self_employed_38;SELF EMPLOYED;SELF EMPLOYED;154;6;/admin/c3/self-employed;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;38
+177;c3_settings_41;C3 SETTINGS;C3 SETTINGS;156;9;/apps/settings/C3Settings;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;41
+178;bonus_settings_42;BONUS SETTINGS;BONUS SETTINGS;156;10;/apps/settings/BonusSettings;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;42
+179;self_employed_settings_43;SELF EMPLOYED SETTINGS;SELF EMPLOYED SETTINGS;156;11;/apps/settings/SelfEmployedSettings;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;43
+180;levy_settings_44;LEVY SETTINGS;LEVY SETTINGS;156;12;/apps/settings/LevySettings;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;44
+181;administrative_users_46;ADMINISTRATIVE USERS;ADMINISTRATIVE;157;14;/admin/manage-users/my-users;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;46
+182;employer_users_47;EMPLOYER USERS;EMPLOYERS;157;15;/admin/manage-users/company-users;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;47
+183;self_employed_users_48;SELF EMPLOYED USERS;SELF EMPLOYED;157;16;/admin/manage-users/self-employed-users;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;48
+184;logged_in_history_49;LOGGED IN HISTORY;LOGGED IN HISTORY;160;17;/admin/logged-in-history;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;49
+185;role_permission_50;ROLE PERMISSION;ROLE PERMISSION;157;18;/apps/settings/rolePermission;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;50
+186;role_master_51;ROLE MASTER;ROLE MASTER;157;19;/apps/roleMaster/RoleMaster;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;51
+187;testpayment_history_55;TESTPAYMENT HISTORY;TESTPAYMENT HISTORY;154;21;/TestPayReports;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;55
+188;testpayment_capture_53;TESTPAYMENT CAPTURE;TESTPAYMENT CAPTURE;154;22;/TestPaymentCapture;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;53
+189;cybersource_settings_54;CYBERSOURCE SETTINGS;CYBERSOURCE SETTINGS;156;23;/SiteSettingList;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;54
+190;user_audit_trail_57;USER AUDIT TRAIL;USER AUDIT TRAIL;157;24;/apps/administration/UserAuditTrail;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;57
+191;exception_logs_59;EXCEPTION LOGS;EXCEPTION LOGS;160;26;/apps/administration/ExceptionLogs;<Icon.Disc />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;59
+192;user_audit_trail_60;USER AUDIT TRAIL;USER AUDIT TRAIL;160;3;/apps/administration/UserAuditTrail;<Icon.Disc />;;;;true;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;60
+193;employer_history_61;EMPLOYER HISTORY;EMPLOYER HISTORY;145;27;/admin/employer-history;<Icon.FileText />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;61
+194;self_employed_history_62;SELF EMPLOYED HISTORY;SELF EMPLOYED HISTORY;145;28;/admin/self-employed-history;<Icon.FileText />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;62
+195;payments_history_63;PAYMENTS HISTORY;PAYMENTS HISTORY;145;29;/admin/payment-history;<Icon.FileText />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;63
+196;reconciliation_history_64;RECONCILIATION HISTORY;RECONCILIATION HISTORY;145;30;/admin/reconciliation-history;<Icon.FileText />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;64
+197;users_history_65;USERS HISTORY;USERS HISTORY;145;31;/admin/users-history;<Icon.FileText />;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;65
+198;import_c3_file_66;Import C3 File;Import C3 File;135;8;/apps/ImportC3/Generation;Icon.Disc;;;;false;2026-01-29 13:31:45.091179+00;;2026-01-29 13:31:45.091179+00;;66

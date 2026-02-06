@@ -1,0 +1,1804 @@
+﻿using Azure;
+using C3Wizard.COMMONPROP;
+using C3WizardData.Models;
+using C3WizardHelper.ViewModels;
+using C3WizardLayer.BusinessObjects;
+using C3WizardLayer.DataObjects;
+using C3WizardRepository.Common;
+using C3WizardRepository.Interface;
+using C3WizardRepository.Repository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using System.ComponentModel.Design;
+using System.Data;
+using static C3WizardRepository.Repository.RepoRegisterCompany;
+using System.Globalization;
+using System.Net;
+using static System.Net.Mime.MediaTypeNames;
+using System.Configuration;
+using System.Web.Http.Results;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+
+namespace C3WIZARDWebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class NonWorkingDirectorController : ControllerBase
+    {
+        private readonly RepoNonDirector repoDirector;
+        private readonly RepoC3 _C3;
+        private readonly C3wizardContext _context;
+        ResponseModel response = new ResponseModel();
+        private readonly IConfiguration _configuration;
+        public NonWorkingDirectorController(RepoNonDirector repoNonDirector, IConfiguration configuration, RepoC3 c3, C3wizardContext context)
+        {
+            repoDirector = repoNonDirector;
+            _configuration = configuration;
+            _C3 = c3;
+            _context = context;
+        }
+        /// <summary>
+        /// This method is used ADD Director
+        /// </summary>
+        /// <param name="c3EmployeeVM"></param>
+        /// <returns></returns>
+        [HttpPost("Save_Director")]
+        public async Task<IActionResult> Save_Director(NondirectorVM DirectorVM)
+        {
+            ResponseModel response = new ResponseModel();
+            bool companyexist = false;
+            int companyid = Convert.ToInt32(DirectorVM.companyid), existingcompanyid = 0;
+            int? ssn = DirectorVM.SocSecNum;
+
+            if (DirectorVM.SocSecNum != null)
+            {
+                //BLMasterEmployee bme;
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                DataSet dataSet = new DataSet();
+                try
+                {
+                    //string SqlQuerystring = ConfigurationSettings.AppSettings.Get("AppConnection");
+                    SqlConnection con = new SqlConnection(C3WizardLayerConn_BaseData.StaticSqlConnection.ConnectionString);
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM MasterEmployee WHERE Isactive=1 And Soc_Sec_Num=" + ssn + " and CompanyId=" + companyid, con);
+                    cmd.CommandType = CommandType.Text;
+
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = cmd;
+                    adapter.Fill(dataSet);
+                    con.Close();
+                    if (dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        for (int i = 0; dataSet.Tables[0].Rows.Count > i; i++)
+                        {
+                            existingcompanyid = int.Parse(dataSet.Tables[0].Rows[i][41].ToString());
+
+                            if (existingcompanyid == companyid && DirectorVM.mode != 2)
+                            {
+                                //response.Message = "C3 Wizard,Director/Employee already exist in this company";
+                                //response.Status = false;
+                                //return response;
+                                return BadRequest(new ResponseModel
+                                {
+                                    Status = false,
+                                    Message = "Director/Employee already exist in this company",
+                                    Statuscode = 400,
+                                });
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    response.Message = "Error: " + ex.Message;
+                    response.Status = false;
+                }
+            }
+
+            BLMasterEmployee blemployee = new BLMasterEmployee();
+            string gender = null;
+            if (DirectorVM.rbmale == true)
+            {
+                gender = "Male";
+            }
+            else
+            {
+                gender = "Female";
+            }
+            blemployee.SocSecNum = DirectorVM.SocSecNum.ToString();
+            blemployee.FirstName = DirectorVM.FirstName;
+            blemployee.MiddleName = DirectorVM.MiddleName;
+            blemployee.LastName = DirectorVM.LastName;
+            blemployee.Phone = DirectorVM.Phone;
+            blemployee.Mobile = DirectorVM.Mobile;
+            blemployee.MaritalStat = DirectorVM.MaritalStat;
+            blemployee.Address1 = DirectorVM.Address1;
+            blemployee.Address2 = DirectorVM.Address2;
+            blemployee.Country = String.IsNullOrEmpty(DirectorVM.Country) ? "0" : DirectorVM.Country.ToString();
+            blemployee.City = DirectorVM.City;
+            blemployee.Zip = DirectorVM.Zip;
+            blemployee.IsActive = true;
+            blemployee.IsdirectorOnly = true;
+            blemployee.IsemployeeDirector = false;
+            blemployee.BirthDate = DirectorVM.BirthDate;
+            blemployee.Gender = gender;
+            blemployee.Email = DirectorVM.Email;
+            blemployee.CompanyId = companyid;
+            try
+            {
+                if (DirectorVM.MaritalStat != null)
+                    blemployee.MaritalStat = DirectorVM.MaritalStat.ToString() == "Single" ? "S" : (DirectorVM.MaritalStat.ToString() == "Married" ? "M" : "");
+            }
+            catch(Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                response.Message = "Error: " + ex.Message;
+                response.Status = false;
+            }
+            try
+            {
+                if (DirectorVM.PayPeriod == "Weekly")
+                    blemployee.PayPeriod = "W";
+                if (DirectorVM.PayPeriod == "Monthly")
+                    blemployee.PayPeriod = "M";
+                if (DirectorVM.PayPeriod == "Every Two Weeks")
+                    blemployee.PayPeriod = "E2W";
+                if (DirectorVM.PayPeriod == "Twice Monthly")
+                    blemployee.PayPeriod = "2M";
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                response.Message = "Error: " + ex.Message;
+                response.Status = false;
+
+            }
+            blemployee.Terminated = DirectorVM.Terminated;
+            decimal? Salary = DirectorVM.wadeg;
+            int? mode = DirectorVM.mode;
+            blemployee.AppintDate = DirectorVM.commencementDate;
+            blemployee.occupation = DirectorVM.Occupation;
+            blemployee.Department = DirectorVM.Department;
+            if (DirectorVM.mode == 1 && companyexist == false)
+            {
+                try
+                {
+                    blemployee.InsertedBy = companyid;
+                    blemployee.InsertedOn = DateTime.Now;
+
+                    blemployee.SaveNew();
+                    var saveemployeeincome = repoDirector.save_MasterDirectorIncomes(blemployee, Salary, mode);
+
+                    response.Status = true;
+                    response.Message = "Director data saved successfully";
+                    response.Statuscode = 200;
+                    response.Data = new { blemployee, saveemployeeincome };
+                    try
+                    {
+                        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                        if (staticConnection.State == ConnectionState.Open)
+                        {
+                            staticConnection.Close();
+                        }
+                        SqlCommand updateContributions = new SqlCommand("Update Process_Contributions set SSN='" + blemployee.EmployeeID + "' from Process_Contributions pc inner join PROCESS_C3Header pc3 on pc.C3HEADERID=pc3.C3HEADERID 	where  pc.C3HEADERID=pc3.C3HEADERID and pc3.EmployerID=" + companyid + " And SSND ='" + ssn + "' ", staticConnection);
+                        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                        int urow = updateContributions.ExecuteNonQuery();
+                        staticConnection.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    // Set the response message
+                    response.Message = "An error occurred while saving the new record. Please contact the support team.";
+                    response.Status = false;
+                    return BadRequest(response);
+                }
+
+
+            }
+            else if (DirectorVM.mode == 2)
+            {
+                try
+                {
+                    blemployee.EmployeeID = DirectorVM.EmployeeID;
+                    blemployee.EmplCode = DirectorVM.EmplCode;
+                    blemployee.UpdatedBy = companyid;
+                    blemployee.UpdatedOn = DateTime.Now;
+                    blemployee.Update(DirectorVM.mode ?? 0);
+                    var saveemployeeincome = repoDirector.save_MasterDirectorIncomes(blemployee, Salary, mode);
+
+                    response.Status = true;
+                    response.Message = "Director data Updated successfully";
+                    response.Statuscode = 200;
+                    response.Data = new { blemployee, saveemployeeincome };
+
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    response.Message = "Error saving new record: system has detected a data exception.";
+                    response.Status = false;
+                    return BadRequest(response);
+
+                }
+
+            }
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// This method retrieves all employee.
+        /// </summary>
+        /// <returns>A list of employer .</returns>
+        [HttpGet("NonWorkingDirector_List")]
+        public async Task<IActionResult> NonWorkingDirector_List(int CompanyId)
+        {
+            //int CompanyId = 1;
+            var response = new ResponseModel();
+            try
+            {
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                DataTable dtcecontribution = new DataTable();
+                DataSet dataSetC3C = new DataSet();
+                DataTable dtC3C = new DataTable();
+                if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                SqlCommand cmdC3C = new SqlCommand("select Distinct PC.SSN from Process_Contributions PC inner join PROCESS_C3Header Ph on PC.C3HEADERID=Ph.C3HEADERID where Ph.ForDirector=1 AND ph.EmployerID =" + CompanyId, staticConnection);
+                cmdC3C.CommandType = CommandType.Text;
+                SqlDataAdapter adapterHPD = new SqlDataAdapter();
+                adapterHPD.SelectCommand = cmdC3C;
+                adapterHPD.Fill(dataSetC3C);
+                dtC3C = dataSetC3C.Tables[0];
+                staticConnection.Close();
+
+                List<BLMasterEmployee> employeelist = new List<BLMasterEmployee>();
+                List<BLMasterEmployee> Viewemployeelist = new List<BLMasterEmployee>();
+
+                employeelist = BLMasterEmployee.MasterNWDirectorCollection_grid(CompanyId).ToList();
+                if (employeelist.Count > 0)
+                {
+                    foreach (var empl in employeelist)
+                    {
+                        BLMasterEmployee blemp = new BLMasterEmployee();
+                        blemp.SocSecNum = empl.SocSecNum;
+                        blemp.EmployeeID = empl.EmployeeID;
+                        blemp.FirstName = empl.FirstName;
+                        blemp.AppintDate = empl.AppintDate != null ? ((DateTime?)empl.AppintDate) : null;
+                        blemp.Terminated = empl.Terminated != null ? ((DateTime?)empl.Terminated) : null;
+                        blemp.ApDate = empl.AppintDate != null ? ((DateTime)empl.AppintDate).ToString(Helper.DateFormat) : null;
+                        blemp.TrDate = empl.Terminated != null ? ((DateTime)empl.Terminated).ToString(Helper.DateFormat) : null;
+                        blemp.Address1 = empl.Address1;
+                        blemp.Wadeg = empl.Wadeg;
+                        blemp.Department = empl.Department;
+                        //string payp = "";
+                        //if (empl.PayPeriod != null)
+                        //{
+                        //    if (empl.PayPeriod == "W")
+                        //        payp = "Weekly";
+                        //    if (empl.PayPeriod == "M")
+                        //        payp = "Monthly";
+                        //    if (empl.PayPeriod == "E2W")
+                        //        payp = "Every Two Weeks";
+                        //    if (empl.PayPeriod == "2M")
+                        //        payp = "Twice Monthly";
+                        //}
+                        //blemp.PayPeriod = payp;
+
+                        blemp.PayPeriod = empl.PayPeriod;
+                        if (dtC3C.Rows.Count > 0)
+                        {
+                            DataRow[] DRC3C = dtC3C.Select("SSN = " + blemp.EmployeeID);
+                            if (DRC3C.Length > 0)
+                            {
+                                blemp.IsC3Created = true;
+                                blemp.Candelete = false;
+                            }
+                        }
+                        Viewemployeelist.Add(blemp);
+                    }
+                }
+                if (Viewemployeelist != null)
+                {
+                    response.Message = "Data retrieved successfully!";
+                    response.Statuscode = 200;
+                    response.Status = true;
+                    response.Data = Viewemployeelist;
+                    return Ok(response);
+                }
+                else
+                {
+                    response.Message = "No data found!";
+                    response.Statuscode = 400;
+                    response.Status = true;
+                    response.Data = Viewemployeelist;
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                throw ex;
+            }
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// This method retrieves .
+        /// </summary>
+        /// <returns>A list of employer .</returns>
+        [HttpGet("NonWorkingDirectorGetById")]
+        public async Task<IActionResult> NonWorkingDirectorGetById(int EmployeeID)
+        {
+
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+            List<BLMasterEmployee> blempList = new List<BLMasterEmployee>();
+
+            NondirectorEditVM masterEmployee = new NondirectorEditVM();
+
+
+            //blemp.EmployeeID = DirectorId;
+            var blempList_ALL = BLMasterEmployee.MasterEmployeeCollection().ToList();
+            blempList = blempList_ALL.Where(t => t.EmployeeID == EmployeeID).ToList();
+            var Emplcode = blempList.ElementAt(0).EmplCode;
+            if (blempList.Count == 1)
+            {
+                masterEmployee.EmployeeID = EmployeeID;
+                masterEmployee.EmplCode = Emplcode;
+                masterEmployee.SocSecNum = string.IsNullOrEmpty(blempList.ElementAt(0).SocSecNum) ? "" : blempList.ElementAt(0).SocSecNum.ToString();
+                //cmbemptype.SelectedValue = string.IsNullOrEmpty(blempList.ElementAt(0).TypeCode) ? "" : blempList.ElementAt(0).TypeCode.ToString();
+                masterEmployee.LastName = string.IsNullOrEmpty(blempList.ElementAt(0).LastName) ? "" : blempList.ElementAt(0).LastName.ToString();
+                masterEmployee.FirstName = string.IsNullOrEmpty(blempList.ElementAt(0).FirstName) ? "" : blempList.ElementAt(0).FirstName.ToString();
+                masterEmployee.MiddleName = string.IsNullOrEmpty(blempList.ElementAt(0).MiddleName) ? "" : blempList.ElementAt(0).MiddleName.ToString();
+
+                masterEmployee.Address1 = string.IsNullOrEmpty(blempList.ElementAt(0).Address1) ? "" : blempList.ElementAt(0).Address1.ToString();
+                masterEmployee.Address2 = string.IsNullOrEmpty(blempList.ElementAt(0).Address2) ? "" : blempList.ElementAt(0).Address2.ToString();
+                masterEmployee.City = string.IsNullOrEmpty(blempList.ElementAt(0).City) ? "" : blempList.ElementAt(0).City.ToString();
+                masterEmployee.Zip = string.IsNullOrEmpty(blempList.ElementAt(0).Zip) ? "" : blempList.ElementAt(0).Zip.ToString();
+                try
+                {
+                    masterEmployee.Country = string.IsNullOrEmpty(blempList.ElementAt(0).Country) ? "" : blempList.ElementAt(0).Country.ToString();
+
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    throw ex;
+                }
+                masterEmployee.Email = string.IsNullOrEmpty(blempList.ElementAt(0).Email) ? "" : blempList.ElementAt(0).Email.ToString();
+                masterEmployee.Phone = string.IsNullOrEmpty(blempList.ElementAt(0).Phone) ? "" : blempList.ElementAt(0).Phone.ToString();
+                masterEmployee.Mobile = string.IsNullOrEmpty(blempList.ElementAt(0).Mobile) ? "" : blempList.ElementAt(0).Mobile.ToString();
+
+                try
+                {
+                    masterEmployee.BirthDate = blempList.ElementAt(0).BirthDate;
+
+                    masterEmployee.Terminated = blempList.ElementAt(0).Terminated;
+                    masterEmployee.commencementDate = blempList.ElementAt(0).AppintDate;
+                    //masterEmployee.IsemployeeDirector = blempList.ElementAt(0).IsdirectorOnly;
+
+                    //masterEmployee.Terminated = blempList.ElementAt(0).Terminated != null ? true : false;
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    throw ex;
+                }
+
+                //try
+                //{
+                //    masterEmployee.rbmale = string.IsNullOrEmpty(blempList.ElementAt(0).Gender) ? "" : blempList.ElementAt(0).Gender;
+                //    //if (gender == "M") { masterEmployee.Gender = }
+                //    //if (gender == "F") { rbfemale.IsChecked = true; }
+                //}
+                //catch (Exception ex)
+                //{
+                //    throw ex;
+                //}
+
+                try
+                {
+                    string gender = string.IsNullOrEmpty(blempList.ElementAt(0).Gender) ? "" : blempList.ElementAt(0).Gender;
+                    if (gender == "M") { masterEmployee.rbmale = true; }
+                    if (gender == "F") { masterEmployee.rbmale = false; }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    throw ex;
+                }
+
+                try
+                {
+                    masterEmployee.MaritalStat = string.IsNullOrEmpty(blempList.ElementAt(0).MaritalStat) ? "" : blempList.ElementAt(0).MaritalStat.ToString() == "S" ? "Single" : (blempList.ElementAt(0).MaritalStat.ToString() == "M" ? "Married" : "");
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    throw ex;
+                }
+                try
+                {
+                    if (blempList.ElementAt(0).PayPeriod != null)
+                    {
+                        if (blempList.ElementAt(0).PayPeriod.ToString() == "W")
+                            masterEmployee.PayPeriod = "Weekly";
+                        if (blempList.ElementAt(0).PayPeriod.ToString() == "M")
+                            masterEmployee.PayPeriod = "Monthly";
+                        if (blempList.ElementAt(0).PayPeriod.ToString() == "2M")
+                            masterEmployee.PayPeriod = "Twice Monthly";
+                        if (blempList.ElementAt(0).PayPeriod.ToString() == "E2W")
+                            masterEmployee.PayPeriod = "Every Two Weeks";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    throw ex;
+                }
+                //masterEmployee.co = blempList.ElementAt(0).AppintDate;
+                // C_Date = blempList.ElementAt(0).AppintDate;
+                // commencement_Date.IsChecked = blempList.ElementAt(0).AppintDate != null ? true : false;
+                masterEmployee.Occupation = blempList.ElementAt(0).occupation;
+                masterEmployee.Department = blempList.ElementAt(0).Department;
+                List<BLMasterEmployeeIncomes> blempIncList = new List<BLMasterEmployeeIncomes>();
+                var blempIncList_ALL = BLMasterEmployeeIncomes.MasterEmployeeIncomesCollection().ToList();
+                blempIncList = blempIncList_ALL.Where(t => t.EmployeeID == EmployeeID).ToList();
+
+                if (blempIncList.Count == 1)
+                {
+                    var EmpIncomeID = Int32.Parse(blempIncList.ElementAt(0).EmpIncomeID.ToString());
+                    masterEmployee.wadeg = (Math.Round((decimal)blempIncList.ElementAt(0).IncRate, 2)).ToString();
+
+                }
+                staticConnection.Close();
+                response.Message = "Data Get Successfully!";
+                response.Statuscode = 200;
+                response.Status = true;
+                response.Data = masterEmployee;
+
+            }
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// This method is used to Delete Employee data
+        /// </summary>
+        /// <param name="DeleteDirector"></param>
+        /// <returns></returns>
+        [HttpGet("DeleteDirector")]
+    [AllowAnonymous]
+        public async Task<IActionResult> DeleteDirector(int EmployeeId, bool? isc3created)
+        {
+            try
+            {
+                BLMasterEmployee Employee_row = new BLMasterEmployee();
+                // bool? isc3created = ((C3WizardLayer.BusinessObjects.BLMasterEmployee)(((System.Windows.Controls.Primitives.ButtonBase)(e.Source)).CommandParameter)).IsC3Created;
+                //bool? isc3created = false;
+                if (isc3created == true)
+                {
+                    response.Message = "You can not delete this Non-Working Director as C3 is exists for this Non-Working Director!";
+                    response.Statuscode = 200;
+                    response.Status = true;
+                    response.Data = null;
+                }
+                else
+                {
+                    Employee_row.EmployeeID = EmployeeId;
+                    Employee_row.Delete();
+
+                    response.Message = "Employee deleted Successfuly";
+                    response.Statuscode = 200;
+                    response.Status = true;
+                    response.Data = Employee_row;
+                }
+                return Ok(response);
+
+            }
+            catch(Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+        [AllowAnonymous]
+        [HttpGet("ImportDirector")]
+        public async Task<IActionResult> ImportDirector(int CompanyId, int UserID, string LoginId, string Password)
+        {
+            if (ConnectionInfom.HasConnection() && ConnectionInfom.APIConnection(_configuration))
+            {
+
+                try
+                {
+                    var response = new ResponseModel();
+                    UserVM user = _C3.GetUserDetails(CompanyId, UserID);
+
+                    if (CompanyId == 0 || UserID == 0 || user == null)
+                    {
+                        response.Status = false;
+                        response.Statuscode = 405;
+                        response.Message = "User Details not found";
+                        return NotFound(response);
+                    }
+                    var reg = regno(CompanyId);
+
+                    String NWDEmp_surl = _configuration["ServiceConfig:ServiceUriString"];
+                    string NWDEmp_sURL = NWDEmp_surl + "/Employee/nwdirectorsByLastC3/" + reg;
+                    HttpMessageHandler nwdhandler = new HttpClientHandler()
+                    {
+                    };
+
+                    var nwdhttpClient = new HttpClient(nwdhandler)
+                    {
+                        BaseAddress = new Uri(NWDEmp_sURL),
+                        Timeout = new TimeSpan(0, 2, 0)
+                    };
+                    nwdhttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                    var userpass = _context.Secusers.Where(e => e.LoginId == LoginId.Trim()).FirstOrDefault();
+                    var nwdplainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(LoginId + ":" + userpass.Password);
+                    string nwdval = System.Convert.ToBase64String(nwdplainTextBytes);
+                    nwdhttpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + nwdval);
+                    HttpResponseMessage nwdresponse = nwdhttpClient.GetAsync(NWDEmp_sURL).Result;
+                    if (nwdresponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        int Count = 0;
+                        var customerJsonString = await nwdresponse.Content.ReadAsStringAsync();
+                        var NWDEmp_model = JsonConvert.DeserializeObject<List<Employeedetails>>(customerJsonString);
+                        if (NWDEmp_model != null)
+                        {
+                           
+                            foreach (Employeedetails emp in NWDEmp_model)
+                            {
+                                try
+                                {
+                                    if (!ssnisexist(emp.socSecNum.Trim(), CompanyId))
+                                    {
+                                        BLMasterEmployee blemployee = new BLMasterEmployee();
+                                        blemployee.CompanyId = CompanyId;
+                                        blemployee.SocSecNum = emp.socSecNum.Trim();
+                                        blemployee.TypeCode = "1";
+                                        blemployee.FirstName = emp.firstName.Trim();
+                                        // blemployee.MiddleName = emp.middleName.Trim();
+                                        blemployee.LastName = emp.surName.Trim();
+                                        blemployee.IsActive = true;
+                                        blemployee.IsdirectorOnly = true;
+                                        blemployee.IsemployeeDirector = false;
+                                        blemployee.BirthDate = emp.birthDate != "" && emp.birthDate != null ? DateTime.ParseExact(emp.birthDate.ToString(), Helper.DateFormat, CultureInfo.InvariantCulture) : DateTime.Parse("01/01/1900");
+                                        blemployee.Gender = emp.gender;
+
+                                        blemployee.MaritalStat = emp.maritalStatus; ;
+
+                                        blemployee.Address1 = emp.streetAddress;
+                                        blemployee.Address2 = emp.streetName;
+                                        blemployee.City = emp.cityTownName;
+                                        blemployee.Country = emp.countryCode;
+                                        blemployee.State = emp.stateRegion;
+                                        //blemployee.occupation = emp.occupation;
+                                        blemployee.Mobile = emp.mobile;
+                                        blemployee.Phone = emp.phone;
+                                        blemployee.IsLevyExempt = false;
+                                        // blemployee.Terminated = emp.endDate != "" && emp.endDate != null ? (DateTime?)DateTime.ParseExact(emp.endDate.ToString(), Helper.DateFormat, CultureInfo.InvariantCulture) : null;
+                                        // blemployee.AppintDate = emp.startDate != "" && emp.startDate != null ? (DateTime?)DateTime.ParseExact(emp.startDate.ToString(), Helper.DateFormat, CultureInfo.InvariantCulture) : null;
+                                        blemployee.PayPeriod = emp.payPeriod != null && emp.payPeriod != "" ? (emp.payPeriod.Trim() == "1" ? "W" : emp.payPeriod.Trim() == "2" ? "B" : emp.payPeriod.Trim() == "3" ? "M" : emp.payPeriod.Trim() == "4" ? "S" : "M") : "M";
+                                        //blemployee.CompanyId = int.Parse(mastercompany.CompanyId.ToString());
+                                        blemployee.InsertedBy = CompanyId;
+                                        blemployee.InsertedOn = DateTime.Now;
+                                        blemployee.InsertedMachineInfo = Helper.MachineInfo;
+                                        blemployee.SaveNew();
+
+                                        //decimal salary = emp.salary != "" && emp.salary != null ? decimal.Parse(emp.salary) : 0;
+                                        // decimal monthlysalary = emp.payPeriod.Trim() == "3" ? Helper.Findsalary(emp) : 0.00M;
+                                        decimal monthlysalary = emp.salary != "" && emp.salary != null ? decimal.Parse(emp.salary) : 0.00M;// emp.payPeriod.Trim() == "3" ? emp.salary != "" && emp.salary != null ? decimal.Parse(emp.salary) : 0.00M : 0.00M;
+                                        save_MasterEmployeeIncomes(blemployee, monthlysalary);
+                                    }
+                                    else
+                                    {
+                                        Count++;
+
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                                    response.Status = false;
+                                    response.Message = ex.Message;
+                                    return BadRequest(response);
+                                }
+                            }
+                            
+
+                            
+                            //LoadEmployee();
+                        }
+                        if(NWDEmp_model.Count== Count)
+                        {
+                            response.Message = "Non Working Directors already exists.";
+                            response.Status = false;
+                            response.Statuscode = 409;
+                            return Conflict(response);
+
+                        }
+                        return Ok(new { message = " Non Working Directors Imported Successfully from Last Submitted  C3" });
+                    }
+                    else
+                    {
+                        var customerJsonString = await nwdresponse.Content.ReadAsStringAsync();
+                        var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                       
+                        response.Message = Emp_model.message;
+                        response.Status = false;
+                        return NotFound(response);
+                       
+
+                       
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    response.Status = false;
+                    response.Message = ex.Message;
+                    return BadRequest(response);
+                }
+            }
+            else
+            {
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                //C3WizardMessageBox.Show("C3 Wizard", "Check your internet connection OR May server not responding.\nplease try after sometime or contact S.S.B for any assistance.");
+                return BadRequest(new { message = "Check your internet connection OR May server not be responding. please try after sometime or contact S.S.B for any assistance." });
+            }
+            return null;
+        }
+        private string regno(int CompanyId)
+        {
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            SqlCommand CurrentCompany = new SqlCommand("SELECT mc.Company_Id, mc.REG_NUMBER, mc.Address1, mc.Address2, mc.City, mc.State, mc.ZIP, mc.CompanyLogo, mc.IsLevyExempt, C.Name FROM MasterCompany mc, Country c WHERE mc.Isactive = 1 And mc.Company_Id = " + CompanyId + " And mc.Country=c.ConId", staticConnection);
+            if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+            //  string value = CurrentCompanyId.ExecuteScalar().ToString();
+            SqlDataReader dr = CurrentCompany.ExecuteReader();
+            string companyid = "", RegNo = "", Address = "", CompanyLogo = "";
+            while (dr.Read())
+            {
+                companyid = dr["Company_Id"].ToString();
+                RegNo = dr["REG_NUMBER"].ToString();
+                Address = dr["Address1"].ToString() + " " + dr["City"].ToString() + " " + dr["State"].ToString() + " " + dr["Name"].ToString() + " " + dr["ZIP"].ToString();
+                CompanyLogo = dr["CompanyLogo"].ToString();
+                //Application.Current.Properties["IsLevyExempt"] = dr["IsLevyExempt"];
+                //bool ise = Helper.IsLevyExempt;
+            }
+            staticConnection.Close();
+
+            return RegNo;
+        }
+        private bool ssnisexist(string ssn, int CompanyId)
+        {
+            try
+            {
+                DataSet dataSet = new DataSet();
+                //string SqlQuerystring = ConfigurationSettings.AppSettings.Get("AppConnection");
+                SqlConnection con = new SqlConnection(C3WizardLayerConn_BaseData.StaticSqlConnection.ConnectionString);
+                con.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM MasterEmployee WHERE Isactive=1 And IsdirectorOnly=1 And Soc_Sec_Num=" + ssn + " and CompanyId=" + CompanyId, con);
+                cmd.CommandType = CommandType.Text;
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                adapter.SelectCommand = cmd;
+                adapter.Fill(dataSet);
+                if (dataSet.Tables[0].Rows.Count > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                //Login login = new Login();
+                //login.Error_Log(ex.Message);
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                return false;
+            }
+
+        }
+        private void save_MasterEmployeeIncomes(BLMasterEmployee obj, decimal salary)
+        {
+            try
+            {
+                //Application.Current.Properties["TextChanged"] = 0;
+                BLMasterEmployeeIncomes empInc = new BLMasterEmployeeIncomes();
+                empInc.EmployeeID = obj.EmployeeID;
+                empInc.EmplCode = null;
+                empInc.IncCode = "Fixed";
+                empInc.LineNo = null;
+                empInc.IncRate = salary;
+                empInc.IncNumber = null;
+                empInc.IncHours = 1;
+                empInc.AcctNo = null;
+                empInc.Department = null;
+                empInc.IncQtd1 = null;
+                empInc.IncQtd2 = null;
+                empInc.IncQtd3 = null;
+                empInc.IncQtd4 = null;
+                empInc.IncYtd = 1;
+                empInc.LoIncAmt = null;
+                empInc.HiIncAmt = null;
+                empInc.SaveNew();
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                //Login login = new Login();
+                //login.Error_Log(ex.Message);
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            }
+        }
+        private string MonthName(string m_no)
+        {
+            string Month = "";
+            switch (m_no)
+            {
+                case "0":
+                    Month = "January";
+                    break;
+                case "1":
+                    Month = "February";
+                    break;
+                case "2":
+                    Month = "March";
+                    break;
+                case "3":
+                    Month = "April";
+                    break;
+                case "4":
+                    Month = "May";
+                    break;
+                case "5":
+                    Month = "June";
+                    break;
+                case "6":
+                    Month = "July";
+                    break;
+                case "7":
+                    Month = "August";
+                    break;
+                case "8":
+                    Month = "September";
+                    break;
+                case "9":
+                    Month = "October";
+                    break;
+                case "10":
+                    Month = "November";
+                    break;
+                case "11":
+                    Month = "December";
+                    break;
+                default:
+                    Month = string.Empty;
+                    break;
+            }
+            return Month;
+        }
+        private bool ValidateDetails(int f_month, int t_month)
+        {
+            string errormessage = "";
+            int From_month = f_month;
+            int To_month = t_month;
+            //if(CmbToMonth.SelectedIndex != -1 || CmbFromMonth.SelectedIndex != -1)
+            //{
+            //    if (CmbYear.SelectedIndex == -1)
+            //    {
+            //        Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            //        C3WizardMessageBox.Show("C3 Wizard", "Please select year!");
+            //        return false;
+            //    }
+            //}
+
+            if (f_month != -1)
+            {
+                if (f_month != -1)
+                {
+                    if (From_month > To_month)
+                    {
+                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                        //C3WizardMessageBox.Show("C3 Wizard", "Selected 'To Month' should be greater than or equal to 'From Month'");
+                        return false;
+                    }
+                }
+            }
+            //if (CmbFromMonth.SelectedIndex == -1)
+            //{ errormessage = errormessage + "From Month" + "\n"; }
+            //if (CmbFromMonth.SelectedIndex == -1)
+            //{ errormessage = errormessage + "To Month" + "\n"; }
+
+
+
+            return true;
+
+
+        }
+        /// <summary>
+        /// c3 reports search
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="f_month"></param>
+        /// <param name="t_month"></param>
+        /// <param name="CompanyId"></param>
+        /// <returns></returns>
+        [HttpGet("SearchC3")]
+        public async Task<IActionResult> SearchC3(string year, int f_month, int t_month, int CompanyId)
+        {
+            ResponseModel ResponseModel = new ResponseModel();
+            if (ValidateDetails(f_month, t_month))
+            {
+                try
+                {
+                    //if (CmbFromMonth.SelectedIndex != -1 && CmbToMonth.SelectedIndex != -1 && CmbYear.SelectedIndex != -1)
+                    //{
+                    int F_month = f_month;
+                    int T_month = t_month;
+                    //int S_year = int.Parse(CmbYear.Text);
+                    //ComboBoxItem year = (ComboBoxItem)CmbYear.SelectedItem;
+                    //string value = CmbYear.SelectedItem != null ? CmbYear.SelectedItem.ToString() : null;
+                    //string S_year = CmbYear.Text != "" ? value : null;
+                    string value = year != null ? year : null;
+                    string S_year = year != "" ? value : null;
+                    //ComboBoxItem year = (ComboBoxItem)CmbYear.SelectedItem;
+                    //string Yearvalue = year.Content.ToString();
+                    //ComboBoxItem From_Month = (ComboBoxItem)CmbFromMonth.SelectedItem;
+                    //string FMvalue = From_Month.Content.ToString();
+                    //ComboBoxItem To_Month = (ComboBoxItem)CmbToMonth.SelectedItem;
+                    //string TMvalue = To_Month.Content.ToString();
+
+                    List<C3Header> listDVOC3Header = new List<C3Header>();
+                    SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                    SqlCommand cmd = new SqlCommand("get_C3Genrated_data", staticConnection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+                    SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    sqlAdapter.Fill(dt);
+                    if (dt.Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            bool issubmited = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                            bool isfinalize = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                            int C3month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+                            int C3year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                            if ((issubmited == true || isfinalize == true))
+                            {
+                                C3Header Obj = new C3Header();
+                                Obj.HeaderID = Convert.IsDBNull(row["C3HEADERID"]) ? 0 : int.Parse(row["C3HEADERID"].ToString());
+                                Obj.RegNo = Convert.IsDBNull(row["RegNo"]) ? null : row["RegNo"].ToString();
+                                Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+                                Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                                Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+                                Obj.P_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                                Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+                                Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+                                Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+                                Obj.TOTALSERVAYANCE = Convert.IsDBNull(row["TOTAL_SERVAYANCE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SERVAYANCE"].ToString())));
+                                Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+                                //Obj.Insert_Datetime = Convert.IsDBNull(row["Insert_Datetime"]) ? DateTime.Parse("01/01/1900") : DateTime.Parse(row["Insert_Datetime"].ToString());
+                                Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                                Obj.Is_submitted = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                                Obj.C3_IsFinalized = !Obj.C3_IsFinalized;
+                                Obj.IssubmittedShow = (bool)Obj.Is_submitted ? "C3 Submitted" : "C3 Not Submitted";
+                                Obj.Issubmittedcolor = (bool)Obj.Is_submitted ? "Black" : "Red";
+                                Obj.IssubmittedShowimg = (bool)Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+
+                                Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                                listDVOC3Header.Add(Obj);
+                            }
+                        }
+                        listDVOC3Header = S_year != null ? listDVOC3Header.Where(x => x.Period_year == S_year).ToList() : listDVOC3Header;
+                        listDVOC3Header = F_month != -1 ? listDVOC3Header.Where(x => x.p_Month >= F_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+                        listDVOC3Header = T_month != -1 ? listDVOC3Header.Where(x => x.p_Month <= T_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+                        //dashboard_list.ItemsSource = listDVOC3Header;
+                        //dashboard_list.SelectedIndex = -1;
+
+                        var list1 = listDVOC3Header.Select(e => new C3HeaderReportsSearchVM
+                        {
+                            year = e.Period_year,
+                            period = e.period_Month,
+                            totalWages = e.TOTAL_WAGES,
+                            socialSecurity = e.TOTALSSCONTRIBUTIONS,
+                            levy = e.TOTALLEVYEEEMPLOYEE,
+                            serverance = e.TOTALSERVAYANCE,
+                            schedule = e.Schedule_NO,
+                            insertedOn = e.Insert_Datetimeinfo,
+                            insertedBy = e.Inserted_ByName,
+                            lastModifiedOn = e.Modified_On,
+                            lastModifiedBy = e.Modified_ByName,
+                            lastSubmittedOn = e.C3_SubmittedDate,
+                            lastSubmittedBy = e.C3_SubmittedByName
+                        }).ToList();
+
+                        ResponseModel.Status = true;
+                        ResponseModel.Message = "Data get successfully";
+                        ResponseModel.Data = list1;
+                        ResponseModel.Statuscode = 200;
+                        return Ok(ResponseModel);
+                    }
+                    else
+                    {
+                        //dashboard_list.ItemsSource = null;
+                        ResponseModel.Status = false;
+                        ResponseModel.Message = "Data not found";
+                        ResponseModel.Statuscode = 400;
+                        return BadRequest(ResponseModel);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    //Login login = new Login();
+                    //login.Error_Log(ex.Message);
+
+                }
+
+            }
+            else
+            {
+
+                ResponseModel.Status = false;
+                ResponseModel.Message = "Selected 'To Month' should be greater than or equal to 'From Month'";
+                ResponseModel.Statuscode = 400;
+                return BadRequest(ResponseModel);
+            }
+            return Ok(ResponseModel);
+        }
+        /// <summary>
+        /// Nw director 2 Reports
+        /// </summary>
+        /// <param name="CompanyId"></param>
+        /// <param name="LoginId"></param>
+        /// <param name="Password"></param>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        [HttpGet("ImportLastC3_Click")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ImportLastC3_Click(int CompanyId, string LoginId, string Password, int UserID)
+        {
+            ResponseModel response1 = new ResponseModel();
+            if (ConnectionInfom.HasConnection() && ConnectionInfom.APIConnection(_configuration))
+            {
+                try
+                {
+                    c3Headerbulk C3Header = new c3Headerbulk();
+
+                    string regn = regno(CompanyId);
+                    //String Newsurl = ConfigurationManager.AppSettings["ServiceUriString"];
+                    String Newsurl = _configuration["ServiceConfig:ServiceUriString"];
+                    //string NewsURL = Newsurl + "/C3/c3EmpSubmissionBulk";
+                    string NewsURL = Newsurl + "/C3/" + regn + "/C3Submitted/ER/1,NW";
+
+                    HttpMessageHandler handler = new HttpClientHandler()
+                    {
+                    };
+
+                    var httpClient = new HttpClient(handler)
+                    {
+                        BaseAddress = new Uri(NewsURL),
+                        Timeout = new TimeSpan(0, 2, 0)
+                    };
+                    httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                    //This is the key section you were missing    
+                    var userpass = _context.Secusers.FirstOrDefault(e => e.LoginId == LoginId);
+                    var plainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(LoginId + ":" + userpass.Password);
+                    string val = System.Convert.ToBase64String(plainTextBytes);
+                    httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+                    HttpResponseMessage response = httpClient.GetAsync(NewsURL).Result;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+                        var C3Header_model = JsonConvert.DeserializeObject<c3Header>(customerJsonString);
+                        if (C3Header_model != null)
+                        {
+                            if (C3Header_model.payerType == "ER")
+                            {
+                                int paymonth = DateTime.ParseExact(C3Header_model.period, Helper.DateFormat, CultureInfo.InvariantCulture).Month;
+                                int payyear = DateTime.ParseExact(C3Header_model.period, Helper.DateFormat, CultureInfo.InvariantCulture).Year;
+
+                                SqlConnection Get_C3staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection;
+                                SqlCommand cmdSSN = new SqlCommand("check_Director_C3Created_Import", Get_C3staticConnection);
+                                cmdSSN.CommandType = CommandType.StoredProcedure;
+                                cmdSSN.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(paymonth) ?? (object)DBNull.Value));
+                                cmdSSN.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)payyear ?? (object)DBNull.Value));
+                                cmdSSN.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+                                SqlDataAdapter sqlAdapterSSN = new SqlDataAdapter(cmdSSN);
+                                DataTable dtSSN = new DataTable();
+                                sqlAdapterSSN.Fill(dtSSN);
+                                if (dtSSN.Rows.Count == 0)
+                                {
+                                    String Emp_surl = _configuration["ServiceConfig:ServiceUriString"];
+                                    string Emp_sURL = Emp_surl + "/C3/" + C3Header_model.payerId + "/C3Submitted/" + paymonth + "," + payyear + "," + C3Header_model.sequenceNo + "," + C3Header_model.payerType + ",NW";
+                                    HttpMessageHandler gethandler = new HttpClientHandler()
+                                    {
+                                    };
+                                    var gethttpClient = new HttpClient(gethandler)
+                                    {
+                                        BaseAddress = new Uri(Emp_sURL),
+                                        Timeout = new TimeSpan(0, 2, 0)
+                                    };
+                                    gethttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                                    //This is the key section you were missing    
+                                    var getplainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(LoginId + ":" + userpass.Password);
+                                    string getval = System.Convert.ToBase64String(getplainTextBytes);
+                                    gethttpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + getval);
+                                    HttpResponseMessage getresponse = httpClient.GetAsync(Emp_sURL).Result;
+                                    if (getresponse.StatusCode == HttpStatusCode.OK)
+                                    {
+                                        var getcustomerJsonString = await getresponse.Content.ReadAsStringAsync();
+                                        var submitC3_model = JsonConvert.DeserializeObject<submitC3string>(getcustomerJsonString);
+                                        if (submitC3_model != null)
+                                        {
+                                            int mondays = MondaysInMonth(paymonth, payyear);
+                                            bool IsWeekfifth = mondays == 5 ? true : false;
+                                            submitC3string subc3 = new submitC3string();
+                                            subc3.c3Header = submitC3_model.c3Header;
+                                            subc3.nonWorkingDirectorWages = submitC3_model.nonWorkingDirectorWages != null ? submitC3_model.nonWorkingDirectorWages.ToList() : null;
+                                            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+
+                                            if (subc3.c3Header != null && subc3.nonWorkingDirectorWages != null)
+                                            {
+                                                if (subc3.c3Header.receivedBy == "c3svc" || (subc3.c3Header.receivedBy != "c3svc" && subc3.c3Header.c3Status == "VAC"))
+                                                {
+                                                    int islocked = 0;
+                                                    if (subc3.c3Header.receivedBy != "c3svc" && subc3.c3Header.c3Status == "VAC")
+                                                    {
+                                                        islocked = 1;
+                                                    }
+
+                                                    if (subc3.nonWorkingDirectorWages.Count > 0)
+                                                    {
+                                                        decimal totalwagesDir = 0;
+                                                        foreach (var nonWDWage in subc3.nonWorkingDirectorWages)
+                                                        {
+                                                            totalwagesDir += decimal.Parse(nonWDWage.wages);
+
+                                                        }
+                                                        if (staticConnection.State == ConnectionState.Open)
+                                                        {
+                                                            staticConnection.Close();
+                                                        }
+
+                                                        DateTime parsedDate = DateTime.ParseExact(subc3.c3Header.dateReceived, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                                                        string formatted = parsedDate.ToString("yyyy-MM-dd");
+
+                                                        SqlCommand insertC3Header = new SqlCommand("INSERT PROCESS_C3Header(RegNo,PERIODD_MONTH,PERIOD_YEAR,TOTAL_WAGES,TOTAL_SSCONTRIBUTIONS,TOTAL_LEVYEEEMPLOYEE,TOTAL_LEVYEEEMPLOYER,TOTAL_SERVAYANCE,TOTAL_LEVYEEPENALTY,TOTAL_PEPENALTY,TOTAL_SSPENALTY,EmployerID,Insert_Datetimeinfo,ForDirector,Schedule_NO,Is_Fianalize,Is_submitted,IsUnLocked,[Inserted_By],[Modified_By],[Modified_Machineinfo] ,[Print_By],[Export_By],[IsImportFromBEMA],[UserName],[Modified_On],[Export_On],C3_SubmittedDate)" +
+                                                                                "VALUES(" + subc3.c3Header.payerId + "," + (paymonth) + "," + payyear + "," + totalwagesDir + "," + subc3.c3Header.calcEmpSsAmt + "," + subc3.c3Header.calcEmpLevyAmt + "," + 0.00 + "," + subc3.c3Header.calcEmpPeAmt + "," + subc3.c3Header.totalEmpLevyPenalty + "," + subc3.c3Header.totalEmpPePenalty + "," +
+                                                                                subc3.c3Header.totalEmpSsFines + "," + CompanyId + "," + DateTime.Now.ToString("yyyy-MM-dd") + "," + 1 + "," + subc3.c3Header.sequenceNo + "," + 1 + "," + 1 + "," + islocked + "," + UserID + "," + UserID + ",'" + Helper.MachineInfo + "'," + 0 + "," + 0 + "," + 1 + ",'" + subc3.c3Header.submittedByName + "','',''," + formatted + ")", staticConnection);
+                                                        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                        int insert = insertC3Header.ExecuteNonQuery();
+                                                        staticConnection.Close();
+                                                        int C3HEADERID = 0;
+                                                        if (insert == 1)
+                                                        {
+                                                            if (staticConnection.State == ConnectionState.Open)
+                                                            {
+                                                                staticConnection.Close();
+                                                            }
+                                                            SqlCommand selectC3Header = new SqlCommand("select max(C3HEADERID) C3HEADERID from PROCESS_C3Header", staticConnection);
+                                                            if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                            SqlDataReader dr = selectC3Header.ExecuteReader();
+
+                                                            while (dr.Read())
+                                                            {
+                                                                C3HEADERID = int.Parse(dr["C3HEADERID"].ToString());
+                                                            }
+                                                            staticConnection.Close();
+                                                        }
+
+                                                        if (subc3.nonWorkingDirectorWages != null)
+                                                        {
+                                                            if (staticConnection.State == ConnectionState.Open)
+                                                            {
+                                                                staticConnection.Close();
+                                                            }
+                                                            if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                            foreach (var nonWDWages in subc3.nonWorkingDirectorWages)
+                                                            {
+                                                                if (staticConnection.State == ConnectionState.Open)
+                                                                {
+                                                                    staticConnection.Close();
+                                                                }
+                                                                string PayFreq = "M";
+                                                                try
+                                                                {
+                                                                    //if (nonWDWages.payPeriod.Trim() == "1")
+                                                                    //  PayFreq = "W";
+                                                                    //if (nonWDWages.payPeriod.Trim() == "2")
+                                                                    //  PayFreq = "E2/W";
+                                                                    //if (nonWDWages.payPeriod.Trim() == "3")
+                                                                    //  PayFreq = "M";
+                                                                    //if (nonWDWages.payPeriod.Trim() == "4")
+                                                                    //  PayFreq = "2/M";
+                                                                }
+                                                                catch (Exception ex)
+                                                                {
+                                                                    //Login login = new Login();
+                                                                    //login.Error_Log(ex.Message);
+                                                                    //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                                                }
+
+
+                                                                int empid = 0;
+                                                                List<BLMasterEmployee> employeelist = new List<BLMasterEmployee>();
+                                                                employeelist = BLMasterEmployee.MasterNWDirectorCollection_grid(CompanyId).ToList();
+                                                                empid = employeelist != null ? employeelist.Any(x => x.SocSecNum == nonWDWages.ssn) ? (int)employeelist.FirstOrDefault(x => x.SocSecNum == nonWDWages.ssn).EmployeeID : 0 : 0;
+
+                                                                SqlCommand insertC3ipWages = new SqlCommand("INSERT [dbo].[Process_Contributions]([C3HEADERID],[SSN],[PERIODD_MONTH], [PERIOD_YEAR],[PayFreq], [WAGES1], [WAGES2],[WAGES3],  [WAGES4],  [WAGES5], [HPay],[BONUS], [DirectorWage], [WEEK1], [WEEK2],[WEEK3],  [WEEK4], [WEEK5], [Levyee], [SocialSecurity],  [Date_joining], [Date_terminated],  [Remarks]) VALUES (" +
+                                                                  C3HEADERID + "," + empid + "," + (paymonth - 1) + "," + payyear + ",'" + PayFreq + "'," + (0.00) + "," + (0.00) + "," + (0.00) + "," + (IsWeekfifth ? (0.00M) : decimal.Parse(nonWDWages.wages)) + "," + (IsWeekfifth ? decimal.Parse(nonWDWages.wages) : (0.00M)) + "," + (0.00) + "," + (0.00) + "," +
+                                                                  (nonWDWages.wages) + "," + 0 + "," + 0 + "," + 0 + "," + (IsWeekfifth ? 0 : 1) + "," + (IsWeekfifth ? 1 : 0) + "," + nonWDWages.levyAmt + "," +
+                                                                  (0.00) + "," + (nonWDWages.startDate != null && nonWDWages.startDate != "" ? DateTime.Parse(nonWDWages.startDate).ToString("yyyy-MM-dd") : "null") + "," + (nonWDWages.endDate != null && nonWDWages.endDate != "" ? DateTime.Parse(nonWDWages.endDate).ToString("yyyy-MM-dd") : "null") + "," + "null" + ")", staticConnection);
+                                                                if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                                int insertipWages = insertC3ipWages.ExecuteNonQuery();
+                                                                staticConnection.Close();
+
+
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    response1.Message = "Data for this month and year already exists.";
+                                    response1.Status = false;
+                                    response1.Statuscode = 400;
+                                    return StatusCode(400, response1);
+                                }
+                            }
+                        }
+                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                        // C3WizardMessageBox.Show("C3 Wizard", "Submitted Last C3 Imported Successfully");
+                        //btn_Search_Click(sender, e);
+                        response1.Message = "Submitted Last C3 Imported Successfully";
+                        response1.Status = true;
+                        response1.Statuscode = 200;
+                        return Ok(response1);
+
+                    }
+                    else
+                    {
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+                        var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                        //C3WizardMessageBox.Show("C3 Wizard", Emp_model.message);
+                        response1.Message = Emp_model.message;
+                        return BadRequest(response1);
+                        //
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    //Login login = new Login();
+                    //login.Error_Log(ex.Message);
+
+                }
+            }
+            else
+            {
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                //C3WizardMessageBox.Show("C3 Wizard", "Check your internet connection OR May server not responding.\nplease try after sometime or contact S.S.B for any assistance.");
+                return BadRequest(new { message = "Check your internet connection OR May server not be responding. please try after sometime or contact S.S.B for any assistance." });
+            }
+            return null;
+        }
+        public static int MondaysInMonth(int CmbMonth, int CmbYear)
+        {
+            int weeks = 0;
+            int daysThisMonth = DateTime.DaysInMonth(CmbYear, CmbMonth);
+            DateTime beginingOfThisMonth = new DateTime(CmbYear, CmbMonth, 1);
+            for (int i = 0; i < daysThisMonth; i++)
+                if (beginingOfThisMonth.AddDays(i).DayOfWeek == DayOfWeek.Monday)
+                    weeks++;
+            return weeks;
+        }
+        private bool ValidateImportDetails(string year, int f_month, int t_month)
+        {
+            string errormessage = "";
+            int From_month = f_month;
+            int To_month = t_month;
+            if (year == "-1")
+            {
+                errormessage = errormessage + "Year" + "\n";
+            }
+            if (f_month == -1)
+            {
+                errormessage = errormessage + "From Month" + "\n";
+            }
+            if (t_month == -1)
+            {
+                errormessage = errormessage + "To Month" + "\n";
+            }
+
+            if (errormessage != "")
+            {
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                //C3WizardMessageBox.Show("C3 Wizard", "Please enter required value \n" + errormessage);
+                return false;
+            }
+
+            if (t_month != -1)
+            {
+                if (f_month != -1)
+                {
+                    if (From_month > To_month)
+                    {
+                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                        //C3WizardMessageBox.Show("C3 Wizard", "Selected 'To Month' should be greater than or equal to 'From Month'");
+                        return false;
+                    }
+                }
+            }
+            return true;
+
+
+        }
+        /// <summary>
+        /// Nw director 1 Reports
+        /// </summary>
+        /// <param name="CompanyId"></param>
+        /// <param name="LoginId"></param>
+        /// <param name="Password"></param>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        [HttpGet("DownloadSubmittedC3_Click")]
+        [AllowAnonymous]
+        public async Task<IActionResult> btn_DownloadSubmittedC3_Click(string year, string endYear, int f_month, int t_month, int CompanyId, string LoginId, string Password, int UserID)
+        {
+            ResponseModel ResponseModel = new ResponseModel();
+            if (ConnectionInfom.HasConnection() && ConnectionInfom.APIConnection(_configuration))
+            {
+
+                if (ValidateImportDetails(year, f_month, t_month))
+                {
+                    try
+                    {
+                        var employeelist = BLMasterEmployee.MasterNWDirectorCollection_grid(CompanyId).ToList();
+                        if (employeelist.Count>0)
+                        {
+                            List<c3Headerbulk> C3Header = new List<c3Headerbulk>();
+                            int year1 = int.Parse(year);
+                            int EndYear = int.Parse(endYear);
+                            DateTime startDate = new DateTime(year1, f_month, 1);
+                            int lastDay = DateTime.DaysInMonth(year1, t_month);
+                            DateTime endDate = new DateTime(EndYear, t_month, lastDay);
+
+
+                            string statedate = startDate.ToString("dd-MM-yyyy");
+                            string enddate = endDate.ToString("dd-MM-yyyy");
+
+                            string regn = regno(CompanyId);
+                            //String Newsurl = ConfigurationManager.AppSettings["ServiceUriString"];
+                            String Newsurl = _configuration["ServiceConfig:ServiceUriString"];
+                            //string NewsURL = Newsurl + "/C3/c3EmpSubmissionBulk";
+                            string NewsURL = Newsurl + "/C3/" + regn + "/C3Submitted/ER/range/" + statedate + "/" + enddate + ",NW";
+
+                            HttpMessageHandler handler = new HttpClientHandler()
+                            {
+                            };
+
+
+
+                            var httpClient = new HttpClient(handler)
+                            {
+                                BaseAddress = new Uri(NewsURL),
+                                Timeout = new TimeSpan(0, 2, 0)
+                            };
+                            httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                            //This is the key section you were missing
+                            //
+                            var userpass = _context.Secusers.FirstOrDefault(e => e.LoginId == LoginId);
+                            var plainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(LoginId + ":" + userpass.Password);
+                            string val = System.Convert.ToBase64String(plainTextBytes);
+                            httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+                            HttpResponseMessage response = httpClient.GetAsync(NewsURL).Result;
+                            if (response.StatusCode == HttpStatusCode.OK)
+                            {
+                                var customerJsonString = await response.Content.ReadAsStringAsync();
+                                var C3Header_model = JsonConvert.DeserializeObject<List<c3Header>>(customerJsonString);
+                                C3Header_model = C3Header_model.Where(x => x.payerType == "ER").ToList();
+                                if (C3Header_model != null)
+                                {
+                                    int count = 0;
+                                    foreach (var header in C3Header_model)
+                                    {
+                                        if (header.receivedBy == "c3svc" || (header.receivedBy != "c3svc" && header.c3Status == "VAC"))
+                                        {
+                                            int islocked = 0;
+                                            if (header.receivedBy != "c3svc" && header.c3Status == "VAC")
+                                            {
+                                                islocked = 1;
+                                            }
+                                            int paymonth = DateTime.ParseExact(header.period, Helper.DateFormat, CultureInfo.InvariantCulture).Month;
+                                            int payyear = DateTime.ParseExact(header.period, Helper.DateFormat, CultureInfo.InvariantCulture).Year;
+
+                                            SqlConnection Get_C3staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection;
+                                            SqlCommand cmdSSN = new SqlCommand("check_Director_C3Created_Import", Get_C3staticConnection);
+                                            cmdSSN.CommandType = CommandType.StoredProcedure;
+                                            cmdSSN.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(paymonth) ?? (object)DBNull.Value));
+                                            cmdSSN.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)payyear ?? (object)DBNull.Value));
+                                            cmdSSN.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+                                            SqlDataAdapter sqlAdapterSSN = new SqlDataAdapter(cmdSSN);
+                                            DataTable dtSSN = new DataTable();
+                                            sqlAdapterSSN.Fill(dtSSN);
+                                            int schcount = 0;
+                                            if (dtSSN.Rows.Count > 0)
+                                            {
+
+                                                foreach (DataRow row in dtSSN.Rows)
+                                                {
+                                                    int scno = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                                                    int hschid = header.sequenceNo;
+                                                    if (scno == hschid)
+                                                    {
+                                                        schcount++;
+                                                    }
+                                                }
+                                            }
+                                            if (schcount == 0)
+                                            {
+                                                //String Emp_surl = ConfigurationManager.AppSettings["ServiceUriString"];
+                                                String Emp_surl = _configuration["ServiceConfig:ServiceUriString"];
+                                                string Emp_sURL = Emp_surl + "/C3/" + header.payerId + "/C3Submitted/" + paymonth + "," + payyear + "," + header.sequenceNo + "," + header.payerType + ",NW";
+                                                HttpMessageHandler gethandler = new HttpClientHandler()
+                                                {
+                                                };
+                                                var gethttpClient = new HttpClient(gethandler)
+                                                {
+                                                    BaseAddress = new Uri(Emp_sURL),
+                                                    Timeout = new TimeSpan(0, 2, 0)
+                                                };
+                                                gethttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                                                //This is the key section you were missing    
+                                                var getplainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(LoginId + ":" + userpass.Password);
+                                                string getval = System.Convert.ToBase64String(getplainTextBytes);
+                                                gethttpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + getval);
+                                                HttpResponseMessage getresponse = httpClient.GetAsync(Emp_sURL).Result;
+                                                if (getresponse.StatusCode == HttpStatusCode.OK)
+                                                {
+                                                    int mondays = MondaysInMonth(paymonth, payyear);
+                                                    bool IsWeekfifth = mondays == 5 ? true : false;
+                                                    var getcustomerJsonString = await getresponse.Content.ReadAsStringAsync();
+                                                    var submitC3_model = JsonConvert.DeserializeObject<submitC3string>(getcustomerJsonString);
+                                                    if (submitC3_model != null)
+                                                    {
+                                                        submitC3string subc3 = new submitC3string();
+                                                        subc3.c3Header = submitC3_model.c3Header;
+                                                        subc3.nonWorkingDirectorWages = submitC3_model.nonWorkingDirectorWages;//!= null ? submitC3_model.nonWorkingDirectorWages.Where(x => x.sequenceNo == "2").ToList() : null;
+                                                        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                                                        if (subc3.c3Header != null && subc3.nonWorkingDirectorWages != null)
+                                                        {
+                                                            if (subc3.nonWorkingDirectorWages.Count > 0)
+                                                            {
+                                                                decimal totalwagesDir = 0;
+                                                                foreach (var nonWDWage in subc3.nonWorkingDirectorWages)
+                                                                {
+                                                                    totalwagesDir += decimal.Parse(nonWDWage.wages);
+
+                                                                }
+                                                                if (staticConnection.State == ConnectionState.Open)
+                                                                {
+                                                                    staticConnection.Close();
+                                                                }
+
+                                                                DateTime parsedDate = DateTime.ParseExact(subc3.c3Header.dateReceived, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                                                                string formatted = parsedDate.ToString("yyyy-MM-dd");
+
+
+                                                                SqlCommand insertC3Header = new SqlCommand("INSERT PROCESS_C3Header(RegNo,PERIODD_MONTH,PERIOD_YEAR,TOTAL_WAGES,TOTAL_SSCONTRIBUTIONS,TOTAL_LEVYEEEMPLOYEE,TOTAL_LEVYEEEMPLOYER,TOTAL_SERVAYANCE,TOTAL_LEVYEEPENALTY,TOTAL_PEPENALTY,TOTAL_SSPENALTY,EmployerID,Insert_Datetimeinfo,ForDirector,Schedule_NO,Is_Fianalize,Is_submitted,IsUnLocked,C3_IsFinalized,[Inserted_By],[Modified_By],[Modified_Machineinfo] ,[Print_By],[Export_By],[IsImportFromBEMA],[UserName],[Modified_On],[Export_On],C3_SubmittedDate)" +
+                                                                                                                         "VALUES(" + subc3.c3Header.payerId + "," + (paymonth) + "," + payyear + "," + totalwagesDir + "," + subc3.c3Header.calcEmpSsAmt + "," + subc3.c3Header.calcEmpLevyAmt + "," + 0.00 + "," + subc3.c3Header.calcEmpPeAmt + "," + subc3.c3Header.totalEmpLevyPenalty + "," + subc3.c3Header.totalEmpPePenalty + "," +
+                                                                                                                         subc3.c3Header.totalEmpSsFines + "," + CompanyId + "," + DateTime.Now.ToString("yyyy-MM-dd") + "," + 1 + "," + subc3.c3Header.sequenceNo + "," + 1 + "," + 1 + "," + islocked + "," + 1 + "," + UserID + "," + UserID + ",'" + Helper.MachineInfo + "'," + 0 + "," + 0 + "," + 1 + ",'" + subc3.c3Header.submittedByName + "','',''," + formatted + ")", staticConnection);
+                                                                if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                                int insert = insertC3Header.ExecuteNonQuery();
+                                                                staticConnection.Close();
+                                                                int C3HEADERID = 0;
+                                                                if (insert == 1)
+                                                                {
+                                                                    if (staticConnection.State == ConnectionState.Open)
+                                                                    {
+                                                                        staticConnection.Close();
+                                                                    }
+                                                                    SqlCommand selectC3Header = new SqlCommand("select max(C3HEADERID) C3HEADERID from PROCESS_C3Header", staticConnection);
+                                                                    if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                                    SqlDataReader dr = selectC3Header.ExecuteReader();
+
+                                                                    while (dr.Read())
+                                                                    {
+                                                                        C3HEADERID = int.Parse(dr["C3HEADERID"].ToString());
+                                                                    }
+                                                                    staticConnection.Close();
+                                                                }
+
+                                                                if (subc3.nonWorkingDirectorWages != null)
+                                                                {
+                                                                    if (staticConnection.State == ConnectionState.Open)
+                                                                    {
+                                                                        staticConnection.Close();
+                                                                    }
+                                                                    if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                                    foreach (var nonWDWages in subc3.nonWorkingDirectorWages)
+                                                                    {
+                                                                        if (staticConnection.State == ConnectionState.Open)
+                                                                        {
+                                                                            staticConnection.Close();
+                                                                        }
+                                                                        string PayFreq = "M";
+                                                                        try
+                                                                        {
+                                                                            //if (nonWDWages.payPeriod.Trim() == "1")
+                                                                            //  PayFreq = "W";
+                                                                            //if (nonWDWages.payPeriod.Trim() == "2")
+                                                                            //  PayFreq = "E2/W";
+                                                                            //if (nonWDWages.payPeriod.Trim() == "3")
+                                                                            //  PayFreq = "M";
+                                                                            //if (nonWDWages.payPeriod.Trim() == "4")
+                                                                            //  PayFreq = "2/M";
+                                                                        }
+                                                                        catch (Exception ex)
+                                                                        {
+                                                                            //Login login = new Login();
+                                                                            //login.Error_Log(ex.Message);
+                                                                            //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                                                        }
+                                                                        int empid = 0;
+                                                                        List<BLMasterEmployee> employeelist1 = new List<BLMasterEmployee>();
+                                                                        employeelist1 = BLMasterEmployee.MasterNWDirectorCollection_grid(CompanyId).ToList();
+                                                                        empid = (int)employeelist1.FirstOrDefault(x => x.SocSecNum == nonWDWages.ssn).EmployeeID;
+                                                                        SqlCommand insertC3ipWages = new SqlCommand("INSERT [dbo].[Process_Contributions]([C3HEADERID],[SSN],[PERIODD_MONTH], [PERIOD_YEAR],[PayFreq], [WAGES1], [WAGES2],[WAGES3],  [WAGES4],  [WAGES5], [HPay],[BONUS], [DirectorWage], [WEEK1], [WEEK2],[WEEK3],  [WEEK4], [WEEK5], [Levyee], [SocialSecurity],  [Date_joining], [Date_terminated],  [Remarks],[SSND]) VALUES (" +
+                                                                          C3HEADERID + "," + empid + "," + (paymonth) + "," + payyear + ",'" + PayFreq + "'," + (0.00) + "," + (0.00) + "," + (0.00) + "," + (IsWeekfifth ? (0.00M) : decimal.Parse(nonWDWages.wages)) + "," + (IsWeekfifth ? decimal.Parse(nonWDWages.wages) : (0.00M)) + "," + (0.00) + "," + (0.00) + "," +
+                                                                          (nonWDWages.wages) + "," + 0 + "," + 0 + "," + 0 + "," + (IsWeekfifth ? 0 : 1) + "," + (IsWeekfifth ? 1 : 0) + "," + nonWDWages.levyAmt + "," +
+                                                                          (0.00) + "," + (nonWDWages.startDate != null && nonWDWages.startDate != "" ? nonWDWages.startDate : "null") + "," + (nonWDWages.endDate != null && nonWDWages.endDate != "" ? nonWDWages.endDate : "null") + "," + "null" + "," + nonWDWages.ssn + ")", staticConnection);
+                                                                        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                                                                        int insertipWages = insertC3ipWages.ExecuteNonQuery();
+                                                                        staticConnection.Close();
+                                                                    }
+                                                                }
+                                                            }
+
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                count++;
+                                            }
+                                        }
+                                    }
+                                    //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                    //C3WizardMessageBox.Show("C3 Wizard", "Submitted C3 imported successfully");
+                                    //btn_Search_Click(sender, e);
+                                    if (C3Header_model.Count == count)
+                                    {
+                                        ResponseModel.Message = "Data for this month and year already exists.";
+                                        ResponseModel.Status = false;
+                                        ResponseModel.Statuscode = 400;
+                                        return StatusCode(400, ResponseModel);
+                                    }
+                                }
+                                ResponseModel.Status = true;
+                                ResponseModel.Message = "C3 Wizard Submitted C3 imported successfully";
+                                ResponseModel.Statuscode = 200;
+                                return Ok(ResponseModel);
+
+                            }
+                            else
+                            {
+                                var customerJsonString = await response.Content.ReadAsStringAsync();
+                                var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                //C3WizardMessageBox.Show("C3 Wizard", Emp_model.message);
+                                ResponseModel.Message = Emp_model.message;
+                                return BadRequest(ResponseModel);
+                                //
+                            }
+                        }
+                        else
+                        {
+                            ResponseModel.Message = "Non-working director not found.";
+                            ResponseModel.Status = false;
+                            ResponseModel.Statuscode = 404;
+                            return StatusCode(404, ResponseModel);
+
+
+                        }
+                    }
+                    
+                    
+                    catch (Exception ex)
+                    {
+                        var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                        LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                        //Login login = new Login();
+                        //login.Error_Log(ex.Message);
+                        ResponseModel.Message = ex.Message;
+                    }
+
+                }
+                else
+                {
+                    ResponseModel.Status = false;
+                    ResponseModel.Message = "Selected 'To Month' should be greater than or equal to 'From Month'";
+                    ResponseModel.Statuscode = 400;
+                    return BadRequest(ResponseModel);
+                }
+            }
+            else
+            {
+                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                //C3WizardMessageBox.Show("C3 Wizard", "Check your internet connection OR May server not responding.\nplease try after sometime or contact S.S.B for any assistance.");
+                ResponseModel.Status = false;
+                ResponseModel.Message = "Check your internet connection OR May server not be responding. please try after sometime or contact S.S.B for any assistance.";
+                ResponseModel.Statuscode = 400;
+                return BadRequest(ResponseModel);
+            }
+            return Ok(ResponseModel);
+        }
+        [AllowAnonymous]
+        [HttpGet("Get_NWEmployeeDetails_SSB_Click")]
+        public async Task<IActionResult> Get_NWEmployeeDetails_SSB_Click(string Txt_SSN, string Txt_Surname, string Txt_Fname, string? Txt_Mname, string DOB, string username, string password)
+        {
+            ResponseModel response1 = new ResponseModel();
+            if (ConnectionInfom.HasConnection() && ConnectionInfom.APIConnection(_configuration))
+            {
+                try
+                {
+                    string birthday = null;
+                    try
+                    {
+                        DateTime Birthd = DateTime.Parse(DOB.Trim());
+                        birthday = Birthd.ToString(Helper.DisplayDateFormat);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                    // String surl = ConfigurationManager.AppSettings["ServiceUriString"];
+                    String surl = _configuration["ServiceConfig:ServiceUriString"];
+                    // string sURL = surl + "/Employee/getIPDetails/" + SSN;
+                    string sURL = surl + "/Employee/getIpDetailsByQuery/" + Txt_SSN.Trim() + "," + birthday + "," + Txt_Fname.Trim() + "," + Txt_Surname.Trim() + "," + (string.IsNullOrWhiteSpace(Txt_Mname) ? "null" : Txt_Mname.Trim());
+                    HttpMessageHandler handler = new HttpClientHandler()
+                    {
+                    };
+                    var httpClient = new HttpClient(handler)
+                    {
+                        BaseAddress = new Uri(sURL),
+                        Timeout = new TimeSpan(0, 2, 0)
+                    };
+                    httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                    //This is the key section you were missing    
+                    var userpass = _context.Secusers.FirstOrDefault(e => e.LoginId == username);
+                    var plainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : System.Text.Encoding.UTF8.GetBytes(username + ":" + userpass.Password);
+                    string val = System.Convert.ToBase64String(plainTextBytes);
+                    httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+                    HttpResponseMessage response = httpClient.GetAsync(sURL).Result;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+                        var EmpList_model = JsonConvert.DeserializeObject<List<Employeedetails>>(customerJsonString);
+                        if (EmpList_model != null)
+                        {
+                            List<Employeedetails> Empl = new List<Employeedetails>();
+                            Empl = EmpList_model;
+                            if (Txt_SSN != "" && Txt_SSN != null && Empl.Count > 1)
+                            {
+                                if (Empl.Any(x => x.socSecNum == Txt_SSN.Trim()))
+                                {
+                                    Empl = Empl.Where(x => x.socSecNum == Txt_SSN.Trim()).ToList();
+                                }
+                            }
+                            if (Empl.Count == 1)
+                            {
+                                try
+                                {
+                                    EmployeedetailsVM employeedetailsVM = new EmployeedetailsVM();
+                                    if (Txt_SSN.Trim() != Empl[0].socSecNum.Trim())
+                                    {
+                                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                                        //lvemployeeSSB.ItemsSource = Empl;
+                                        //lvemployeeSSB.SelectedIndex = -1;
+                                        //MyPopupSSB.IsOpen = true;
+                                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                    }
+                                    else
+                                    {
+                                        //Txt_SSN.Text = Empl[0].socSecNum;
+                                        Txt_Surname = Empl[0].surName;
+                                        Txt_Fname = Empl[0].firstName;
+                                        //Txt_Mname.Text = Emp_model.middleName;
+
+                                        employeedetailsVM.streetAddress = Empl[0].streetAddress;
+                                        employeedetailsVM.streetName = Empl[0].streetName;
+                                        employeedetailsVM.cityTownName = Empl[0].cityTownName;
+                                        employeedetailsVM.postalCode = Empl[0].postalCode;
+                                        try
+                                        {
+                                            employeedetailsVM.countryCode = Empl[0].countryCode;
+
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            //Login login = new Login();
+                                            //login.Error_Log(ex.Message);
+                                        }
+                                        employeedetailsVM.email = Empl[0].email;
+                                        employeedetailsVM.phone = Empl[0].phone;
+                                        employeedetailsVM.mobile = Empl[0].mobile;
+
+                                        try
+                                        {
+                                            if (Empl[0].birthDate != "")
+                                            {
+                                                // DOB.SelectedDate = Emp_model.birthDate == "" ? DateTime.Parse("01-01-1900") : DateTime.Parse(Emp_model.birthDate);
+                                            }
+                                            if (Empl[0].endDate != "")
+                                            {
+                                                // TerminationDate.SelectedDate = Empl[0].endDate == "" ? DateTime.Parse("01-01-1900") : DateTime.Parse(Empl[0].endDate);
+                                                // Termination_date.IsChecked = Empl[0].endDate == "" ? false : true;
+                                            }
+
+                                            // IsDirector.IsChecked = Emp_model.isdirectorOnly == "" ? false : Emp_model.isdirectorOnly == "false" ? false : true;
+                                            // IsLevyExempt.IsChecked = Emp_model.isLevyExempt == "" ? false : Emp_model.isLevyExempt == "false" ? false : true;
+                                            //if (IsDirector.IsChecked == true)
+                                            //{
+                                            //  Add_Wages.Visibility = Visibility.Visible;
+                                            //}
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            //Login login = new Login();
+                                            //login.Error_Log(ex.Message);
+                                        }
+
+                                        try
+                                        {
+                                            string gender = Empl[0].gender;
+                                            if (gender == "M") { employeedetailsVM.rbmale = true; }
+                                            if (gender == "F") { employeedetailsVM.rbfemale = true; }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            //Login login = new Login();
+                                            //login.Error_Log(ex.Message);
+                                        }
+
+                                        try
+                                        {
+                                            employeedetailsVM.cmbmarital = Empl[0].maritalStatus == "S" ? "Single" : Empl[0].maritalStatus == "M" ? "Married" : "";
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // Login login = new Login();
+                                            // login.Error_Log(ex.Message);
+                                        }
+                                        try
+                                        {
+                                            string payp = Empl[0].payPeriod != null && Empl[0].payPeriod != "" ? (Empl[0].payPeriod.Trim() == "1" ? "W" : Empl[0].payPeriod.Trim() == "2" ? "B" : Empl[0].payPeriod.Trim() == "3" ? "M" : Empl[0].payPeriod.Trim() == "4" ? "S" : "M") : "M";
+                                            if (payp == "W")
+                                                employeedetailsVM.cmbPayFreq = "Weekly";
+                                            if (payp == "M")
+                                                employeedetailsVM.cmbPayFreq = "Monthly";
+                                            if (payp == "B")
+                                                employeedetailsVM.cmbPayFreq = "Every Two Weeks";
+                                            if (payp == "S")
+                                                employeedetailsVM.cmbPayFreq = "Twice Monthly";
+
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // Login login = new Login();
+                                            // login.Error_Log(ex.Message);
+                                        }
+                                        if (Empl[0].last_Pay_Date != "")
+                                        {
+                                            //Last_Pay_Date.SelectedDate = Empl[0].last_Pay_Date == "" ? DateTime.Parse("01-01-1900") : DateTime.Parse(Empl[0].last_Pay_Date);
+                                        }
+
+                                        if (Empl[0].startDate != "")
+                                        {
+                                            //commencement.SelectedDate = Empl[0].startDate == "" ? DateTime.Parse("01-01-1900") : DateTime.Parse(Empl[0].startDate);
+                                            // commencement_Date.IsChecked = Empl[0].startDate == "" ? false : true;
+                                        }
+
+                                        employeedetailsVM.Txt_Occupation = Empl[0].occupation;
+                                        employeedetailsVM.Txt_Salary = Empl[0].payPeriod.Trim() == "3" ? Empl[0].salary != "" && Empl[0].salary != null ? Empl[0].salary : "0.00" : "0.00";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    //Login login = new Login();
+                                    //login.Error_Log(ex.Message);
+                                    //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                    //C3WizardMessageBox.Show("C3 Wizard", "" + ex);
+                                }
+                            }
+                            if (Empl.Count > 0)
+                            {
+                                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                                //lvemployeeSSB.ItemsSource = Empl;
+                                //lvemployeeSSB.SelectedIndex = -1;
+                                //MyPopupSSB.IsOpen = true;
+                                //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                                response1.Data = Empl;
+                                return Ok(response1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+                        var Emp_model = JsonConvert.DeserializeObject<Apistatus>(customerJsonString);
+                        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                        //C3WizardMessageBox.Show("C3 Wizard", Emp_model.message);
+                        response1.Message = Emp_model.message;
+                        response1.Statuscode = 200;
+                        return BadRequest(response1);
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                    LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                    //Login login = new Login();
+                    //login.Error_Log(ex.Message);
+                    //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                    //C3WizardMessageBox.Show("C3 Wizard", "" + ex);
+                    //DOB.Text = "";
+                }
+                return Ok(response1);
+            }
+            else
+            {
+                response1.Message = "Check your internet connection OR May server not responding.please try after sometime or contact S.S.B for any assistance.";
+                response1.Statuscode = 500;
+                response1.Status = false;
+            }
+            return Ok(response1);
+        }
+
+    }
+}

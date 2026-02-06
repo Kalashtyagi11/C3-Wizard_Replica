@@ -1,0 +1,185 @@
+﻿using C3Wizard.COMMONPROP;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardRepository.Common
+{
+    public class Helper
+    {
+        public static string DateFormat
+        {
+            get
+            {
+                return "dd/MM/yyyy";
+            }
+        }
+        public static string SQLDateFormat
+        {
+            get
+            {
+                return "yyyy-MM-dd";
+            }
+
+        }
+        public static string ReplaceCharacter(string text)
+        {    
+            if (string.IsNullOrEmpty(text)) return string.Empty;
+            return text.Replace("'", "");
+        }
+
+        public static string DisplayDateFormat
+        {
+            get
+            {
+                return "dd-MM-yyyy";
+            }
+        }
+        public static int yearindex(int[] yearlisy, int selectedyear)
+        {
+            int ycount = yearlisy.ToList().Count;
+            int yindex = -1;
+            for (int i = 0; i < ycount; i++)
+            {
+                if (selectedyear == yearlisy[i])
+                    yindex = i;
+            }
+
+            return yindex; ;
+        }
+        int[] ylist = null;
+        public static string MachineInfo { get { return System.Environment.MachineName; } }
+
+        public static bool IsFileLocked(string file)
+        {
+            try
+            {
+                if (File.Exists(file))
+                {
+                    using (FileStream fileStream = File.Open(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    {
+                        if (fileStream != null) fileStream.Close();  //This line is me being overly cautious, fileStream will never be null unless an exception occurs... and I know the "using" does it but its helpful to be explicit - especially when we encounter errors - at least for me anyway!
+                    }
+                }
+                return false;
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+
+            //file is not locked
+            return false;
+        }
+
+        public static string MMDDyyyyDateFormat
+        {
+            get
+            {
+                return "MM/dd/yyyy";
+            }
+        }
+
+        public static int[] yearlist()
+        {
+            int startyear = 2018;
+            int currrentyear = System.DateTime.Now.Year;
+            int endyear = currrentyear + 10;
+            int arrraylength = (endyear - startyear) >= 0 ? (endyear - startyear) : 0;
+            int[] years = new int[arrraylength + 1];
+            int index = 0;
+            for (int i = startyear; i <= endyear; i++)
+            {
+                years[index] = i;
+                index++;
+            }
+
+            return years;
+        }
+
+        public static int MondaysInMonth(int CmbMonth, int CmbYear)
+        {
+            int weeks = 0;
+            int daysThisMonth = DateTime.DaysInMonth(CmbYear, CmbMonth);
+            DateTime beginingOfThisMonth = new DateTime(CmbYear, CmbMonth, 1);
+            for (int i = 0; i < daysThisMonth; i++)
+                if (beginingOfThisMonth.AddDays(i).DayOfWeek == DayOfWeek.Monday)
+                    weeks++;
+            return weeks;
+        }
+
+     public static decimal Findsalary(Employeedetails EmpWagesde)
+    {
+      decimal monthlysalary = 0.00M;
+      List<EmployeeWagesdetails> EmpWagesDetailslist = new List<EmployeeWagesdetails>();
+      EmployeeWagesdetails EmpWagesDetails5 = new EmployeeWagesdetails();
+      EmpWagesDetails5.weekno = 5;
+      EmpWagesDetails5.wagesPaid = EmpWagesde.wagesPaid5;
+      EmpWagesDetailslist.Add(EmpWagesDetails5);
+      EmployeeWagesdetails EmpWagesDetails4 = new EmployeeWagesdetails();
+      EmpWagesDetails4.weekno = 4;
+      EmpWagesDetails4.wagesPaid = EmpWagesde.wagesPaid4;
+      EmpWagesDetailslist.Add(EmpWagesDetails4);
+      EmployeeWagesdetails EmpWagesDetails3 = new EmployeeWagesdetails();
+      EmpWagesDetails3.weekno = 3;
+      EmpWagesDetails3.wagesPaid = EmpWagesde.wagesPaid3;
+      EmpWagesDetailslist.Add(EmpWagesDetails3);
+      EmployeeWagesdetails EmpWagesDetails2 = new EmployeeWagesdetails();
+      EmpWagesDetails2.weekno = 2;
+      EmpWagesDetails2.wagesPaid = EmpWagesde.wagesPaid2;
+      EmpWagesDetailslist.Add(EmpWagesDetails2);
+      EmployeeWagesdetails EmpWagesDetails1 = new EmployeeWagesdetails();
+      EmpWagesDetails1.weekno = 1;
+      EmpWagesDetails1.wagesPaid = EmpWagesde.wagesPaid1;
+      EmpWagesDetailslist.Add(EmpWagesDetails1);
+      foreach (var EMPwage in EmpWagesDetailslist)
+      {
+        if (monthlysalary == 0)
+        {
+          decimal wages = 0.00M;
+          try
+          {
+            wages = EMPwage.wagesPaid != null && EMPwage.wagesPaid != "" ? decimal.Parse(EMPwage.wagesPaid) : 0.00M;
+          }
+          catch (Exception ex)
+          {
+
+          }
+          switch (EMPwage.weekno)
+          {
+            case 1:
+              monthlysalary = wages;
+              break;
+            case 2:
+              monthlysalary = wages;
+              break;
+            case 3:
+              monthlysalary = wages;
+              break;
+            case 4:
+              monthlysalary = wages;
+              break;
+            case 5:
+              monthlysalary = wages;
+              break;
+          }
+
+        }
+
+      }
+
+
+
+      return monthlysalary;
+    }
+
+
+  }
+}

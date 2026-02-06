@@ -1,0 +1,131 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardData.Models
+{
+    public class OnlinePayments
+    {
+        public int Id { get; set; }
+        public string? SystemTransId { get; set; }
+        public string? SystemKey { get; set; }
+        public string? PaymentId { get; set; }
+        public string? PaymentPayerId { get; set; }
+        public string? PaymentGatewayTransactionID { get; set; }
+        public string? Currency { get; set; }
+        public string? CreateTime { get; set; }
+        public string? Description { get; set; }
+        public decimal PaymentAmount { get; set; }
+        public decimal? ExcangeRate { get; set; }
+        public decimal? PaymentAmountUSD { get; set; }
+        public decimal? FromAccountAmount { get; set; }
+        public string PaymentStatus { get; set; }
+        public string? Message { get; set; }
+
+        public int? UserId { get; set; }
+
+        public string? RenewalYear { get; set; }
+
+        public int TransactionTypeId { get; set; }
+        public int? DebitTransactionId { get; set; }
+        public int? CreditTransactionId { get; set; }
+        public int C3HeaderId { get; set; }
+        public string? TransactionFor { get; set; }
+
+        public string? RefCustomerName { get; set; }
+        public string? ReasonForPayment { get; set; }
+        public string? Notes { get; set; }
+        public string? CardNumber { get; set; }
+        public string? CardMonthExpiry { get; set; }
+        public string? cardHolderName { get; set; }
+        public string? CVV { get; set; }
+        public string? apiResponse { get; set; }
+        public int? OldSystemId { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
+        public bool IsActive { get; set; }
+        public int? SourceData { get; set; }
+
+        public bool? IsReconciled { get; set; }
+        public bool? IscardView { get; set; }
+        public string? cardType { get; set; }
+        public int? ReconciledBy { get; set; }
+        public DateTime? ReconciledOn { get; set; }
+
+        public string? BankName { get; set; }
+        public string? checkNum { get; set; }
+        public DateTime? checkDate { get; set; }
+        public string? JVNumber { get; set; }
+        public DateTime? jvDate { get; set; }
+        public string? needToPay { get; set; }
+        public DateTime? transactionDate { get; set; }
+
+        public string? BimaRefNum { get; set; }
+
+        public string? mode { get; set; }
+        public string? headerID { get; set; }
+    }
+
+  //public class SiteSettings
+  //{
+
+  //  public int SiteSettings_Id { get; set; }
+
+  //  public string MerchantId { get; set; }
+
+  //  public string KeyId { get; set; }
+
+  //  public string SecretKey { get; set; }
+
+  //  public string BaseUrl { get; set; }
+
+
+  //  public string Environment { get; set; }
+
+  //  public int? InsertedBy { get; set; }
+  //  public DateTime? InsertedOn { get; set; }
+
+  //  public string? InsertedMachineInfo { get; set; }
+
+  //  public int? UpdatedBy { get; set; }
+  //  public DateTime? UpdatedOn { get; set; }
+  //  public string UpdatedMachineInfo { get; set; }
+  //  public bool? IsActive { get; set; }
+  //}
+
+  public class SiteSettings
+  {
+    public int SiteSettings_Id { get; set; }
+    public string MerchantId { get; set; }
+    public string KeyId { get; set; }
+    public string SecretKey { get; set; }
+    public string BaseUrl { get; set; }
+    public string Environment { get; set; }
+    public int? InsertedBy { get; set; }
+    public DateTime? InsertedOn { get; set; }
+    public string? InsertedMachineInfo { get; set; }
+    public int? UpdatedBy { get; set; }
+    public DateTime? UpdatedOn { get; set; }
+    public string? UpdatedMachineInfo { get; set; }
+    public bool IsActive { get; set; }
+  }
+
+  public class UserCardDetail
+  {
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public string CardType { get; set; }
+    public string CardNumber { get; set; }
+    public string CardMonthExpiry { get; set; }
+    public string CardHolderName { get; set; }
+    public string CVV { get; set; }
+    public bool? IsActive { get; set; }
+    public int InsertedBy { get; set; }
+    public DateTime InsertedOn { get; set; }
+  }
+
+}

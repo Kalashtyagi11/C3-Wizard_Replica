@@ -1,0 +1,1157 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Atul\\c3Api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\reporegistercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\reporegistercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\c3controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\c3controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\nondirectorcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\nondirectorcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\nondirectorrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\nondirectorrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\paymentrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\paymentrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\javaemployervm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\javaemployervm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\dtoresponsemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\dtoresponsemodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\c3wizardcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\c3wizardcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\javaemployercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\javaemployercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\repoc3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\repoc3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|c:\\atul\\c3api\\c3wizard.commonprop\\c3contributions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|solutionrelative:c3wizard.commonprop\\c3contributions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\getemployerdeailsmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\getemployerdeailsmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\mastercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\mastercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\selfemployeddeailsmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\selfemployeddeailsmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\businessobjects\\blselfemployed.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\businessobjects\\blselfemployed.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\dataobjects\\dlselfemployedy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\dataobjects\\dlselfemployedy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\businessobjects\\blmastercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\businessobjects\\blmastercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\dataobjects\\dlmastercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\dataobjects\\dlmastercompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\registercompanyvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\registercompanyvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\administrationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\administrationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\dashboardrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\dashboardrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\forgetpassword.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\forgetpassword.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\selfemployeecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\selfemployeecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\selpempcontributionrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\selpempcontributionrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\selfempcontributioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\selfempcontributioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\businessobjects\\blexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\businessobjects\\blexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\businessobjects\\blmasteremployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\businessobjects\\blmasteremployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\dataobjects\\dlmasteremployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\dataobjects\\dlmasteremployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\dataobjects\\c3wizardlayerconn_basedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\dataobjects\\c3wizardlayerconn_basedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\c3headervm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\c3headervm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\c3contributionvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\c3contributionvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|c:\\atul\\c3api\\c3wizard.commonprop\\c3header.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|solutionrelative:c3wizard.commonprop\\c3header.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\dirpayrollpreviewvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\dirpayrollpreviewvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\bonusvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\bonusvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\masteremployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\masteremployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\employeedetailsvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\employeedetailsvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\aboutus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\aboutus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\selfempmodel\\selfdashboardvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\selfempmodel\\selfdashboardvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\employeervm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\employeervm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\secuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\secuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\selfusermanagementcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\selfusermanagementcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\welcomecustomerresetmail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\welcomecustomerresetmail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\welcomecustomer.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\welcomecustomer.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\welcome.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\welcome.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\otpverificationlogin.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\otpverificationlogin.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\companymappingnotification.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\companymappingnotification.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\c3report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\c3report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\wwwroot\\email\\verifictiontemplate.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\wwwroot\\email\\verifictiontemplate.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\processc3header.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\processc3header.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|c:\\atul\\c3api\\c3wizard.commonprop\\dvoexceptionrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|solutionrelative:c3wizard.commonprop\\dvoexceptionrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|c:\\atul\\c3api\\c3wizard.commonprop\\dvobase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|solutionrelative:c3wizard.commonprop\\dvobase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|c:\\atul\\c3api\\c3wizard.commonprop\\idvo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5263020F-B249-4C83-8885-A3E3FDB56103}|C3Wizard.COMMONPROP\\C3Wizard.COMMONPROP.csproj|solutionrelative:c3wizard.commonprop\\idvo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\secusersprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\secusersprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\userotp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\userotp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\process_c3header_backup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\process_c3header_backup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\processselfemployedc3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\processselfemployedc3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\auditlog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\auditlog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\businessobjects\\blsecusers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\businessobjects\\blsecusers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|c:\\atul\\c3api\\c3wizardlayer\\dataobjects\\dlsecusers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B32553-45E2-48DA-B5E3-9182C8C565AD}|C3WizardLayer\\C3WizardLayer.csproj|solutionrelative:c3wizardlayer\\dataobjects\\dlsecusers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\reposelfusermanagement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\reposelfusermanagement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|c:\\atul\\c3api\\c3wizarddata\\models\\onlinepayments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FA91CB6-3358-4D24-A96C-F005DF881D10}|C3WizardData\\C3WizardData.csproj|solutionrelative:c3wizarddata\\models\\onlinepayments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|c:\\atul\\c3api\\c3wizardhelper\\viewmodels\\userviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{436829C3-2D36-4D09-B891-E8F1420A84E8}|C3WizardHelper\\C3WizardHelper.csproj|solutionrelative:c3wizardhelper\\viewmodels\\userviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|c:\\atul\\c3api\\c3wizardwebapi\\controllers\\settingscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4532879-FDB0-475F-B23E-32B39AE19DA5}|C3WIZARDWebApi\\C3WIZARDWebApi.csproj|solutionrelative:c3wizardwebapi\\controllers\\settingscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\reposelfemployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\reposelfemployee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|c:\\atul\\c3api\\c3wizardrepository\\repository\\connectioninfossb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93418E4F-6565-4142-A24C-2DBA65E6A309}|C3WizardRepository\\C3WizardRepository.csproj|solutionrelative:c3wizardrepository\\repository\\connectioninfossb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "C3Controller.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\C3Controller.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\C3Controller.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\C3Controller.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\C3Controller.cs",
+              "ViewState": "AgIAAKsqAAAAAAAAAAAawLUqAABaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-07T09:05:14.575Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "NonDirectorRepo.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\NonDirectorRepo.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\NonDirectorRepo.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\NonDirectorRepo.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\NonDirectorRepo.cs",
+              "ViewState": "AgIAAAsJAAAAAAAAAAAawBoJAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-05T04:35:29.086Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PaymentRepo.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\PaymentRepo.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\PaymentRepo.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\PaymentRepo.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\PaymentRepo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-10T06:00:59.805Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "javaEmployerVm.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\javaEmployerVm.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\javaEmployerVm.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\javaEmployerVm.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\javaEmployerVm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-09T06:18:30.628Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "javaEmployerController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\javaEmployerController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\javaEmployerController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\javaEmployerController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\javaEmployerController.cs",
+              "ViewState": "AgIAAJgAAAAAAAAAAAAawKcAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-09T06:11:03.395Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RepoRegisterCompany.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoRegisterCompany.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\RepoRegisterCompany.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoRegisterCompany.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\RepoRegisterCompany.cs",
+              "ViewState": "AgIAABMDAAAAAAAAAAAlwC4DAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T04:33:13.846Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NonDirectorController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\NonDirectorController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\NonDirectorController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\NonDirectorController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\NonDirectorController.cs",
+              "ViewState": "AgIAAPADAAAAAAAAAAAawPgDAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-03T05:09:19.261Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEICAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-10T12:26:48.711Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "C3wizardContext.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\C3wizardContext.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\C3wizardContext.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\C3wizardContext.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\C3wizardContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHcAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T09:12:24.326Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "PaymentController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\PaymentController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\PaymentController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\PaymentController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\PaymentController.cs",
+              "ViewState": "AgIAAA4EAAAAAAAAAAAawCcEAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-15T11:26:19.943Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "DTOResponsemodel.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\DTOResponsemodel.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\DTOResponsemodel.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\DTOResponsemodel.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\DTOResponsemodel.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAMwCkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-02T11:24:28.988Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\appsettings.json",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\appsettings.json",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\appsettings.json",
+              "RelativeToolTip": "C3WIZARDWebApi\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-09T10:46:47.302Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Program.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Program.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Program.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Program.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-09T13:42:32.839Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "RepoC3.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoC3.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\RepoC3.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoC3.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\RepoC3.cs",
+              "ViewState": "AgIAAP4bAAAAAAAAAAAIwAwcAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T06:27:18.861Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "C3Contributions.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\C3Contributions.cs",
+              "RelativeDocumentMoniker": "C3Wizard.COMMONPROP\\C3Contributions.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\C3Contributions.cs",
+              "RelativeToolTip": "C3Wizard.COMMONPROP\\C3Contributions.cs",
+              "ViewState": "AgIAAMICAAAAAAAAAAAqwO0CAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T13:44:50.578Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "GetEmployerDeailsModule.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\GetEmployerDeailsModule.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\GetEmployerDeailsModule.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\GetEmployerDeailsModule.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\GetEmployerDeailsModule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-07T06:52:03.659Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "MasterCompany.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\MasterCompany.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\MasterCompany.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\MasterCompany.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\MasterCompany.cs",
+              "ViewState": "AgIAAD0AAAAAAAAAAAAAwAYAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-07T06:14:44.528Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "SelfEmployedDeailsModule.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\SelfEmployedDeailsModule.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\SelfEmployedDeailsModule.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\SelfEmployedDeailsModule.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\SelfEmployedDeailsModule.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAIA5wDgAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T11:32:24.721Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "BLSelfEmployed.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLSelfEmployed.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\BusinessObjects\\BLSelfEmployed.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLSelfEmployed.cs",
+              "RelativeToolTip": "C3WizardLayer\\BusinessObjects\\BLSelfEmployed.cs",
+              "ViewState": "AgIAAOAAAAAAAAAAAAAawO8AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T09:33:24.643Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "BLMasterCompany.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLMasterCompany.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\BusinessObjects\\BLMasterCompany.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLMasterCompany.cs",
+              "RelativeToolTip": "C3WizardLayer\\BusinessObjects\\BLMasterCompany.cs",
+              "ViewState": "AgIAAKcAAAAAAAAAAAAawLYAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-07T05:34:10.552Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "DLSelfEmployedy.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLSelfEmployedy.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\DataObjects\\DLSelfEmployedy.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLSelfEmployedy.cs",
+              "RelativeToolTip": "C3WizardLayer\\DataObjects\\DLSelfEmployedy.cs",
+              "ViewState": "AgIAAL4AAAAAAAAAAAAawM0AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-06T05:02:20.048Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "DLMasterCompany.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLMasterCompany.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\DataObjects\\DLMasterCompany.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLMasterCompany.cs",
+              "RelativeToolTip": "C3WizardLayer\\DataObjects\\DLMasterCompany.cs",
+              "ViewState": "AgIAANgAAAAAAAAAAAAawK4AAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-07T05:16:49.139Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "AdministrationController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\AdministrationController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\AdministrationController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\AdministrationController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\AdministrationController.cs",
+              "ViewState": "AgIAAEoIAAAAAAAAAAAEwOkIAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T04:43:48.056Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "RegisterCompanyVm.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\RegisterCompanyVm.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\RegisterCompanyVm.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\RegisterCompanyVm.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\RegisterCompanyVm.cs",
+              "ViewState": "AgIAAEQAAAAAAAAAAIAxwEwAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T10:39:19.398Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "DashBoardRepo.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\DashBoardRepo.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\DashBoardRepo.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\DashBoardRepo.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\DashBoardRepo.cs",
+              "ViewState": "AgIAAOACAAAAAAAAAIA2wPECAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T04:36:21.006Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "DashBoardController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\DashBoardController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\DashBoardController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\DashBoardController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\DashBoardController.cs",
+              "ViewState": "AgIAAPEAAAAAAAAAAAAMwPkAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-24T07:09:49.633Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "ForgetPassword.html",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\ForgetPassword.html",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\ForgetPassword.html",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\ForgetPassword.html",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\ForgetPassword.html",
+              "ViewState": "AgIAAAgAAAAAAAAAAIBJwBEAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-11-17T12:20:50.415Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "DLMasterEmployee.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLMasterEmployee.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\DataObjects\\DLMasterEmployee.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLMasterEmployee.cs",
+              "RelativeToolTip": "C3WizardLayer\\DataObjects\\DLMasterEmployee.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAApwFAAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-17T05:39:32.626Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "SelfEmployeeController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SelfEmployeeController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\SelfEmployeeController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SelfEmployeeController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\SelfEmployeeController.cs",
+              "ViewState": "AgIAABAHAAAAAAAAAAAMwCYHAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T09:51:58.833Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "BLException.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLException.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\BusinessObjects\\BLException.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLException.cs",
+              "RelativeToolTip": "C3WizardLayer\\BusinessObjects\\BLException.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAA1wCkAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-30T12:07:50.443Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "SelpEmpContributionRepo.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\SelpEmpContributionRepo.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\SelpEmpContributionRepo.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\SelpEmpContributionRepo.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\SelpEmpContributionRepo.cs",
+              "ViewState": "AgIAADMDAAAAAAAAAAAewD0DAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-16T10:02:27.007Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "SelfEmpContributionController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SelfEmpContributionController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\SelfEmpContributionController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SelfEmpContributionController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\SelfEmpContributionController.cs",
+              "ViewState": "AgIAAGIBAAAAAAAAAAAewHQBAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T05:53:19.583Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "BLMasterEmployee.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLMasterEmployee.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\BusinessObjects\\BLMasterEmployee.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLMasterEmployee.cs",
+              "RelativeToolTip": "C3WizardLayer\\BusinessObjects\\BLMasterEmployee.cs",
+              "ViewState": "AgIAABICAAAAAAAAAAAMwCMCAABkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-13T09:44:06.407Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "C3WizardLayerConn_BaseData.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\C3WizardLayerConn_BaseData.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\DataObjects\\C3WizardLayerConn_BaseData.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\C3WizardLayerConn_BaseData.cs",
+              "RelativeToolTip": "C3WizardLayer\\DataObjects\\C3WizardLayerConn_BaseData.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAowA8AAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-17T05:39:59.873Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "C3HeaderVM.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\C3HeaderVM.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\C3HeaderVM.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\C3HeaderVM.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\C3HeaderVM.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAIA6wE4AAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T11:02:40.826Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "C3Header.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\C3Header.cs",
+              "RelativeDocumentMoniker": "C3Wizard.COMMONPROP\\C3Header.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\C3Header.cs",
+              "RelativeToolTip": "C3Wizard.COMMONPROP\\C3Header.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwA8AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T13:59:45.542Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "C3ContributionVm.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\C3ContributionVm.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\C3ContributionVm.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\C3ContributionVm.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\C3ContributionVm.cs",
+              "ViewState": "AgIAAIoAAAAAAAAAAIA7wJUAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-16T10:17:25.21Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "DirPayrollpreviewVM.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\DirPayrollpreviewVM.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\DirPayrollpreviewVM.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\DirPayrollpreviewVM.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\DirPayrollpreviewVM.cs",
+              "ViewState": "AgIAAFYAAAAAAAAAAIA2wGAAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-16T09:02:39.931Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "BonusVM.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\BonusVM.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\BonusVM.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\BonusVM.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\BonusVM.cs",
+              "ViewState": "AgIAAJQAAAAAAAAAAAAtwJsAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-16T07:18:56.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "MasterEmployee.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\MasterEmployee.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\MasterEmployee.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\MasterEmployee.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\MasterEmployee.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAhwAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T09:11:34.797Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "EmployeedetailsVM.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\EmployeedetailsVM.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\EmployeedetailsVM.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\EmployeedetailsVM.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\EmployeedetailsVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T06:34:23.2Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "AboutUs.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\AboutUs.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\AboutUs.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\AboutUs.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\AboutUs.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-12T11:52:44.042Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "SelfDashboardVm.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\SelfEmpModel\\SelfDashboardVm.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\SelfEmpModel\\SelfDashboardVm.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\SelfEmpModel\\SelfDashboardVm.cs",
+              "RelativeToolTip": "C3WizardData\\SelfEmpModel\\SelfDashboardVm.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAvwBIAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T11:02:03.227Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "EmployeerVm.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\EmployeerVm.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\EmployeerVm.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\EmployeerVm.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\EmployeerVm.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAewBIAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-25T12:41:47.169Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "Secuser.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\Secuser.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\Secuser.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\Secuser.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\Secuser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T14:04:27.735Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "SelfUserManagementController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SelfUserManagementController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\SelfUserManagementController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SelfUserManagementController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\SelfUserManagementController.cs",
+              "ViewState": "AgIAAJwBAAAAAAAAAAAawKsBAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T04:39:32.21Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "WelcomeCustomerResetMail.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomerResetMail.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomerResetMail.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomerResetMail.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomerResetMail.cshtml",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAawFEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-18T05:19:22.573Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 47,
+              "Title": "WelcomeCustomer.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomer.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomer.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomer.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\WelcomeCustomer.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-25T09:44:29.887Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 48,
+              "Title": "Welcome.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\Welcome.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\Welcome.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\Welcome.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\Welcome.cshtml",
+              "ViewState": "AgIAAHUAAAAAAAAAAIBJwHwAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-17T12:54:33.418Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 49,
+              "Title": "OtpVerificationLogin.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\OtpVerificationLogin.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\OtpVerificationLogin.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\OtpVerificationLogin.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\OtpVerificationLogin.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAIBJwAoAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-17T12:19:59.5Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 50,
+              "Title": "CompanyMappingNotification.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\CompanyMappingNotification.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\CompanyMappingNotification.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\CompanyMappingNotification.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\CompanyMappingNotification.cshtml",
+              "ViewState": "AgIAAGMAAAAAAAAAAIBJwG4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-25T09:44:37.999Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 51,
+              "Title": "C3Report.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\C3Report.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\C3Report.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\C3Report.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\C3Report.cshtml",
+              "ViewState": "AgIAAAwAAAAAAAAAAIBJwBcAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-25T09:44:02.392Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 52,
+              "Title": "verifictionTemplate.cshtml",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\verifictionTemplate.cshtml",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\wwwroot\\Email\\verifictionTemplate.cshtml",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\wwwroot\\Email\\verifictionTemplate.cshtml",
+              "RelativeToolTip": "C3WIZARDWebApi\\wwwroot\\Email\\verifictionTemplate.cshtml",
+              "ViewState": "AgIAAAMAAAAAAAAAAIBJwEcAAAAuAQAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-17T12:53:17.212Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 53,
+              "Title": "ProcessC3header.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\ProcessC3header.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\ProcessC3header.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\ProcessC3header.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\ProcessC3header.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-15T09:02:14.111Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 56,
+              "Title": "iDVO.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\iDVO.cs",
+              "RelativeDocumentMoniker": "C3Wizard.COMMONPROP\\iDVO.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\iDVO.cs",
+              "RelativeToolTip": "C3Wizard.COMMONPROP\\iDVO.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAADwvy8AAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T13:51:36.598Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 55,
+              "Title": "DVOBase.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\DVOBase.cs",
+              "RelativeDocumentMoniker": "C3Wizard.COMMONPROP\\DVOBase.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\DVOBase.cs",
+              "RelativeToolTip": "C3Wizard.COMMONPROP\\DVOBase.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAADwvy8AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T13:51:53.433Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 54,
+              "Title": "DVOExceptionRecord.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\DVOExceptionRecord.cs",
+              "RelativeDocumentMoniker": "C3Wizard.COMMONPROP\\DVOExceptionRecord.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3Wizard.COMMONPROP\\DVOExceptionRecord.cs",
+              "RelativeToolTip": "C3Wizard.COMMONPROP\\DVOExceptionRecord.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAqwDIAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T13:59:32.493Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 57,
+              "Title": "SECUsersProfile.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\SECUsersProfile.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\SECUsersProfile.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\SECUsersProfile.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\SECUsersProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T13:55:24.418Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 58,
+              "Title": "UserOtp.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\UserOtp.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\UserOtp.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\UserOtp.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\UserOtp.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAD4vwwAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-10T05:37:11.393Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 60,
+              "Title": "ProcessSelfEmployedC3.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\ProcessSelfEmployedC3.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\ProcessSelfEmployedC3.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\ProcessSelfEmployedC3.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\ProcessSelfEmployedC3.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-15T13:09:35.557Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 59,
+              "Title": "PROCESS_C3Header_Backup.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\PROCESS_C3Header_Backup.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\PROCESS_C3Header_Backup.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\PROCESS_C3Header_Backup.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\PROCESS_C3Header_Backup.cs",
+              "ViewState": "AgIAALEAAAAAAAAAAAAcwLsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-07T08:46:33.173Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 61,
+              "Title": "AuditLog.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\AuditLog.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\AuditLog.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\AuditLog.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\AuditLog.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAYwAwAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-07T10:46:05.343Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 63,
+              "Title": "DLSECUsers.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLSECUsers.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\DataObjects\\DLSECUsers.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\DataObjects\\DLSECUsers.cs",
+              "RelativeToolTip": "C3WizardLayer\\DataObjects\\DLSECUsers.cs",
+              "ViewState": "AgIAAJ0EAAAAAAAAAIAwwKwEAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-30T12:03:29.752Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 62,
+              "Title": "BLSECUsers.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLSECUsers.cs",
+              "RelativeDocumentMoniker": "C3WizardLayer\\BusinessObjects\\BLSECUsers.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardLayer\\BusinessObjects\\BLSECUsers.cs",
+              "RelativeToolTip": "C3WizardLayer\\BusinessObjects\\BLSECUsers.cs",
+              "ViewState": "AgIAAKQBAAAAAAAAAIAwwLcBAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-06T12:21:11.93Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 65,
+              "Title": "RepoSelfUserManagement.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoSelfUserManagement.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\RepoSelfUserManagement.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoSelfUserManagement.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\RepoSelfUserManagement.cs",
+              "ViewState": "AgIAAN8DAAAAAAAAAAAMwN4DAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T09:45:10.926Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 64,
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "RelativeDocumentMoniker": "..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "RelativeToolTip": "..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAACUTAAAAAAAAAAAQwDMTAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-11-05T13:37:39.702Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 66,
+              "Title": "OnlinePayments.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardData\\Models\\OnlinePayments.cs",
+              "RelativeDocumentMoniker": "C3WizardData\\Models\\OnlinePayments.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardData\\Models\\OnlinePayments.cs",
+              "RelativeToolTip": "C3WizardData\\Models\\OnlinePayments.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-07T13:05:01.011Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 67,
+              "Title": "UserViewModel.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\UserViewModel.cs",
+              "RelativeDocumentMoniker": "C3WizardHelper\\ViewModels\\UserViewModel.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardHelper\\ViewModels\\UserViewModel.cs",
+              "RelativeToolTip": "C3WizardHelper\\ViewModels\\UserViewModel.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAAAkwD0AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T13:49:01.939Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 68,
+              "Title": "SettingsController.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SettingsController.cs",
+              "RelativeDocumentMoniker": "C3WIZARDWebApi\\Controllers\\SettingsController.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WIZARDWebApi\\Controllers\\SettingsController.cs",
+              "RelativeToolTip": "C3WIZARDWebApi\\Controllers\\SettingsController.cs",
+              "ViewState": "AgIAAHwFAAAAAAAAAAAcwIMFAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-18T12:36:05.992Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 69,
+              "Title": "RepoSelfEmployee.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoSelfEmployee.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\RepoSelfEmployee.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\RepoSelfEmployee.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\RepoSelfEmployee.cs",
+              "ViewState": "AgIAAJgAAAAAAAAAAAAiwJ8AAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T09:44:27.647Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 70,
+              "Title": "ConnectionInfoSSB.cs",
+              "DocumentMoniker": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\ConnectionInfoSSB.cs",
+              "RelativeDocumentMoniker": "C3WizardRepository\\Repository\\ConnectionInfoSSB.cs",
+              "ToolTip": "C:\\Atul\\c3Api\\C3WizardRepository\\Repository\\ConnectionInfoSSB.cs",
+              "RelativeToolTip": "C3WizardRepository\\Repository\\ConnectionInfoSSB.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAADgvyEAAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-16T09:33:16.972Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

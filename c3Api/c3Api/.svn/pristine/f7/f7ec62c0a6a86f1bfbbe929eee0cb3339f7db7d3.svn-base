@@ -1,0 +1,1153 @@
+﻿using C3Wizard.COMMONPROP;
+using C3WizardData.Models;
+using C3WizardHelper.ViewModels;
+using C3WizardLayer.DataObjects;
+using C3WizardRepository.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
+using PayPal.Api;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace C3WizardRepository.Repository
+{
+
+    public class DashBoardRepo
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly C3wizardContext _DbContext;
+        public DashBoardRepo(IHttpContextAccessor httpContextAccessor, C3wizardContext c3WizardContext)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _DbContext = c3WizardContext;
+        }
+        decimal total_con = 0;
+        decimal unPaid = 0;
+        decimal Director_total_con = 0;
+        decimal unPaidDir = 0;
+        bool employeec = true, directorc = true;
+        string smonth = null, syear = null, dsmonth = null, dsyear = null;
+        string pendingempc3 = "";
+        string pendingdirc3 = "";
+        public async Task<List<PayPeriod1>> load_dashboard(int CompanyId, int? StartMonths, int? endMonths, int? StartYear, int? EndYear, string ResultArea)
+        {
+
+            var returnData = new List<PayPeriod1>();
+            DateTime Nowdate = DateTime.Now;
+            int curmonth = Nowdate.AddMonths(-1).Month;
+            int curyear = Nowdate.AddMonths(-1).Year;
+            DateTime startDate = new DateTime(curyear, curmonth, 1);
+            DateTime endDate = startDate.AddMonths(2).AddDays(-6);
+            bool IsLastmonthEMPC3Submitted = false;
+            bool IsLastmonthDirC3Submitted = false;
+            List<C3Header> listDVOC3Header = new List<C3Header>();
+            SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+            SqlCommand cmd = new SqlCommand("get_C3Genrated_data", staticConnection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            sqlAdapter.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                int c3count = 0;
+                int Pendingc3count = 0;
+                foreach (DataRow row in dt.Rows)
+                {
+
+                    c3count++;
+                    bool issubmited = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                    string period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+                    string Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                    if (!issubmited)
+                    {
+                        Pendingc3count++;
+                        pendingempc3 = pendingempc3 + " " + period_Month + " " + Period_year + ",";
+                    }
+
+
+
+                    if (issubmited && period_Month == MonthName((startDate.Month).ToString()) && Period_year == startDate.Year.ToString())
+                    {
+                        IsLastmonthEMPC3Submitted = true;
+                    }
+                    //if (c3count <= 12)
+                    // {
+                    var m = startDate.Month;
+
+
+                    bool isfinalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                    if (true)//isfinalize == true)
+                    {
+                        var Obj = new C3Header();
+
+                        Obj.HeaderID = Convert.IsDBNull(row["C3HEADERID"]) ? 0 : int.Parse(row["C3HEADERID"].ToString());
+                        Obj.RegNo = Convert.IsDBNull(row["RegNo"]) ? null : row["RegNo"].ToString();
+                        Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+                        Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? 0 : Convert.ToInt32(row["PERIODD_MONTH"]);
+                        Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                        Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+                        Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+                        Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+                        Obj.TOTALSERVAYANCE = Convert.IsDBNull(row["TOTAL_SERVAYANCE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SERVAYANCE"].ToString())));
+                        Obj.TOTALLEVYEEEMPLOYER = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYER"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYER"].ToString())));
+                        Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+                        Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                        Obj.Is_submitted = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                        Obj.C3_IsFinalized = Convert.IsDBNull(row["C3_IsFinalized"]) ? false : bool.Parse(row["C3_IsFinalized"].ToString());
+                        Obj.IsUnLocked = Convert.IsDBNull(row["IsUnLocked"]) ? false : bool.Parse(row["IsUnLocked"].ToString());
+                        Obj.IsUnLocked = !Obj.IsUnLocked;
+                        Obj.IssubmittedShow = (bool)Obj.Is_submitted ? "C3 Submitted" : "C3 Not Submitted";
+                        Obj.Issubmittedcolor = (bool)Obj.Is_submitted ? "Black" : "Red";
+
+                        Obj.IssubmittedShowimg = (bool)Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+                        Obj.C3submittedShow = (bool)Obj.Is_submitted ? "Resubmit C3" : "Submit C3";
+                        Obj.C3submittedShowimg = (bool)Obj.Is_submitted ? "/Images/restore.png" : "/Images/finalyze20x20.png";
+                        Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                        Obj.TOTALPEPENALTY = Convert.IsDBNull(row["TOTAL_PEPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_PEPENALTY"].ToString())));
+                        Obj.TOTALSSPENALTY = Convert.IsDBNull(row["TOTAL_SSPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSPENALTY"].ToString())));
+                        Obj.TOTALLEVYEEPENALTY = Convert.IsDBNull(row["TOTAL_LEVYEEPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEPENALTY"].ToString())));
+                        //Obj.IsPaid = _DbContext.OnlinePayments.Any(e => e.C3HeaderId == Obj.HeaderID && e.PaymentStatus == "AUTHORIZED");
+                        var Paymentdetails = _DbContext.OnlinePayments.Where(e => e.C3HeaderId == Obj.HeaderID && e.IsActive && e.TransactionFor != "Self").OrderByDescending(f => f.Id).Select(r => new { r.PaymentStatus });
+                        Obj.IsPaid = Paymentdetails.Any(e => e.PaymentStatus == "AUTHORIZED" || e.PaymentStatus == "Offline Payment");
+                        Obj.IsPaidStatus = Paymentdetails?.FirstOrDefault()?.PaymentStatus;
+                        Obj.isNilReturn = Convert.IsDBNull(row["isNilReturn"]) ? false : bool.Parse(row["isNilReturn"].ToString());
+                        Obj.IsImportFromBEMA = bool.Parse(row["IsImportFromBEMA"].ToString());
+                        Obj.Notes = Convert.IsDBNull(row["Notes"]) ? null : row["Notes"].ToString();
+                        listDVOC3Header.Add(Obj);
+                        //A/ if (employeec || (smonth == Obj.period_Month && syear == Obj.Period_year))
+                        if (Obj.IsPaid && Obj.IsImportFromBEMA == false && Obj.Period_year == DateTime.Now.Year.ToString()/*&& Obj.Is_submitted*/)
+                        {
+                            var EmployeesContribution = "C3 Contribution - " + MonthName(row["PERIODD_MONTH"].ToString());
+                            // if (Obj.IsImportFromBEMA)
+                            //total_con += Obj.TOTALSSCONTRIBUTIONS + Obj.TOTALLEVYEEEMPLOYEE + Obj.TOTALSERVAYANCE + Obj.TOTALPEPENALTY + Obj.TOTALSSPENALTY + Obj.TOTALLEVYEEPENALTY;// + Obj.TOTALLEVYEEEMPLOYER;
+                            //else
+                            total_con += Obj.TOTALSSCONTRIBUTIONS + Obj.TOTALLEVYEEEMPLOYEE + Obj.TOTALSERVAYANCE + Obj.TOTALPEPENALTY + Obj.TOTALSSPENALTY + Obj.TOTALLEVYEEPENALTY + Obj.TOTALLEVYEEEMPLOYER;
+                            employeec = false;
+                            smonth = smonth == null ? Obj.period_Month : smonth;
+                            syear = syear == null ? Obj.Period_year : syear;
+
+                            returnData.Add(new PayPeriod1 { Key = "EmployeesContribution", Value = EmployeesContribution });
+                        }
+
+                        else if (Obj.Period_year == DateTime.Now.Year.ToString() /*&& Obj.Is_submitted */&& Obj.IsImportFromBEMA == false)
+                        {
+                            unPaid += Obj.TOTALSSCONTRIBUTIONS + Obj.TOTALLEVYEEEMPLOYEE + Obj.TOTALSERVAYANCE + Obj.TOTALPEPENALTY + Obj.TOTALSSPENALTY + Obj.TOTALLEVYEEPENALTY + Obj.TOTALLEVYEEEMPLOYER;
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+                //}
+                //total.Text = "$" + total_con;
+                //Pendingc3.Text = Pendingc3count + " Regular employees Remittance(s) not submitted to SSB";
+
+                returnData.Add(new PayPeriod1 { Key = "total", Value = "$" + total_con.ToString("F2") });
+                returnData.Add(new PayPeriod1 { Key = "paidMonths", Value = string.Join(" ,", listDVOC3Header.Where(e => e.IsPaid && e.IsImportFromBEMA == false).Select(e => e.period_Month).Distinct()) });
+
+                returnData.Add(new PayPeriod1 { Key = "unPaid", Value = "$" + unPaid.ToString("F2") });
+                returnData.Add(new PayPeriod1 { Key = "unPaidMonths", Value = string.Join(" ,", listDVOC3Header.Where(e => !e.IsPaid && e.IsImportFromBEMA == false).Select(e => e.period_Month).Distinct()) });
+
+                returnData.Add(new PayPeriod1 { Key = "Pendingc3", Value = Pendingc3count + " Regular employees Remittance(s) not submitted to SSB" });
+
+                if (Pendingc3count > 0)
+                {
+                    // Pendingc3.Foreground = Brushes.Red;
+                    returnData.Add(new PayPeriod1 { Key = "Pendingc3Foreground", Value = "Red" });
+                }
+                else
+                {
+                    // Pendingc3.Foreground = Brushes.Black;
+                    returnData.Add(new PayPeriod1 { Key = "Pendingc3Foreground", Value = "black" });
+                }
+
+
+
+                var DVOC3Header = listDVOC3Header.Select(obj => new
+                {
+                    HeaderID = obj.HeaderID,
+                    RegNo = obj.RegNo,
+                    period_Month = obj.period_Month,
+                    Period_year = obj.Period_year,
+                    TOTAL_WAGES = obj.TOTAL_WAGES,
+                    TOTALSSCONTRIBUTIONS = obj.TOTALSSCONTRIBUTIONS,
+                    TOTALLEVYEEEMPLOYEE = obj.TOTALLEVYEEEMPLOYEE,
+                    TOTALSERVAYANCE = obj.TOTALSERVAYANCE,
+                    TOTALLEVYEEEMPLOYER = obj.TOTALLEVYEEEMPLOYER,
+                    Insert_Datetimeinfo = obj.Insert_Datetimeinfo,
+                    Is_Fianalize = obj.Is_Fianalize,
+                    Is_submitted = obj.Is_submitted,
+                    C3_IsFinalized = obj.C3_IsFinalized,
+                    IsUnLocked = obj.IsUnLocked,
+                    IssubmittedShow = obj.IssubmittedShow,
+                    Issubmittedcolor = obj.Issubmittedcolor,
+                    IssubmittedShowimg = obj.IssubmittedShowimg,
+                    C3submittedShow = obj.C3submittedShow,
+                    C3submittedShowimg = obj.C3submittedShowimg,
+                    Schedule_NO = obj.Schedule_NO,
+                    p_Month = obj.p_Month,
+                    TOTALPEPENALTY = obj.TOTALPEPENALTY,
+                    TOTALSSPENALTY = obj.TOTALSSPENALTY,
+                    TOTALLEVYEEPENALTY = obj.TOTALLEVYEEPENALTY,
+                    TotalSSBpenanlity = obj.TOTALPEPENALTY + obj.TOTALSSPENALTY + obj.TOTALLEVYEEPENALTY,
+                    ispaid = obj.IsPaid,
+                    IsImportFromBEMA = obj.IsImportFromBEMA,
+                    payAmt = obj.TOTALSSCONTRIBUTIONS + obj.TOTALPEPENALTY + obj.TOTALSSPENALTY + obj.TOTALLEVYEEPENALTY + obj.TOTALLEVYEEEMPLOYEE + obj.TOTALSERVAYANCE
+                    + (obj.IsImportFromBEMA ? 0 : obj.TOTALLEVYEEEMPLOYER),
+                    IsPaidStatus = obj.IsPaidStatus,
+                    obj.isNilReturn,
+                    obj.Notes
+                });
+
+
+                var TOTALSSCONTRIBUTIONS = listDVOC3Header[0].TOTALSSCONTRIBUTIONS;
+                var TOTALPEPENALTY = listDVOC3Header[0].TOTALPEPENALTY;
+                var TOTALSSPENALTY = listDVOC3Header[0].TOTALSSPENALTY;
+                var TOTALLEVYEEPENALTY = listDVOC3Header[0].TOTALLEVYEEPENALTY;
+                var TOTALLEVYEEEMPLOYEE = listDVOC3Header[0].TOTALLEVYEEEMPLOYEE;
+
+
+                // if (ResultArea == "R")
+                // {
+                //   DVOC3Header = DVOC3Header.AsEnumerable();
+
+                //   if (Year != null && Year > 0 && StartMonths != null && StartMonths > 0 &&
+                //endYear != null && endYear > 0 && endMonths != null && endMonths > 0)
+                //   {
+                //     DateTime startDate0 = new DateTime(Year.Value, StartMonths.Value, 1);
+                //     DateTime endDate0 = new DateTime(endYear.Value, endMonths.Value, DateTime.DaysInMonth(endYear.Value, endMonths.Value));
+
+                //     DVOC3Header = DVOC3Header.Where(p =>
+                //     {
+                //       int year = Convert.ToInt32(p.Period_year);
+                //       int month = Convert.ToInt32(p.p_Month);
+                //       DateTime periodDate = new DateTime(year, month, 1);
+
+                //       return periodDate >= startDate0 && periodDate <= endDate0;
+                //     });
+                //   }
+                // }
+                if (ResultArea == "R")
+                {
+                    DateTime? startDate0 = null;
+                    DateTime? endDate0 = null;
+
+                    //if (StartYear != null && StartMonths != null)
+                    //{
+                    //    startDate0 = new DateTime(StartYear.Value, StartMonths.Value, 1);
+                    //}
+                    //else if (StartYear != null)
+                    //{
+                    //    startDate0 = new DateTime(StartYear.Value, 1, 1);
+                    //}
+
+                    //if (EndYear != null && endMonths != null)
+                    //{
+                    //    endDate0 = new DateTime(EndYear.Value, endMonths.Value, DateTime.DaysInMonth(EndYear.Value, endMonths.Value));
+                    //}
+                    //else if (EndYear != null)
+                    //{
+                    //    endDate0 = new DateTime(EndYear.Value, 12, 31);
+                    //}
+
+                    if (StartYear != null)
+                    {
+                        if (StartMonths != null)
+                            startDate0 = new DateTime(StartYear.Value, StartMonths.Value, 1);
+                        else
+                            startDate0 = new DateTime(StartYear.Value, 1, 1); // Defaults to Jan if month missing
+                    }
+
+                    // Rule: Determine End Date (show until this point)
+                    if (EndYear != null)
+                    {
+                        if (endMonths != null)
+                            endDate0 = new DateTime(EndYear.Value, endMonths.Value, DateTime.DaysInMonth(EndYear.Value, endMonths.Value));
+                        else
+                            endDate0 = new DateTime(EndYear.Value, 12, 31); // Defaults to Dec if month missing
+                    }
+
+                    // --- DVOC3Header Filtering ---
+                    if (DVOC3Header != null)
+                    {
+                        DVOC3Header = DVOC3Header.AsEnumerable();
+
+                        if (startDate0 != null || endDate0 != null)
+                        {
+                            DVOC3Header = DVOC3Header.Where(p =>
+                            {
+                                int year = Convert.ToInt32(p.Period_year);
+                                int month = Convert.ToInt32(p.p_Month);
+                                DateTime periodDate = new DateTime(year, month, 1);
+
+                                return (!startDate0.HasValue || periodDate >= startDate0.Value) &&
+           (!endDate0.HasValue || periodDate <= endDate0.Value);
+                            }).ToList();
+                        }
+                    }
+                }
+
+                returnData.Add(new PayPeriod1 { Key = "dashboard_list", Value = JsonConvert.SerializeObject(DVOC3Header) });
+                //dashboard_list.ItemsSource = listDVOC3Header;
+                //dashboard_list.SelectedIndex = -1;
+                //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(dashboard_list.ItemsSource);
+                // PropertyGroupDescription groupDescription = new PropertyGroupDescription("Period_year");
+                //view.GroupDescriptions.Add(groupDescription);
+            }
+            else
+            {
+
+                //dashboard_list.ItemsSource = null;
+                //total.Text = "$" + 0;
+                //Pendingc3.Text = 0 + " Regular employees Remittance(s) not submitted to SSB";
+                //Pendingc3.Foreground = Brushes.Black;
+                returnData.Add(new PayPeriod1 { Key = "dashboard_list", Value = null });
+                returnData.Add(new PayPeriod1 { Key = "total", Value = "$" + 0 });
+                returnData.Add(new PayPeriod1 { Key = "Pendingc3", Value = 0 + " Regular employees Remittance(s) not submitted to SSB" });
+                returnData.Add(new PayPeriod1 { Key = "Pendingc3Foreground", Value = "Black" });
+            }
+
+            List<C3Header> Director_listDVOC3Header = new List<C3Header>();
+            SqlConnection Director_staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection;
+            SqlCommand Director_cmd = new SqlCommand("Get_Director_C3_Genrated_data", staticConnection);
+            Director_cmd.CommandType = CommandType.StoredProcedure;
+            Director_cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+            SqlDataAdapter Director_sqlAdapter = new SqlDataAdapter(Director_cmd);
+            DataTable Director_dt = new DataTable();
+            Director_sqlAdapter.Fill(Director_dt);
+            if (Director_dt.Rows.Count > 0)
+            {
+                int D3count = 0;
+                int Pendingc3count = 0;
+                foreach (DataRow row in Director_dt.Rows)
+                {
+                    D3count++;
+                    bool issubmited = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                    string period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+                    string Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                    if (!issubmited)
+                    {
+                        Pendingc3count++;
+                        pendingdirc3 = pendingdirc3 + " " + period_Month + " " + Period_year + ",";
+                    }
+
+                    if (issubmited && period_Month == MonthName((startDate.Month).ToString()) && Period_year == startDate.Year.ToString())
+                    {
+                        IsLastmonthDirC3Submitted = true;
+                    }
+                    if (D3count <= 12)
+                    {
+                        bool isfinalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                        if (true)//isfinalize == true)
+                        {
+                            C3Header Director_Obj = new C3Header();
+                            Director_Obj.HeaderID = Convert.IsDBNull(row["C3HEADERID"]) ? 0 : int.Parse(row["C3HEADERID"].ToString());
+                            Director_Obj.RegNo = Convert.IsDBNull(row["RegNo"]) ? null : row["RegNo"].ToString();
+                            Director_Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? 0 : Convert.ToInt32(row["PERIODD_MONTH"]);
+                            Director_Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+                            Director_Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                            Director_Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+                            Director_Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+                            Director_Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+                            Director_Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+                            Director_Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                            Director_Obj.Is_submitted = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                            Director_Obj.C3_IsFinalized = Convert.IsDBNull(row["C3_IsFinalized"]) ? false : bool.Parse(row["C3_IsFinalized"].ToString());
+                            Director_Obj.IsUnLocked = Convert.IsDBNull(row["IsUnLocked"]) ? false : bool.Parse(row["IsUnLocked"].ToString());
+                            Director_Obj.IsUnLocked = !Director_Obj.IsUnLocked;
+                            Director_Obj.IssubmittedShow = (bool)Director_Obj.Is_submitted ? "C3 Submitted" : "C3 not Submitted";
+                            Director_Obj.Issubmittedcolor = (bool)Director_Obj.Is_submitted ? "Black" : "Red";
+                            Director_Obj.IssubmittedShowimg = (bool)Director_Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+                            Director_Obj.C3submittedShow = (bool)Director_Obj.Is_submitted ? "Resubmit C3" : "Submit C3";
+                            Director_Obj.C3submittedShowimg = (bool)Director_Obj.Is_submitted ? "/Images/restore.png" : "/Images/finalyze20x20.png";
+                            Director_Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                            Director_Obj.TOTALPEPENALTY = Convert.IsDBNull(row["TOTAL_PEPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_PEPENALTY"].ToString())));
+                            Director_Obj.TOTALSSPENALTY = Convert.IsDBNull(row["TOTAL_SSPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSPENALTY"].ToString())));
+                            Director_Obj.TOTALLEVYEEPENALTY = Convert.IsDBNull(row["TOTAL_LEVYEEPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEPENALTY"].ToString())));
+                            Director_Obj.IsPaid = _DbContext.OnlinePayments.Any(e => e.C3HeaderId == Director_Obj.HeaderID && (e.PaymentStatus == "AUTHORIZED" || e.PaymentStatus == "Offline Payment"));
+                            Director_Obj.isNilReturn = Convert.IsDBNull(row["isNilReturn"]) ? false : bool.Parse(row["isNilReturn"].ToString());
+                            var Paymentdetails = _DbContext.OnlinePayments.Where(e => e.C3HeaderId == Director_Obj.HeaderID && e.IsActive && e.TransactionFor != "Self").OrderByDescending(f => f.Id).Select(r => new { r.PaymentStatus });
+                            Director_Obj.IsPaid = Paymentdetails.Any(e => e.PaymentStatus == "AUTHORIZED" || e.PaymentStatus == "Offline Payment");
+                            Director_Obj.IsPaidStatus = Paymentdetails?.FirstOrDefault()?.PaymentStatus;
+                            Director_Obj.Notes = Convert.IsDBNull(row["Notes"]) ? null : row["Notes"].ToString();
+                            Director_Obj.IsImportFromBEMA = bool.Parse(row["IsImportFromBEMA"].ToString());
+                            Director_listDVOC3Header.Add(Director_Obj);
+                            //if (directorc || (dsmonth == Director_Obj.period_Month && dsyear == Director_Obj.Period_year))
+                            if (Director_Obj.IsPaid && Director_Obj.Period_year == DateTime.Now.Year.ToString() && Director_Obj.IsImportFromBEMA == false)
+                            {
+                                var DirectorsContribution = "NW Director Contribution - " + MonthName(row["PERIODD_MONTH"].ToString());
+                                Director_total_con += Director_Obj.TOTALSSCONTRIBUTIONS + Director_Obj.TOTALLEVYEEEMPLOYEE + Director_Obj.TOTALLEVYEEPENALTY;
+                                directorc = false;
+                                dsmonth = dsmonth == null ? Director_Obj.period_Month : dsmonth;
+                                dsyear = dsyear == null ? Director_Obj.Period_year : dsyear;
+
+                                returnData.Add(new PayPeriod1 { Key = "DirectorsContribution", Value = DirectorsContribution });
+
+                            }
+
+                            else if (Director_Obj.Period_year == DateTime.Now.Year.ToString() /*&& Obj.Is_submitted */&& Director_Obj.IsImportFromBEMA == false)
+                            {
+                                unPaidDir += Director_Obj.TOTALSSCONTRIBUTIONS + Director_Obj.TOTALLEVYEEEMPLOYEE + Director_Obj.TOTALLEVYEEPENALTY;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                    }
+                }
+                //Director_total.Text = "$" + Director_total_con;
+                //DirectorsPendingC3.Text = Pendingc3count + " Non-Working Director Remittance(s) not submitted to SSB";
+
+                returnData.Add(new PayPeriod1 { Key = "Director_total", Value = "$" + Director_total_con.ToString("F2") });
+                returnData.Add(new PayPeriod1 { Key = "unPaidDir", Value = "$" + unPaidDir.ToString("F2") });
+                returnData.Add(new PayPeriod1 { Key = "unPaidMonthsDir", Value = string.Join(" ,", Director_listDVOC3Header.Where(e => !e.IsPaid).Select(e => e.period_Month).Distinct()) });
+                returnData.Add(new PayPeriod1 { Key = "paidMonthsDir", Value = string.Join(" ,", Director_listDVOC3Header.Where(e => e.IsPaid).Select(e => e.period_Month).Distinct()) });
+
+                returnData.Add(new PayPeriod1 { Key = "DirectorsPendingC3", Value = Pendingc3count + " Non-Working Director Remittance(s) not submitted to SSB" });
+                if (Pendingc3count > 0)
+                {
+                    //DirectorsPendingC3.Foreground = Brushes.Red;
+                    returnData.Add(new PayPeriod1 { Key = "DirectorsPendingC3Foreground", Value = "Red" });
+                }
+                else
+                {
+                    //DirectorsPendingC3.Foreground = Brushes.Black;
+                    returnData.Add(new PayPeriod1 { Key = "DirectorsPendingC3Foreground", Value = "Black" });
+                }
+
+                //Director_dashboard_list.ItemsSource = Director_listDVOC3Header;
+                //Director_dashboard_list.SelectedIndex = -1;
+                //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(Director_dashboard_list.ItemsSource);
+                //PropertyGroupDescription groupDescription = new PropertyGroupDescription("Period_year");
+                //view.GroupDescriptions.Add(groupDescription);
+
+
+                var Director = Director_listDVOC3Header.Select(obj => new
+                {
+                    HeaderID = obj.HeaderID,
+                    RegNo = obj.RegNo,
+                    period_Month = obj.period_Month,
+                    p_Month = obj.p_Month,
+                    Period_year = obj.Period_year,
+                    TOTAL_WAGES = obj.TOTAL_WAGES,
+                    TOTALSSCONTRIBUTIONS = obj.TOTALSSCONTRIBUTIONS,
+                    TOTALLEVYEEEMPLOYEE = obj.TOTALLEVYEEEMPLOYEE,
+                    TOTALSERVAYANCE = obj.TOTALSERVAYANCE,
+                    Insert_Datetimeinfo = obj.Insert_Datetimeinfo,
+                    Is_Fianalize = obj.Is_Fianalize,
+                    Is_submitted = obj.Is_submitted,
+                    C3_IsFinalized = obj.C3_IsFinalized,
+                    IsUnLocked = obj.IsUnLocked,
+                    IssubmittedShow = obj.IssubmittedShow,
+                    Issubmittedcolor = obj.Issubmittedcolor,
+                    IssubmittedShowimg = obj.IssubmittedShowimg,
+                    C3submittedShow = obj.C3submittedShow,
+                    C3submittedShowimg = obj.C3submittedShowimg,
+                    Schedule_NO = obj.Schedule_NO,
+                    TOTALPEPENALTY = obj.TOTALPEPENALTY,
+                    TOTALSSPENALTY = obj.TOTALSSPENALTY,
+                    TOTALLEVYEEPENALTY = obj.TOTALLEVYEEPENALTY,
+                    TotalSSBpenanlity = obj.TOTALLEVYEEPENALTY,
+                    ispaid = obj.IsPaid,
+                    IsImportFromBEMA = obj.IsImportFromBEMA,
+                    payAmt = obj.TOTALLEVYEEPENALTY + obj.TOTALLEVYEEEMPLOYEE,
+                    IsPaidStatus = obj.IsPaidStatus,
+                    obj.isNilReturn,
+                    obj.Notes
+                });
+
+
+                //if (ResultArea == "R")
+                //{
+                //    Director = Director.AsEnumerable();
+
+                //    if (Year != null && Year > 0 && StartMonths != null && StartMonths > 0 &&
+                //  endYear != null && endYear > 0 && endMonths != null && endMonths > 0)
+                //    {
+                //        DateTime startDate1 = new DateTime(Year.Value, StartMonths.Value, 1);
+                //        DateTime endDate1 = new DateTime(endYear.Value, endMonths.Value, DateTime.DaysInMonth(endYear.Value, endMonths.Value));
+
+                //        Director = Director.Where(p =>
+                //        {
+                //            int year = Convert.ToInt32(p.Period_year);
+                //            int month = Convert.ToInt32(p.p_Month);
+                //            DateTime periodDate = new DateTime(year, month, 1);
+
+                //            return periodDate >= startDate1 && periodDate <= endDate1;
+                //        }).ToList();
+                //    }
+                //}
+                if (ResultArea == "R")
+                {
+                    DateTime? startDate0 = null;
+                    DateTime? endDate0 = null;
+
+                    //if (StartYear != null && StartMonths != null)
+                    //{
+                    //    startDate0 = new DateTime(StartYear.Value, StartMonths.Value, 1);
+                    //}
+                    //else if (StartYear != null)
+                    //{
+                    //    startDate0 = new DateTime(StartYear.Value, 1, 1);
+                    //}
+
+                    //if (EndYear != null && endMonths != null)
+                    //{
+                    //    endDate0 = new DateTime(EndYear.Value, endMonths.Value, DateTime.DaysInMonth(EndYear.Value, endMonths.Value));
+                    //}
+                    //else if (EndYear != null)
+                    //{
+                    //    endDate0 = new DateTime(EndYear.Value, 12, 31);
+                    //}
+                    if (StartYear != null)
+                    {
+                        if (StartMonths != null)
+                            startDate0 = new DateTime(StartYear.Value, StartMonths.Value, 1);
+                        else
+                            startDate0 = new DateTime(StartYear.Value, 1, 1); // Defaults to Jan if month missing
+                    }
+
+                    // Rule: Determine End Date (show until this point)
+                    if (EndYear != null)
+                    {
+                        if (endMonths != null)
+                            endDate0 = new DateTime(EndYear.Value, endMonths.Value, DateTime.DaysInMonth(EndYear.Value, endMonths.Value));
+                        else
+                            endDate0 = new DateTime(EndYear.Value, 12, 31); // Defaults to Dec if month missing
+                    }
+                    if (Director != null)
+                    {
+                        Director = Director.AsEnumerable();
+
+                        if (startDate0 != null || endDate0 != null)
+                        {
+                            Director = Director.Where(p =>
+                            {
+                                int year = Convert.ToInt32(p.Period_year);
+                                int month = Convert.ToInt32(p.p_Month);
+                                DateTime periodDate = new DateTime(year, month, 1);
+
+                                //return periodDate >= startDate0 && periodDate <= endDate0;
+                                return (!startDate0.HasValue || periodDate >= startDate0.Value) &&
+           (!endDate0.HasValue || periodDate <= endDate0.Value);
+                            }).ToList();
+                        }
+                    }
+                }
+                returnData.Add(new PayPeriod1 { Key = "Director_dashboard_list", Value = JsonConvert.SerializeObject(Director) });
+
+            }
+            else
+            {
+
+                //Director_dashboard_list.ItemsSource = null;
+                //Director_total.Text = "$" + 0;
+                //DirectorsPendingC3.Text = 0 + " Non-Working Director Remittance(s) not submitted to SSB";
+                //DirectorsPendingC3.Foreground = Brushes.Black;
+
+                returnData.Add(new PayPeriod1 { Key = "Director_dashboard_list", Value = null });
+                returnData.Add(new PayPeriod1 { Key = "Director_total", Value = "$" + 0.00.ToString("F2") });
+                returnData.Add(new PayPeriod1 { Key = "unPaidDir", Value = "$" + unPaidDir.ToString("F2") });
+                returnData.Add(new PayPeriod1 { Key = "DirectorsPendingC3", Value = 0 + " Non-Working Director Remittance(s) not submitted to SSB" });
+                returnData.Add(new PayPeriod1 { Key = "DirectorsPendingC3Foreground", Value = "Black" });
+            }
+
+            return returnData;
+            //if(!IsPendingc3MessageNeedtoshow)
+            //{
+            //  //Application.Current.Properties["IsPendingc3MessageNeedtoshow"] = true;
+            //  string message = pendingempc3 != "" ? pendingempc3 + " C3 remittance(s) pending \n" : "";
+            //  message = pendingdirc3 != "" ? pendingempc3 != "" ? message + " & " + pendingdirc3 + " Non-Working Director Wages pending \n" : pendingdirc3 + " Non- Working Director Wages pending \n" : message;
+            //  if (!IsLastmonthEMPC3Submitted || !IsLastmonthDirC3Submitted)
+            //  {
+            //    if (endDate <= DateTime.Now)
+            //    {
+            //      message = !IsLastmonthEMPC3Submitted ? MonthName((startDate.Month).ToString()) + " " + startDate.Year.ToString() + ", C3 remittance(s) pending" : "";
+            //      message = !IsLastmonthDirC3Submitted ? !IsLastmonthEMPC3Submitted ? message + " & Non- Working Director Wages pending" : MonthName((startDate.Month).ToString()) + " " + startDate.Year.ToString() + ", Non- Working Director Wages pending" : message;
+
+            //    }
+            //  }
+
+            //  message = message != "" ? message + "\nPlease verify and submit." : "";
+            //  if (message != "")
+            //  {
+            //    Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            //    C3WizardMessageBox.Show("C3 Wizard", message);
+            //    Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+            //  }
+
+            //}
+        }
+
+        public async Task<string?> getNotesC3(int headerid,string type)
+        {
+            if (type=="comp")
+            {
+                return await _DbContext.ProcessC3headers.Where(x => x.C3headerid == headerid)
+                               .Select(x => x.Notes).FirstOrDefaultAsync(); 
+            }
+            else
+            {
+                return await _DbContext.ProcessSelfEmployedC3s.Where(x => x.Sec3id == headerid)
+                             .Select(x => x.Notes).FirstOrDefaultAsync();
+            }
+        }
+
+        public async Task<bool> statusChangeMainC3Table(int headerid, int companyid, string notes,int userId,string type)
+        {
+            var paymentchk = _DbContext.OnlinePayments?.Where(e => e.C3HeaderId == headerid).ToList();
+            if (paymentchk!.All(e=>e.PaymentStatus!= "AUTHORIZED"))
+            {
+                if (type=="comp")
+                {
+                    var header = _DbContext.ProcessC3headers?.FirstOrDefault(e => e.C3headerid == headerid && e.EmployerId == companyid);
+                    
+                    if (header != null )
+                    {
+
+                        var username = _DbContext.Secusers?.Where(x => x.UserId == userId)?.Select(x => x.FirstName + " " + x.LastName)?.FirstOrDefault();
+                        string newEntry = $"{DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToLower()}, by {username}, {header.IsSubmitted} ---> {false}, {notes?.Trim()}";
+                        if (string.IsNullOrEmpty(header.Notes))
+                        {
+                            header.Notes = newEntry;
+                        }
+                        else
+                        {
+                            header.Notes += "," + newEntry;
+                        }
+
+                        header.IsSubmitted = false;
+                        header.EditPermittedBy = userId;
+                        header.IsSentForEdit = true;
+                        header.SentOnForEdit = DateTime.Now;
+
+                        var details = _DbContext.ProcessContributions.Where(e => e.C3headerid == header.C3headerid).ToList();
+
+                        if ( details != null && details.Any())
+                        {
+                            foreach (var item in details)
+                            {
+                                item.IsSubmitted = false;
+
+                            } 
+                        }
+
+                        _DbContext.SaveChanges();
+                        return true;
+                    }  
+                }
+                if(type=="self")
+                {
+                    var header = _DbContext.ProcessSelfEmployedC3s?.FirstOrDefault(e => e.Sec3id == headerid);
+                    
+                    if (header != null)
+                    {
+
+                        var username = _DbContext.Secusers?.Where(x => x.UserId == userId)?.Select(x => x.FirstName + " " + x.LastName)?.FirstOrDefault();
+                        string newEntry = $"{DateTime.Now.ToString("dd/MMM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToLower()}, by {username}, {header.IsSubmitted} ---> {false}, {notes?.Trim()}";
+                        if (string.IsNullOrEmpty(header.Notes))
+                        {
+                            header.Notes = newEntry;
+                        }
+                        else
+                        {
+                            header.Notes += "," + newEntry;
+                        }
+
+                        header.IsSubmitted = false;
+                        header.EditPermittedBy = userId;
+                        header.IsSentForEdit = true;
+                        header.SentOnForEdit = DateTime.Now;
+
+                        _DbContext.SaveChanges();
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
+        public string MonthName(string m_no)
+        {
+            string Month = "";
+            switch (m_no)
+            {
+                //case "1" or "0":
+                //    Month = "January";
+                //    break;
+                case "1":
+                    Month = "January";
+                    break;
+                case "2":
+                    Month = "February";
+                    break;
+                case "3":
+                    Month = "March";
+                    break;
+                case "4":
+                    Month = "April";
+                    break;
+                case "5":
+                    Month = "May";
+                    break;
+                case "6":
+                    Month = "June";
+                    break;
+                case "7":
+                    Month = "July";
+                    break;
+                case "8":
+                    Month = "August";
+                    break;
+                case "9":
+                    Month = "September";
+                    break;
+                case "10":
+                    Month = "October";
+                    break;
+                case "11":
+                    Month = "November";
+                    break;
+                case "12":
+                    Month = "December";
+                    break;
+                default:
+                    Month = string.Empty;
+                    break;
+            }
+
+
+            return Month;
+        }
+
+        public async Task<List<MenuItem>> MenuList(int roleId)
+        {
+
+
+            var rolecategoryName = _DbContext.Secroles.FirstOrDefault(x => x.RoleId == roleId)?.roleCategory;
+
+            int ModuleTypeId = 0;
+            if (rolecategoryName == roleCategory.Company.ToString())
+            {
+                ModuleTypeId = 1;
+            }
+            else if (rolecategoryName == roleCategory.SSB.ToString())
+            {
+                ModuleTypeId = 3;
+            }
+            else
+            {
+                ModuleTypeId = 2;
+            }
+
+            var Model = (from c in _DbContext.Secmodules.Where(x => x.IsActive == true && x.ModuleTypeId == ModuleTypeId)
+                         join p in _DbContext.SecuserModules.Where(x => x.RoleId == roleId && x.IsActive) on c.ModuleId equals p.ModuleId into ps
+                         from p in ps.DefaultIfEmpty()
+                         select new MenuItem
+                         {
+                             roleId = roleId,
+                             title = c.Module,
+                             Description = c.Description,
+                             ParentId = c.ParentId,
+                             href = c.PageUrl,
+                             icon = c.icon,
+                             Id = c.ModuleId,
+                             UpdatePermission = p.UpdatePermission == null ? false : (bool)p.UpdatePermission,
+                             AddPermission = p.AddPermission == null ? false : (bool)p.AddPermission,
+                             ViewPermission = p.ViewPermission == null ? false : (bool)p.ViewPermission,
+                             DeletePermission = p.DeletePermission == null ? false : (bool)p.DeletePermission,
+                             Is_Submitted = p.Is_Submitted == null ? false : (bool)p.Is_Submitted,
+                             Is_Print = p.Is_Print == null ? false : (bool)p.Is_Print,
+                             Is_preview = p.Is_preview == null ? false : (bool)p.Is_preview,
+                             Is_pay = p.Is_pay == null ? false : (bool)p.Is_pay,
+                             Is_wages = p.Is_wages == null ? false : (bool)p.Is_wages,
+                             //OrderNo = c.OrderNo,
+                             Level = c.Level,
+                         }).OrderBy(t => t.Level).ThenBy(t => t.Id).ToList();
+
+            Model.ForEach(e => { e.children = Model.Where(q => q.ParentId == e.Id).ToList(); e.collapisble = Model.Any(q => q.ParentId == e.Id); });
+            Model.RemoveAll(e => e.ParentId != 0);
+            //Model.OrderBy(t => t.Level);//.ThenBy(t => t.Id);
+            return Model;
+
+
+
+
+
+            //XmlSerializer serializer1 = new XmlSerializer(typeof(MenuItemsXml));
+            //using (StreamReader reader = new StreamReader(filePath))
+            //{
+            //  var person = (MenuItemsXml)serializer1.Deserialize(reader);
+
+            //  List<MenuItem> menuItems = new List<MenuItem>();
+            //  foreach (var sheet in person.Worksheet.Where(e => e.Table.Row.Count() > 0))
+            //  {
+            //    if (sheet.Table.Row != null && sheet.Table.Row.Count > 1)
+            //    {
+            //      var headerRow = sheet.Table.Row[0];
+            //      Dictionary<int, string> columnKeys = new Dictionary<int, string>();
+
+            //      for (int i = 0; i < headerRow.Cell.Count; i++)
+            //      {
+            //        if (!string.IsNullOrWhiteSpace(headerRow.Cell[i].Data.Text))
+            //        {
+            //          columnKeys[i] = headerRow.Cell[i].Data.Text;
+            //        }
+            //      }
+
+            //      for (int r = 1; r < sheet.Table.Row.Count; r++)
+            //      {
+            //        var row = sheet.Table.Row[r];
+            //        MenuItem item = new MenuItem();
+
+            //        for (int c = 0; c < row.Cell.Count; c++)
+            //        {
+            //          if (columnKeys.ContainsKey(c))
+            //          {
+            //            string key = columnKeys[c];
+            //            string value = row.Cell[c].Data.Text;
+
+            //            if (key.Equals("id", StringComparison.OrdinalIgnoreCase)) item.Id = int.Parse(value);
+            //            else if (key.Equals("menuname", StringComparison.OrdinalIgnoreCase)) item.MenuName = value;
+            //            else if (key.Equals("order", StringComparison.OrdinalIgnoreCase)) item.Order = int.Parse(value);
+            //            else if (key.Equals("parentid", StringComparison.OrdinalIgnoreCase)) item.ParentId = string.IsNullOrEmpty(value) ? (int?)null : int.Parse(value);
+            //            else if (key.Equals("isactive", StringComparison.OrdinalIgnoreCase)) item.IsActive = int.Parse(value);
+            //            else if (key.Equals("Admin", StringComparison.OrdinalIgnoreCase)) item.Admin = int.Parse(value);
+            //            else if (key.Equals("AdminUser", StringComparison.OrdinalIgnoreCase)) item.AdminUser = int.Parse(value);
+            //            else if (key.Equals("Company", StringComparison.OrdinalIgnoreCase)) item.Company = int.Parse(value);
+            //            else if (key.Equals("CompanyUser", StringComparison.OrdinalIgnoreCase)) item.CompanyUser = int.Parse(value);
+            //            else if (key.Equals("SelfEmployed", StringComparison.OrdinalIgnoreCase)) item.SelfEmployed = int.Parse(value);
+            //            else if (key.Equals("SelfEmployedUser", StringComparison.OrdinalIgnoreCase)) item.SelfEmployedUser = int.Parse(value);
+
+            //          }
+            //        }
+            //        menuItems.Add(item);
+            //      }
+
+            //    }
+            //  }
+
+            //  var data = menuItems.Where(e => e.ParentId == 0 && e.IsActive == 1 && (e.Admin == roleId || e.AdminUser == roleId || e.Company == roleId || e.CompanyUser == roleId || e.SelfEmployed == roleId || e.SelfEmployedUser == roleId)).Select(e => new MenuItem { Id = e.Id, MenuName = e.MenuName, MenuItemList = e.MenuItemList, Order = e.Order }).ToList();
+            //  data.ForEach(e => e.MenuItemList = menuItems.Where(q => q.ParentId == e.Id).ToList());
+            //  return data;
+            //}
+
+        }
+
+
+        public async Task<string> SaveOrUpdateROles(List<MenuItem> menuList)
+        {
+
+            int RoleID = 0;
+            if (menuList != null)
+            {
+                RoleID = menuList[0].roleId;
+                //var result = _DbContext.SecuserModules.Where(x => x.RoleId == RoleID && x.IsActive == true).ToList();
+                //if (!result.Any())
+                //{
+                //  var vmodel = _DbContext.Secmodules.Where(x => x.IsActive == true).ToList();
+                //  foreach (var item in vmodel)
+                //  {
+                //    var rmodel = new SecuserModule();
+                //    rmodel.RoleId = RoleID;
+                //    rmodel.ModuleId = item.ModuleId;
+                //    rmodel.IsActive = true; 
+                //    _DbContext.Entry(rmodel).State = EntityState.Added;
+                //  }
+                //  _DbContext.SaveChanges();
+                //}
+
+                // menuList = menuList.Concat(menuList.SelectMany(e => e.children)).ToList();
+                foreach (var items in menuList)
+                {
+                    var results = _DbContext.SecuserModules.Where(x => x.RoleId == RoleID && x.ModuleId == items.Id && x.IsActive == true).FirstOrDefault();
+                    if (results != null)
+                    {
+
+                        //results.ViewPermission = items.ViewPermission;
+                        //results.EditPermission = items.EditPermission;
+                        results.AddPermission = items.AddPermission;
+                        results.UpdatePermission = items.UpdatePermission;
+                        results.DeletePermission = items.DeletePermission;
+                        results.Is_Print = items.Is_Print;
+                        results.Is_Submitted = items.Is_Submitted;
+                        results.ViewPermission = items.ViewPermission;
+                        results.Is_preview = items.Is_preview;
+                        results.Is_pay = items.Is_pay;
+                        results.Is_wages = items.Is_wages;
+                        results.IsActive = true;
+                        _DbContext.Entry(results).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        results = new SecuserModule()
+                        {
+                            ViewPermission = items.ViewPermission,
+                            Is_Print = items.Is_Print,
+                            Is_Submitted = items.Is_Submitted,
+                            Is_preview = items.Is_preview,
+                            Is_pay = items.Is_pay,
+                            Is_wages = items.Is_wages,
+                            AddPermission = items.AddPermission,
+                            DeletePermission = items.DeletePermission,
+                            UpdatePermission = items.UpdatePermission,
+                            ModuleId = items.Id,
+                            RoleId = RoleID,
+                            IsActive = true
+                        };
+                        _DbContext.SecuserModules.Add(results);
+                    }
+                }
+                _DbContext.SaveChanges();
+
+                return "Roles Permission Saved Successfully.";
+            }
+
+            return "-1";
+
+
+
+            //var secRoleList = new List<SecuserModule>();
+
+            //var updateData = _DbContext.Secmodules.Where(e=>menuList.Any(f=>f.Id== e.ModuleId)).ToList();
+
+
+
+            //foreach (var item in menuList)
+            //{
+            //  var secRole = new SecuserModule
+            //  {
+            //    UserId = item.userId,
+            //    RoleId = item.roleId,
+            //    ModuleId = item.Id,
+            //    AddPermission = item.AddPermission,
+            //    UpdatePermission = item.UpdatePermission,
+            //    DeletePermission = item.DeletePermission,
+            //    InsertedBy = item.userId,
+            //    InsertedOn = DateTime.Now,
+            //    IsActive = true
+            //  };
+            //  secRoleList.Add(secRole);
+            //}
+
+            //_DbContext.SecuserModules.AddRange(secRoleList);
+            //await _DbContext.SaveChangesAsync();
+        }
+
+
+        public async Task<AdminDashboardResponse> AdminDashBoard()
+        {
+
+            var paidUnpaidList = new List<DashboardSummary>();
+            var selfpaidUnpaidList = new List<CompanyPaymentStatus>();
+            var companyStatusList = new List<CompanyPaymentStatus>();
+            using (var connection = C3WizardLayerConn_BaseData.StaticSqlConnection)
+            {
+                await connection.OpenAsync();
+
+                using (var command = new SqlCommand("Get_AdminDashBoardNew", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        // Read first result set (Total Paid & Unpaid by Month)
+
+                        while (await reader.ReadAsync())
+                        {
+                            paidUnpaidList.Add(new DashboardSummary
+                            {
+                                PeriodMonth = MonthName(reader["PERIODD_MONTH"]?.ToString()),
+                                TotalPaid = Convert.ToDecimal(reader["totalPaid"] ?? 0),
+                                TotalUnpaid = Convert.ToDecimal(reader["totalUnpaid"] ?? 0),
+                                Types = reader["Types"]?.ToString(),
+                                year = reader["PERIOD_YEAR"]?.ToString(),
+                                paidEmployer = Convert.ToInt32(reader["PaidEmployer"] ?? 0),
+                                unPaidEmployer = Convert.ToInt32(reader["UnpaidEmployer"] ?? 0),
+
+                            });
+                        }
+                        //var paidAmountC = paidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.ToString("MMMM"))?.TotalPaid;
+                        //var paidAmountP = paidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.AddMonths(-1).ToString("MMMM"))?.TotalPaid;
+
+                        //var unpaidAmountC = paidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.ToString("MMMM"))?.TotalUnpaid;
+                        //var unpaidAmountP = paidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.AddMonths(-1).ToString("MMMM"))?.TotalUnpaid;
+
+
+                        //if (paidAmountP != 0 && paidAmountP != null)
+                        //{
+                        //  var paidPercentage = Math.Round(((paidAmountC ?? 0) - (paidAmountP ?? 0)) * 100 / (paidAmountP ?? 0), 2);
+                        //  paidUnpaidList!.FirstOrDefault()!.paidPercentage = paidPercentage;
+                        //}
+                        //if (unpaidAmountP != 0 && unpaidAmountP != null)
+                        //{
+                        //  var unpaidPercentage = Math.Round((unpaidAmountC ?? 0 - unpaidAmountP ?? 0) * 100 / unpaidAmountP ?? 0, 2);
+                        //  paidUnpaidList!.FirstOrDefault()!.unpaidPercentage = unpaidPercentage;
+                        //}
+
+
+
+
+
+
+
+                        // Move to the second result set (Company Payment Status)
+                        await reader.NextResultAsync();
+                        var request = _httpContextAccessor.HttpContext.Request;
+                        string baseUrl = $"{request.Scheme}://{request.Host}/CompanyLogo/";
+                        while (await reader.ReadAsync())
+                        {
+                            companyStatusList.Add(new CompanyPaymentStatus
+                            {
+                                Types = reader["Types"]?.ToString(),
+                                Paid = Convert.ToDecimal(reader["totalPaid"] ?? 0),
+                                Unpaid = Convert.ToDecimal(reader["totalUnpaid"] ?? 0),
+                                totalNoEmp = Convert.ToInt32(reader["empCount"] ?? 0),
+                                schduleNo = Convert.ToInt32(reader["Schedule_NO"] ?? 0),
+                                PeriodMonth = MonthName(reader["PERIODD_MONTH"]?.ToString()),
+                                year = reader["PERIOD_YEAR"]?.ToString(),
+                                CompanyName = reader["Company_Name"] is DBNull ? "" : reader["Company_Name"]?.ToString(),
+                                PaymentStatus = reader["Payment_Status"] is DBNull ? "" : reader["Payment_Status"]?.ToString(),
+                                CompanyLogo = (reader["CompanyLogo"] is DBNull || string.IsNullOrEmpty(reader["CompanyLogo"]?.ToString())) ? "" : $"{baseUrl}{reader["CompanyLogo"]?.ToString()}"
+
+                            });
+                        }
+
+                        await reader.NextResultAsync();
+
+                        while (await reader.ReadAsync())
+                        {
+                            //selfpaidUnpaidList.Add(new DashboardSummary
+                            //{
+                            //  PeriodMonth = MonthNameZeroindex(reader["PERIODD_MONTH"]?.ToString()),
+                            //  TotalPaid = Convert.ToDecimal(reader["totalPaid"] ?? 0),
+                            //  TotalUnpaid = Convert.ToDecimal(reader["totalUnpaid"] ?? 0)
+
+                            //});
+
+                            selfpaidUnpaidList.Add(new CompanyPaymentStatus
+                            {
+                                //Types = reader["Types"]?.ToString(),
+                                Paid = Convert.ToDecimal(reader["totalPaid"] ?? 0),
+                                Unpaid = Convert.ToDecimal(reader["totalUnpaid"] ?? 0),
+                                //totalNoEmp = Convert.ToInt32(reader["empCount"] ?? 0),
+                                schduleNo = Convert.ToInt32(reader["Schedule_NO"] ?? 0),
+                                PeriodMonth = MonthName(reader["PERIODD_MONTH"]?.ToString()),
+                                year = reader["PERIOD_YEAR"]?.ToString(),
+                                CompanyName = reader["fullName"] is DBNull ? "" : reader["fullName"]?.ToString(),
+                                PaymentStatus = reader["Payment_Status"] is DBNull ? "" : reader["Payment_Status"]?.ToString(),
+                                paidEmployer = Convert.ToInt32(reader["PaidEmployer"] ?? 0),
+                                unPaidEmployer = Convert.ToInt32(reader["UnpaidEmployer"] ?? 0),
+                                //CompanyLogo = (reader["CompanyLogo"] is DBNull || string.IsNullOrEmpty(reader["CompanyLogo"]?.ToString())) ? "" : $"{baseUrl}{reader["CompanyLogo"]?.ToString()}"
+
+                            });
+                        }
+                        //var selfpaidAmountC = selfpaidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.ToString("MMMM"))?.Paid;
+                        //var selfpaidAmountP = selfpaidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.AddMonths(-1).ToString("MMMM"))?.Paid;
+                        //
+                        //var selfunpaidAmountC = selfpaidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.ToString("MMMM"))?.Unpaid;
+                        //var selfunpaidAmountP = selfpaidUnpaidList?.FirstOrDefault(e => e.PeriodMonth == DateTime.Now.AddMonths(-1).ToString("MMMM"))?.Unpaid;
+
+
+                        //if (selfpaidAmountP != 0 && selfpaidAmountP != null)
+                        //{
+                        //  var selfpaidPercentage = Math.Round(((selfpaidAmountC ?? 0) - (selfpaidAmountP ?? 0)) * 100 / (selfpaidAmountP ?? 0), 2);
+                        //  selfpaidUnpaidList!.FirstOrDefault()!.paidPercentage = selfpaidPercentage;
+                        //}
+                        //if (selfunpaidAmountP != 0 && selfunpaidAmountP != null)
+                        //{
+                        //  var selfunpaidPercentage = Math.Round((selfunpaidAmountC ?? 0 - selfunpaidAmountP ?? 0) * 100 / selfunpaidAmountP ?? 0, 2);
+                        //  selfpaidUnpaidList!.FirstOrDefault()!.unpaidPercentage = selfunpaidPercentage;
+                        //}
+
+
+
+                    }
+                }
+                await connection.CloseAsync();
+            }
+
+            var response = new AdminDashboardResponse
+            {
+                Summary = paidUnpaidList,
+                CompanyPaymentStatus = companyStatusList,
+                selfSummary = selfpaidUnpaidList
+            };
+
+            return response;
+
+
+        }
+
+        public string MonthNameZeroindex(string m_no)
+        {
+            string Month = "";
+            switch (m_no)
+            {
+                case "0":
+                    Month = "January";
+                    break;
+                case "1":
+                    Month = "February";
+                    break;
+                case "2":
+                    Month = "March";
+                    break;
+                case "3":
+                    Month = "April";
+                    break;
+                case "4":
+                    Month = "May";
+                    break;
+                case "5":
+                    Month = "June";
+                    break;
+                case "6":
+                    Month = "July";
+                    break;
+                case "7":
+                    Month = "August";
+                    break;
+                case "8":
+                    Month = "September";
+                    break;
+                case "9":
+                    Month = "October";
+                    break;
+                case "10":
+                    Month = "November";
+                    break;
+                case "11":
+                    Month = "December";
+                    break;
+                default:
+                    Month = string.Empty;
+                    break;
+            }
+
+
+            return Month;
+        }
+
+    }
+}

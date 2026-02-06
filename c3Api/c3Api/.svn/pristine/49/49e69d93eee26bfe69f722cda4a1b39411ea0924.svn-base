@@ -1,0 +1,417 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3Wizard.COMMONPROP
+{
+    public class TransactionDetails
+    {
+        public string? TransactionID { get; set; }
+        public DateTime? TransactionDate { get; set; }
+        public decimal? PaymentAmount { get; set; }
+        public string? TransactionStatus { get; set; }
+
+    }
+
+    //Written By Rohit to Handle Data in C3Wizard Heard Tables 
+    //Written on 09/09/2018
+    //Modified By -
+    //Modified Date 
+    public class C3Header : DVOBase
+    {
+        private int _HeaderID;
+        private string _RegNO;
+        private string _PeriodMonth;
+        private string _PeriodYear;
+        private int _PMonth;
+        private int _PYear;
+        private Decimal _TOTALWAGES;
+        private Decimal _TOTALSSCONTRIBUTIONS;
+        private Decimal _TOTALLEVYEEEMPLOYEE;
+        private Decimal _TOTALLEVYEEEMPLOYER;
+        private Decimal _TOTALSERVAYANCE;
+        private Decimal _TOTALLEVYEEPENALTY;
+        private Decimal _TOTALPEPENALTY;
+        private Decimal _TOTALSSPENALTY;
+        private string _Insert_Datetimeinfo;
+        private string _C3_SubmittedDate;
+        private string _Insert_Machineinfo;
+        private string _PRINT_Datetimeinfo;
+        private int _EmployerID;
+        private int _C3_SubmittedBy;
+        private string _C3_SubmittedByName;
+        private int _Schedule_NO;
+        private bool _Is_Fianalize;
+        private bool _Is_submitted;
+        private bool _isImportFromBEMA;
+        private bool _c3_IsFinalized;
+        protected string _IssubmittedShow;
+        protected string _Issubmittedcolor;
+        protected string _IssubmittedShowimg;
+        protected string _C3submittedShow;
+        protected string _C3submittedShowimg;
+        private string _UsarName;
+        private int _inserted_By;
+        private int _modified_By;
+        private string _inserted_ByName;
+        private string _modified_ByName;
+        private string _notes;
+        private string _modified_On;
+        private bool _isUnLocked;
+        private bool _isPaid;
+        private bool _isNilreturn;
+        private string _isPaidStatus;
+        private List<TransactionDetails> _IsPaidNew;
+
+
+
+
+        #region public constructor
+
+        //public List<TransactionDetails> IsPaidNew { get; set; } = new List<TransactionDetails>();
+        public C3Header()
+        {
+
+            _HeaderID = 0;
+            _RegNO = string.Empty;
+            _PeriodMonth = string.Empty;
+            _PeriodYear = string.Empty;
+            _PMonth = -1;
+            _PYear = -1;
+            _TOTALWAGES = 0;
+            _TOTALSSCONTRIBUTIONS = 0;
+            _TOTALLEVYEEEMPLOYEE = 0;
+            _TOTALLEVYEEEMPLOYER = 0;
+            _TOTALSERVAYANCE = 0;
+            _TOTALLEVYEEPENALTY = 0;
+            _TOTALPEPENALTY = 0;
+            _TOTALSSPENALTY = 0;
+            _Insert_Datetimeinfo = "01/01/1900";
+            //_Insert_Datetime = DateTime.Parse("01/01/1900");
+            _Insert_Machineinfo = string.Empty;
+            _PRINT_Datetimeinfo = string.Empty;
+            _EmployerID = 0;
+            _C3_SubmittedBy = 0;
+            _Schedule_NO = 0;
+            _Is_Fianalize = false;
+            _Is_submitted = false;
+            _c3_IsFinalized = false;
+            _UsarName = string.Empty;
+            _C3_SubmittedDate = string.Empty;
+            _isUnLocked = false;
+            _isImportFromBEMA = false;
+            _inserted_By = 0;
+            _modified_By = 0;
+            _modified_On = string.Empty;
+            _isPaid = false;
+            _IsPaidNew = new List<TransactionDetails>();
+        }
+        #endregion constructor
+        #region public properties
+
+        public int EmployerID
+        {
+            get { return _EmployerID; }
+            set { _EmployerID = value; }
+        }
+        public int C3_SubmittedBy
+        {
+            get { return _C3_SubmittedBy; }
+            set { _C3_SubmittedBy = value; }
+        }
+        public string C3_SubmittedByName
+        {
+            get { return _C3_SubmittedByName; }
+            set { _C3_SubmittedByName = value; }
+        }
+
+     
+        public List<TransactionDetails> PayDetails
+        {
+            get { return _IsPaidNew; }
+            set { _IsPaidNew = value; }
+        }
+
+
+
+
+        public int HeaderID
+        {
+            get { return _HeaderID; }
+            set { _HeaderID = value; }
+        }
+        public string RegNo
+        {
+            get { return _RegNO; }
+            set { _RegNO = value; }
+        }
+        public string UsarName
+        {
+            get { return _UsarName; }
+            set { _UsarName = value; }
+        }
+        public string C3_SubmittedDate
+        {
+            get { return _C3_SubmittedDate; }
+            set { _C3_SubmittedDate = value; }
+        }
+        public string period_Month
+        {
+            get { return _PeriodMonth; }
+            set { _PeriodMonth = value; }
+        }
+        public string Period_year
+        {
+            get { return _PeriodYear; }
+            set { _PeriodYear = value; }
+        }
+        public int p_Month
+        {
+            get { return _PMonth; }
+            set { _PMonth = value; }
+        }
+        public int P_year
+        {
+            get { return _PYear; }
+            set { _PYear = value; }
+        }
+        public decimal TOTAL_WAGES
+        {
+            get { return _TOTALWAGES; }
+            set { _TOTALWAGES = value; }
+        }
+        public decimal TOTALSSCONTRIBUTIONS
+        {
+            get { return _TOTALSSCONTRIBUTIONS; }
+            set { _TOTALSSCONTRIBUTIONS = value; }
+        }
+        public decimal TOTALLEVYEEEMPLOYEE
+        {
+            get { return _TOTALLEVYEEEMPLOYEE; }
+            set { _TOTALLEVYEEEMPLOYEE = value; }
+        }
+
+        public decimal TOTALLEVYEEEMPLOYER
+        {
+            get { return _TOTALLEVYEEEMPLOYER; }
+            set { _TOTALLEVYEEEMPLOYER = value; }
+        }
+        public decimal TOTALSERVAYANCE
+        {
+            get { return _TOTALSERVAYANCE; }
+            set { _TOTALSERVAYANCE = value; }
+        }
+        public decimal TOTALLEVYEEPENALTY
+        {
+            get { return _TOTALLEVYEEPENALTY; }
+            set { _TOTALLEVYEEPENALTY = value; }
+        }
+        public decimal TOTALPEPENALTY
+        {
+            get { return _TOTALPEPENALTY; }
+            set { _TOTALPEPENALTY = value; }
+        }
+        public decimal TOTALSSPENALTY
+        {
+            get { return _TOTALSSPENALTY; }
+            set { _TOTALSSPENALTY = value; }
+        }
+        public int Schedule_NO
+        {
+            get { return _Schedule_NO; }
+            set { _Schedule_NO = value; }
+        }
+        public bool Is_Fianalize
+        {
+            get { return _Is_Fianalize; }
+            set { _Is_Fianalize = value; }
+        }
+        public bool C3_IsFinalized
+        {
+            get { return _c3_IsFinalized; }
+            set { _c3_IsFinalized = value; }
+        }
+        public bool Is_submitted
+        {
+            get { return _Is_submitted; }
+            set { _Is_submitted = value; }
+        }
+        public bool IsImportFromBEMA
+        {
+            get { return _isImportFromBEMA; }
+            set { _isImportFromBEMA = value; }
+        }
+        public bool IsUnLocked
+        {
+            get { return _isUnLocked; }
+            set { _isUnLocked = value; }
+        }
+        public bool IsPaid
+        {
+            get { return _isPaid; }
+            set { _isPaid = value; }
+        }
+    public string IsPaidStatus
+    {
+      get { return _isPaidStatus; }
+      set { _isPaidStatus = value; }
+    }
+    public bool isNilReturn
+    {
+      get { return _isNilreturn; }
+      set { _isNilreturn = value; }
+    }
+
+    // public List<TransactionDetails> IsPaidNew { get; set; } = new List<TransactionDetails>();
+    public string Insert_Datetimeinfo
+        {
+            get { return _Insert_Datetimeinfo; }
+            set { _Insert_Datetimeinfo = value; }
+        }
+        public int Inserted_By
+        {
+            get { return _inserted_By; }
+            set { _inserted_By = value; }
+        }
+        public string Inserted_ByName
+        {
+            get { return _inserted_ByName; }
+            set { _inserted_ByName = value; }
+        }
+        public string Modified_On
+        {
+            get { return _modified_On; }
+            set { _modified_On = value; }
+        }
+        public int Modified_By
+        {
+            get { return _modified_By; }
+            set { _modified_By = value; }
+        }
+        public string Modified_ByName
+        {
+            get { return _modified_ByName; }
+            set { _modified_ByName = value; }
+        }
+        public string Notes
+        {
+            get { return _notes; }
+            set { _notes = value; }
+        }
+        public string PRINT_Datetimeinfo
+        {
+            get { return PRINT_Datetimeinfo; }
+            set { PRINT_Datetimeinfo = value; }
+        }
+        public string IssubmittedShow
+        {
+            get { return _IssubmittedShow; }
+            set { _IssubmittedShow = value; }
+        }
+        public string Issubmittedcolor
+        {
+            get { return _Issubmittedcolor; }
+            set { _Issubmittedcolor = value; }
+        }
+        public string IssubmittedShowimg
+        {
+            get { return _IssubmittedShowimg; }
+            set { _IssubmittedShowimg = value; }
+        }
+        public string C3submittedShow
+        {
+            get { return _C3submittedShow; }
+            set { _C3submittedShow = value; }
+        }
+        public string C3submittedShowimg
+        {
+            get { return _C3submittedShowimg; }
+            set { _C3submittedShowimg = value; }
+        }
+        #endregion public properties
+        #region Stored-Procedures
+        public override string INSERT_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string UPDATE_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string DELETE_SPNAME
+        {
+            get { return ""; }
+        }
+
+        public override string FIND_SPNAME
+        {
+            get { return "uspTimeCardDetailGet"; }
+        }
+
+        public override string ALL_SPNAME
+        {
+            get { return "GET_ALLACTIVEC3Headers"; }
+        }
+        public override string TABLE_NAME
+        {
+            get { return ""; }
+        }
+
+        public override int UNIQUE_ID
+        {
+            get { return 0; }
+        }
+
+        public override string NOTES_TABLE_RECORD_ID
+        {
+            get { return string.Empty; }
+            set { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        public override string FIND_QUERY(ref Object[] parameters)
+        {
+            System.Text.StringBuilder sql = new StringBuilder();
+            sql.Append("select MasterEmployee.first_name p_first_name,MasterEmployee.last_name p_last_name,MasterEmployee.department p_department, ");
+            sql.Append(" PayrollGLAccounts.keyvalue p_keyvalue,EmployeeTCard_Details.card_no p_card_no,EmployeeTCard_Details.inc_code p_inc_code, ");
+            sql.Append("EmployeeTCard_Details.inc_hours p_inc_hours,EmployeeTCard_Details.inc_number p_inc_number,MasterEmployee.cash_acct p_acct_no, ");
+            sql.Append(" EmployeeTCard_Details.inc_rate p_inc_rate,EmployeeTCard_Details.line_no p_line_no,EmployeeTCard_Header.used_flag p_used_flag ,");
+            sql.Append(" EmployeeTCard_Header.empl_code p_empl_code,EmployeeTCard_Header.end_date p_end_date,EmployeeTCard_Header.start_date p_start_date ");
+            sql.Append(" , 1 p_key , 2  p_description ");
+            sql.Append("  from EmployeeTCard_Details INNER JOIN  EmployeeTCard_Header ON EmployeeTCard_Header.card_no = EmployeeTCard_Details.card_no  INNER JOIN MasterEmployee  ON  MasterEmployee.empl_code=EmployeeTCard_Header.empl_code LEFT Outer JOIN PayrollGLAccounts ");
+            sql.Append(" ON PayrollGLAccounts.acct_no=EmployeeTCard_Details.acct_no ");
+            //  sql.Append(" INNER JOIN Flex_Segment_Value_Details ON Flex_Segment_Value_Details.Keyvalue = Substring(ISNULL(PayrollGLAccounts.keyvalue,'000'),1,3) ");
+            sql.Append("where  1=1  ");// and Flex_Segment_Value_Details.segmentid=1 ");
+            sql.Append("  ");
+            sql.Append(" and EmployeeTCard_Details.inc_number >= 0 AND EmployeeTCard_Details.inc_rate >= 0 ");
+            if (parameters[0] != null)
+                if (parameters[0].ToString() != string.Empty)
+                    sql.Append(" AND EmployeeTCard_Header.empl_code = '" + Convert.ToString(parameters[0]).Replace("'", "''") + "'");
+            if (parameters[1] != null)
+                if (parameters[1].ToString() != string.Empty)
+                    sql.Append(" AND Rtrim(MasterEmployee.first_name) LIKE '" + parameters[1].ToString().Trim().Replace("'", "''") + "%'");
+
+            if (parameters[2] != null)
+                if (parameters[2].ToString() != string.Empty)
+                    sql.Append(" AND Rtrim(MasterEmployee.last_name) LIKE '" + parameters[2].ToString().Trim().Replace("'", "''") + "%'");
+            if (parameters[3] != null)
+                if (parameters[3].ToString() != string.Empty && parameters[3].ToString() != "01/01/1900")//dateFrom
+                    sql.Append(" AND EmployeeTCard_Header.start_date >= '" + parameters[3].ToString().Trim().Replace("'", "''") + "'");
+            if (parameters[4] != null)
+                if (parameters[4].ToString() != string.Empty && parameters[4].ToString() != "01/01/1900")//dateto
+                    sql.Append(" AND EmployeeTCard_Header.end_date <= '" + parameters[4].ToString().Trim().Replace("'", "''") + "'");
+            if (parameters[5] != null)
+                if (parameters[5].ToString() != string.Empty)
+                    sql.Append(" AND Rtrim(EmployeeTCard_Header.used_flag) = '" + parameters[5].ToString().Trim().Replace("'", "''") + "'");
+            if (parameters[6] != null && parameters[7] != null)
+                if (parameters[6].ToString() != string.Empty && parameters[7].ToString() != string.Empty)
+                    sql.Append(" AND EmployeeTCard_Header.empl_code BETWEEN '" + parameters[6].ToString().Trim() + "' AND '" + parameters[7].ToString().Trim().Replace("'", "''") + "'");
+
+            return sql.ToString();
+        }
+        #endregion Stored-Procedures
+    }
+}

@@ -1,0 +1,215 @@
+﻿@using C3WizardHelper.ViewModels
+@model RegisterCompanyVm
+
+<p class="p-top-xs" style="">Dear Sir/Madam,</p>
+<br />
+<p class="p-top-xs"> A new registration request for the <strong>C3Wizard</strong> portal has been received. The details are as follows: </p>
+<br />
+
+<table style="width:100%;margin-bottom:20px;background-color:transparent;border-collapse:collapse;border-spacing:0">
+
+    <tbody style="display:table-row-group;vertical-align:middle;border-color:inherit">
+
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px"> Registration For</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">
+                Company
+                @if (@Model.employmentType == "Company")
+                {
+                    <span style="color: green;">✅</span>
+                }
+                else
+                {
+                    <span style="color: red;">❌</span>
+                }
+                <br />Self Employed
+                @if (@Model.employmentType == "SelfEmployed")
+                {
+                    <span style="color: green;">✅</span>
+                }
+                else
+                {
+                    <span style="color: red;">❌</span>
+                }
+
+            </td>
+        </tr>
+
+
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px">Employer Name</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse"><strong>@Model.CompanyName</strong></td>
+
+        </tr>
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px">Employer Registration No</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse"><strong>@Model.RegNumber</strong></td>
+
+        </tr>
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px">Trade Name</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">@Model.TradeName </td>
+        </tr>
+
+
+
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px"> Is Levy Exempt?</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">
+                @if (@Model.IsLevyExempt == true)
+                {
+                    <span style="color: green;">✅</span>
+                }
+                else
+                {
+                    <span style="color: red;">❌</span>
+                }
+            </td>
+        </tr>
+
+
+
+        @*<tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+        <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:left;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px">Email</th>
+        <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">
+        @Model.Email
+        </td>
+        </tr>*@
+
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;font-size:14px">Organization Basic Details</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">
+                <strong>
+                    <span>Contact Person:</span>
+                </strong>  &nbsp;&nbsp;@Model.ContactPerson
+                <br />
+                <strong>
+                    <span>Mobile:</span>
+                </strong>  &nbsp;&nbsp;@Model.Mobile
+                <br />
+                <strong>
+                    <span>Email:</span>
+                </strong> &nbsp;&nbsp;@Model.EmailId.
+                <br />
+                <strong>
+                    <span>Telephone Number:</span>&nbsp;&nbsp;
+                        @{
+                            var parts = new List<string>();
+
+                            if (!string.IsNullOrWhiteSpace(Model.Mobile))
+                            {
+                                parts.Add(Model.Mobile);
+                            }
+                            if (!string.IsNullOrWhiteSpace(Model.Zip))
+                            {
+                                parts.Add(Model.Zip);
+                            }
+                            if (!string.IsNullOrWhiteSpace(Model.Phone))
+                            {
+                                parts.Add(Model.Phone);
+                            }
+
+                            var finalOutput = string.Join(" - ", parts);
+                        }
+                        @finalOutput
+                </strong>
+
+                <br />
+                <strong>
+                    <span>Nationality:</span>
+                </strong>  &nbsp;&nbsp;
+                    @if (@Model.Country == "1")
+                    {
+                    <span> Saint Kitts </span>
+                    }
+                    else
+                    {
+                    <span>Nevis</span>
+                    }
+                <br />
+        </tr>
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;
+color:#1e1e1e;font-size:14px">Address Details</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">
+                <strong>
+                    <span>Address #1:</span>
+                </strong> &nbsp;&nbsp;@Model.Address1
+                <br />
+                <strong>
+                    <span>Address #2:</span>
+                </strong> &nbsp;&nbsp;@Model.Address2
+                <br />
+                <strong>
+                    <span>City:</span>
+                </strong> &nbsp;&nbsp;@Model.City
+                <br />
+                <strong>
+                    <span>PostCode:</span>
+                </strong>  &nbsp;&nbsp;@Model.Zip
+                <br />
+                <strong>
+                    <span>Country:</span>
+                </strong> &nbsp;&nbsp;
+                    @if (@Model.Country == "1")
+                    {
+                    <span> Saint Kitts </span>
+                    }
+                    else
+                    {
+                    <span>Nevis</span>
+                    }
+                <br />
+        </tr>
+
+        <tr style="display:table-row;vertical-align:inherit;border-color:inherit">
+            <th style="border-top:0;vertical-align:bottom;border:1px solid #ddd;padding:8px;line-height:1.428571429;text-align:center;width:15%;font-weight:normal;color:#1e1e1e;
+font-size:14px">User Profile Details</th>
+            <td style="padding:8px;line-height:1.428571429;vertical-align:top;border:1px solid #ddd;border-collapse:collapse">
+                <strong>
+                    <span>First Name:</span>
+                </strong> &nbsp;&nbsp;@Model.FirstName
+                <br />
+                <strong>
+                    <span>MiddleName:</span>
+                </strong> &nbsp;&nbsp;@Model.MiddleName
+                <br />
+                <strong>
+                    <span>LastName:</span>
+                </strong> &nbsp;&nbsp;@Model.LastName
+                <br />
+                <strong>
+                    <span>User:</span>
+                </strong> &nbsp;&nbsp;@Model.LoginId
+                <br />
+                <strong>
+                    <span>Security Question 1:</span>
+                </strong>  &nbsp;&nbsp;@Model.Question1
+                <br />
+                <strong>
+                    <span>Security Question 2:</span>
+                </strong> &nbsp;&nbsp;@Model.Question2
+                <br />
+        </tr>
+
+
+    </tbody>
+</table>
+
+<br />
+If you experience any difficulties, please email us at eservices@socialsecurity.kn
+or call us at (869)465-2535
+
+<br />
+<br />
+<b>Sincerely</b>,
+<br />
+<br />
+Administrator (C3 Remittances)
+<br />
+
+St. Christopher & Nevis Social Security Board
+
+
+

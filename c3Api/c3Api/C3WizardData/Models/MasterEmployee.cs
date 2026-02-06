@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace C3WizardData.Models;
+
+public partial class MasterEmployee
+{
+    public int EmployeeId { get; set; }
+
+    public string? EmplCode { get; set; }
+
+    public string? SocSecNum { get; set; }
+
+    public string? FirstName { get; set; }
+
+    public string? MiddleName { get; set; }
+
+    public string? LastName { get; set; }
+
+    public string? TypeCode { get; set; }
+
+    public DateTime? BirthDate { get; set; }
+
+    public string? Gender { get; set; }
+
+    public string? Address1 { get; set; }
+
+    public string? Address2 { get; set; }
+
+    public string? City { get; set; }
+
+    public string? State { get; set; }
+
+    public string? Country { get; set; }
+
+    public string? Zip { get; set; }
+
+    public string? Phone { get; set; }
+
+    public string? Mobile { get; set; }
+
+    public string? Email { get; set; }
+
+    public string? Tin { get; set; }
+
+    public DateTime? AppintDate { get; set; }
+
+    public DateTime? LastPayDate { get; set; }
+
+    public DateTime? WagesPayDate { get; set; }
+
+    public DateTime? Terminated { get; set; }
+
+    public string? EmplStatus { get; set; }
+
+    public string? PayPeriod { get; set; }
+
+    public int? AllowAnces { get; set; }
+
+    public int? StateAllow { get; set; }
+
+    public string? MaritalStat { get; set; }
+
+    public string? HoldPymnt { get; set; }
+
+    public string? BankAcctNo { get; set; }
+
+    public decimal? StateUdf { get; set; }
+
+    public string? FlexDeptAcctType { get; set; }
+
+    public DateTime? LastIncDate { get; set; }
+
+    public int? InsertedBy { get; set; }
+
+    public DateTime? InsertedOn { get; set; }
+
+    public string? InsertedMachineInfo { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? UpdatedOn { get; set; }
+
+    public string? UpdatedMachineInfo { get; set; }
+
+    public bool IsActive { get; set; }
+
+    public string? Occupation { get; set; }
+
+    public int? CompanyId { get; set; }
+
+    public bool? IsdirectorOnly { get; set; }
+
+    public bool? IsemployeeDirector { get; set; }
+
+    public bool? IsLevyExempt { get; set; }
+    public bool? isFileCreatedEmp { get; set; }
+
+    public string? Department { get; set; }
+}

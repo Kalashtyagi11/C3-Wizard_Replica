@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../C3WizardData"
+		},
+		{
+			"path": "../C3WizardHelper"
+		},
+		{
+			"path": "../C3WizardLayer"
+		},
+		{
+			"path": "../C3WizardRepository"
+		},
+		{
+			"path": "../C3WIZARDWebApi"
+		}
+	]
+}

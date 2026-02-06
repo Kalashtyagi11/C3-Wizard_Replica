@@ -1,0 +1,44 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardData.SelfEmpModel
+{
+    public class SelfDashboardVm
+    {
+        public string? SelfEmployeeContributionText { get; set; }
+        public string? Pendingc3Text { get; set; }
+        public string? Director_total_con { get; set; }
+        public string? unpaidSelf { get; set; }
+        public string? unpaidMonths { get; set; }
+        public string? paidMonths { get; set; }
+        public bool IsPendingc3MessageNeedtoshow { get; set; }
+
+        public List<dashboarddata> Dashboardddata { get; set; }
+
+    }
+
+
+    public class dashboarddata
+    {
+        public string? year { get; set; }
+        public string? month { get; set; }
+        public int? monthNo { get; set; }
+        public decimal? TotalWages { get; set; }
+        public decimal? Countribution { get; set; }
+        public string? CreationDate { get; set; }
+        public int? HeaderId { get; set; }
+        public string? Ssnemp { get; set; }
+        public decimal? TOTALSSPENALTY { get; set; }
+        public bool Is_submitted { get; set; }
+        public bool ispaid { get; set; } = false;
+        public bool IsImportFromBEMA { get; set; } = false;
+        public decimal? payAmt { get; set; }
+        public string? payReason { get; set; }
+        public string? Notes { get; set; }
+        public string? TransactionID { get; set; }
+        public string? mode { get; set; }
+    }
+}

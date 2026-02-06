@@ -1,0 +1,1946 @@
+﻿using Azure;
+using C3WizardData.Models;
+using C3WizardHelper.ViewModels;
+using C3WizardRepository.Repository;
+using C3WIZARDWebApi.Common;
+using Com.CloudRail.SI.Extensions;
+using iText.Commons.Actions.Contexts;
+using iText.Html2pdf;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.ReportingServices.ReportProcessing.ReportObjectModel;
+using Newtonsoft.Json;
+using PayPal.Api;
+using PayPalCheckoutSdk.Orders;
+using Payroll_25.Repo;
+using RazorLight;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Transactions;
+using static iText.IO.Util.IntHashtable;
+
+namespace Payroll_25.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    //[Authorize]
+    public class PaymentController : ControllerBase
+    {
+        private readonly PaymentRepo _paymentRepo;
+        private readonly C3wizardContext _Context;
+        private readonly IConfiguration _configuration;
+        public PaymentController(PaymentRepo paymentRepo, C3wizardContext _c3WizardContext, IConfiguration configuration)
+        {
+            this._paymentRepo = paymentRepo ?? throw new ArgumentNullException(nameof(paymentRepo));
+            _Context = _c3WizardContext;
+            _configuration = configuration;
+        }
+
+        [HttpPost("BuySubscription")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ProcessPayment([FromBody] DTOSubscriptionPayment model)
+        {
+            var response = new DTOResponsemodel();
+            try
+            {
+                var paymentResponse = await _paymentRepo.ProcessPayment(model);
+
+                response.Status = paymentResponse.Status;
+                response.Message = paymentResponse.Status
+                    ? "Payment processed successfully."
+                    : "Payment processing failed.";
+                response.Data = paymentResponse.Data;
+
+                return paymentResponse.Status ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                response.Status = false;
+                response.Message = "An error occurred while processing the payment.";
+                response.Data = new { error = ex.Message };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
+        [HttpPost("Paymentsuccess")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Paymentsuccess(PaymentDetails1 model)
+        {
+            var response = new DTOResponsemodel();
+
+            // Validate input
+            if (string.IsNullOrEmpty(model.token) || string.IsNullOrEmpty(model.PayerID))
+            {
+                response.Status = false;
+                response.Message = "Token or PayerID is null";
+                response.Data = "";
+                return BadRequest(response);
+            }
+
+            try
+            {
+                // Process the payment
+                response = await _paymentRepo.ProcessPaymentAsync(model);
+
+                if (response.Status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new DTOResponsemodel
+                {
+                    Status = false,
+                    Message = "An error occurred while processing the payment: " + ex.Message,
+                    Data = ""
+                });
+            }
+        }
+
+
+        [HttpPost("PaymentCancel")]
+        [AllowAnonymous]
+        public async Task<IActionResult> PaymentCancel(string token)
+        {
+            var response = new DTOResponsemodel();
+
+            // Validate input
+            if (string.IsNullOrEmpty(token))
+            {
+                response.Status = false;
+                response.Message = "Token  is null";
+                response.Data = "";
+                return BadRequest(response);
+            }
+
+            try
+            {
+                // Process the payment
+                response = await _paymentRepo.ProcessPaymentCancelAsync(token);
+
+                if (response.Status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new DTOResponsemodel
+                {
+                    Status = false,
+                    Message = "An error occurred while processing the payment: " + ex.Message,
+                    Data = ""
+                });
+            }
+        }
+
+
+        //[HttpGet("GetTransactionsByUserId")]
+        //public IActionResult GetTransactionsByUserId()
+        //{
+        //    var transactions = (from onlinepayment in _context.OnlinePayments
+        //                        join c3data in _context.ProcessC3headers
+        //                        on onlinepayment.C3HeaderId equals c3data.C3headerid
+        //                        //where c3data.UserId == userId
+        //                        select new
+        //                        {
+        //                            onlinepayment.PaymentGatewayTransactionID,
+        //                            onlinepayment.CreatedOn,
+        //                            onlinepayment.PaymentStatus
+        //                        }).ToList();
+
+        //    if (!transactions.Any())
+        //    {
+        //        return NotFound("No transactions found");
+        //    }
+
+        //    return Ok(transactions);
+        //}
+
+        ///============================Narendra working====================
+
+        [HttpGet("loaddashboardPaymentStatus")]
+        public async Task<IActionResult> loaddashboardPaymentStatus(string? status, DateTime? Fromdate, DateTime? Todate, int CompanyId, int? Year, string? ResultArea, int? FromMonth, int? ToMonth)
+        {
+            try
+            {
+
+                int? StartMonths = null;
+                int? endMonths = null;
+                if (FromMonth != null && FromMonth > 0)
+                {
+                    StartMonths = FromMonth;
+
+                }
+                if (ToMonth != null && ToMonth > 0)
+                {
+                    endMonths = ToMonth;
+                }
+                var data = await _paymentRepo.load_dashboard(CompanyId, StartMonths, endMonths, Year, ResultArea);
+                var ss = new
+                {
+                    //data[0].Key.ToString() = data
+                    EmployeesContribution = data.FirstOrDefault(e => e.Key == "EmployeesContribution")?.Value,
+                    total = data.FirstOrDefault(e => e.Key == "total")?.Value,
+                    Pendingc3 = data.FirstOrDefault(e => e.Key == "Pendingc3")?.Value,
+                    Pendingc3Foreground = data.FirstOrDefault(e => e.Key == "Pendingc3Foreground")?.Value,
+                    dashboard_list = JsonConvert.DeserializeObject<List<C3HeaderVM>>(data.FirstOrDefault(e => e.Key == "dashboard_list")?.Value ?? "[]"),// as  List<C3Header>,
+                    DirectorsContribution = data.FirstOrDefault(e => e.Key == "DirectorsContribution")?.Value,
+                    Director_total = data.FirstOrDefault(e => e.Key == "Director_total")?.Value,
+                    DirectorsPendingC3 = data.FirstOrDefault(e => e.Key == "DirectorsPendingC3")?.Value,
+                    DirectorsPendingC3Foreground = data.FirstOrDefault(e => e.Key == "DirectorsPendingC3Foreground")?.Value,
+                    Director_dashboard_list = JsonConvert.DeserializeObject<List<C3HeaderVM>>(data.FirstOrDefault(e => e.Key == "Director_dashboard_list")?.Value ?? "[]"),
+
+                };
+
+
+
+                var empList = ss.dashboard_list
+                .Where(e => e.PayDetails != null)
+                .Select(e =>
+                {
+                    var filteredDetails = e.PayDetails
+            .Where(d =>
+                (string.IsNullOrEmpty(status) || d.TransactionStatus == status) &&
+                (Fromdate == null || d.TransactionDate.Value.Date >= Fromdate.Value.Date) &&
+                (Todate == null || d.TransactionDate.Value.Date <= Todate.Value.Date))
+            .ToList();
+
+                    if (filteredDetails.Any())
+                    {
+                        e.PayDetails = filteredDetails;
+                        return e;
+                    }
+
+                    return null;
+                })
+                .Where(e => e != null)
+                .ToList();
+
+
+
+                var DirList = ss.Director_dashboard_list
+                  .Where(e => e.PayDetails != null)
+                  .Select(e =>
+                  {
+                      var filteredDetails = e.PayDetails
+              .Where(d =>
+                  (string.IsNullOrEmpty(status) || d.TransactionStatus == status) &&
+                  (Fromdate == null || d.TransactionDate.Value.Date >= Fromdate.Value.Date) &&
+                  (Todate == null || d.TransactionDate.Value.Date <= Todate.Value.Date))
+              .ToList();
+
+                      if (filteredDetails.Any())
+                      {
+                          e.PayDetails = filteredDetails;
+                          return e;
+                      }
+
+                      return null;
+                  })
+                  .Where(e => e != null)
+                  .ToList();
+
+
+                //await load_dashboard1(CompanyId);
+
+                return Ok(new ResponseModel { Status = true, Message = "data  found..!", Data = new { empList, DirList } });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+
+        }
+
+
+
+
+        //[HttpGet("C3Transactiondata")]
+        //public async Task<IActionResult> C3Transactiondata()
+        //{
+
+        //    var data = await _paymentRepo.GetPayPalAccessToken();
+        //    var stream = await _paymentRepo.ExportToExcel(data);
+        //    return Ok();
+
+        //}
+        [HttpGet("GetOfflinePaymentDataSelfEmp")]
+        public async Task<IActionResult> GetOfflinePaymentDataSelfEmp(int SelfHeaderId)
+        {
+            try
+            {
+                var data = await _paymentRepo.GetOfflinePaymentDirectorSelf(SelfHeaderId);
+                if (data.Status == true)
+                    return Ok(data);
+                else
+                    return BadRequest("Data not found");
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = ex.InnerException?.Message ?? ex.Message,
+                    Data = null
+                });
+            }
+        }
+        [HttpGet("GetOfflinePaymentDataDirector")]
+        public async Task<IActionResult> GetOfflinePaymentDataDirector(int HeaderId)
+        {
+            try
+            {
+                var data = await _paymentRepo.GetOfflinePaymentDirector(HeaderId);
+                if (data.Status == true)
+                    return Ok(data);
+                else
+                    return BadRequest("Data not found");
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = ex.InnerException?.Message ?? ex.Message,
+                    Data = null
+                });
+            }
+        }
+        [HttpGet("GetOfflinePaymentData")]
+        public async Task<IActionResult> GetOfflinePaymentData(int HeaderId)
+        {
+            try
+            {
+                var data = await _paymentRepo.GetOfflinePayment(HeaderId);
+                if (data.Status == true)
+                    return Ok(data);
+                else
+                    return BadRequest("Data not found");
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = ex.InnerException?.Message ?? ex.Message,
+                    Data = null
+                });
+            }
+        }
+        [HttpGet("GetReconciliationData")]
+        public async Task<ResponseModel> GetReconciliationDataAsync()
+        {
+            try
+            {
+                var data = await _paymentRepo.GetReconciliationDataAsync();
+                return data;
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return new ResponseModel
+                {
+                    Status = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Statuscode = 500,
+                    Data = null
+                };
+            }
+        }
+
+
+
+
+        [HttpPost("UploadExcelData")]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            try
+            {
+                var res = await _paymentRepo.UploadExcel(file);
+                if ((bool)res.Status)
+                {
+                    return Ok(res);
+                }
+                else
+                {
+                    return BadRequest(res);
+                }
+            }
+            catch (DbUpdateException dbEx) when (dbEx.InnerException is SqlException sqlEx)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, dbEx.Message, dbEx.StackTrace);
+
+                if (sqlEx.Number == 2627 || sqlEx.Number == 2601)
+                {
+                    return BadRequest(new ResponseModel
+                    {
+                        Status = false,
+                        Statuscode = 409,
+                        Message = "Duplicate entry: Transaction ID already exists.",
+                        Data = null
+                    });
+                }
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = "SQL Error: " + sqlEx.Message,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = ex.InnerException?.Message ?? ex.Message,
+                    Data = null
+                });
+            }
+
+        }
+
+        [HttpPost("AdminTranactionHistoryData")]
+        public async Task<IActionResult> AdminTranactionHistoryData(string? PaymentStatus, DateTime? FromDate, DateTime? ToDate, int? CompanyId, int? UserId, string types)
+        {
+            try
+            {
+                //A/ var AllCompanydata = await _paymentRepo.getAllCompanyTrans(PaymentStatus, FromDate, ToDate, CompanyId, UserId, types);
+
+                return Ok(new { Status = true, Message = "data  found..!", Data = "" });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+        [HttpPost("AdminTranactionHistory")]
+        public async Task<IActionResult> AdminTranactionHistory(string? PaymentStatus, DateTime? FromDate, DateTime? ToDate, int? CompanyId, int? UserId, string types, int pageNumber, int pageSize)
+        {
+            try
+            {
+                //if (pageNumber < 1) pageNumber = 1;
+                //if (pageSize < 1) pageSize = 10;
+                if (pageNumber < 0) pageNumber = 0;
+                if (pageSize < 1) pageSize = 10;
+
+                //if (CompanyId==null && types!= "SelfEmployee")
+                //{
+                //  return BadRequest(new { Status = false, Message = "companyId Required" });
+                //}
+
+                var AllCompanydata = await _paymentRepo.getAllCompanyTrans(PaymentStatus, FromDate, ToDate, CompanyId, UserId, types, pageNumber, pageSize);
+
+
+
+                return Ok(new { Status = true, Message = "data  found..!", Data = AllCompanydata.Data });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+
+        [HttpPost("DownloadPdf")]
+        public async Task<IActionResult> DownloadPdf()
+        {
+            try
+            {
+                var pdfData = await _paymentRepo.htmlTopdf("");
+                return File(pdfData, "application/pdf", "generated.pdf");
+                //return Ok(new { Status = true, Message = "data  found..!", Data = AllCompanydata });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+
+
+        [HttpPost("payNowDataCyberSource")]
+        public async Task<IActionResult> ProcessPayment([FromBody] PaymentFormModelVm modal)
+        {
+
+            try
+            {
+                modal.isBimapost = false;
+                var IsBEMA_APIs_Integration = _configuration["IsBEMA_APIs_Integration"];
+                if (IsBEMA_APIs_Integration == "1")
+                {
+                    if (!C3WizardRepository.Repository.ConnectionInfom.APIConnection(_configuration) || !C3WizardRepository.Repository.ConnectionInfom.HasConnection())
+                    {
+                        return BadRequest(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Check your internet connection or the server may not be responding. Please try again later or contact S.S.B for assistance.",
+                            Statuscode = 503 // Service Unavailable
+                        });
+                    }
+                    modal.isBimapost = true;
+
+
+
+                }
+
+                // var user = _Context.Secusers.FirstOrDefault(e => e.UserId == modal.UserId);
+
+                var dt = await _paymentRepo.PayCharge(modal);
+
+                if (dt == null)
+                {
+                    return BadRequest(new { status = false, msg = "Payment failed:this register number BIMA API data could not be found" });
+                }
+
+                var result = dt.AsEnumerable().Select(row => new TransactionReceipt
+                {
+                    types = row.Field<string>("PaymentStatus") == "AUTHORIZED" ? 1 : 0,
+                    //receiptNumber = row.Field<int>("Id").ToString("D6"),
+                    receiptNumber = string.IsNullOrEmpty(row.Field<string>("bimaReceiptNumber")) ? row.Field<int>("Id").ToString("D6") : row.Field<string>("bimaReceiptNumber")?.ToString(),
+                    regNo = row.Field<string>("RegNumber")?.ToString(),
+                    cardHolderName = modal.cardHolderName,
+                    // regNo = row.Field<string>("TransactionFor") == "Self" ? _Context.ProcessSelfEmployedC3s.FirstOrDefault(e => e.Sec3id == Convert.ToInt32(row.Field<int>("C3HeaderId"))).Ssn : _Context.ProcessC3headers.FirstOrDefault(e => e.C3headerid == Convert.ToInt32(row.Field<int>("C3HeaderId").ToString())).RegNo,
+                    Id = row.Field<string>("PaymentGatewayTransactionID"),
+                    Name = row.Field<string>("RefCustomerName"),
+                    Email = row.Field<string>("Email")?.ToString(),
+                    PaymentStatus = row.Field<string>("PaymentStatus"),
+                    Amount = Math.Round(row.Field<decimal>("PaymentAmount"), 2),
+                    date = row.Field<string>("CreateTime"),
+                    PaymentHeaderdetails = JsonConvert.DeserializeObject<List<PaymentHeaderVm>>(row.Field<string>("bimapaymentHeader"))
+                });
+
+
+
+                string isSend = await sendMail(result?.FirstOrDefault());
+                if (dt.Rows[0]["PaymentStatus"].ToString() == "AUTHORIZED")
+                {
+
+                    isSend = await sendMailPaymentSSB(result?.FirstOrDefault());
+                    return Ok(new { Status = true, Message = isSend == "1" ? "Your payment was successful and a confirmation email has been sent to your registered email address." : "Your payment was successful, but the confirmation email could not be sent at this time due to a technical issue.", Data = result, Msg2 = isSend });
+                }
+                else
+                {
+                    return Ok(new { Status = false, Message = "Payment Failed", Data = result, Msg2 = isSend });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        private async Task<string> sendMailPaymentSSB(TransactionReceipt result)
+        {
+            try
+            {
+                result.types = -1;
+
+
+                string paymentRows = "";
+                foreach (var header in result.PaymentHeaderdetails)
+                {
+                    paymentRows += $@"
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>{header.paymentCode}:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>${header.paymentAmount}</td>
+  </tr>";
+                }
+
+                string bodyMessage = $@"
+            <p>Dear <strong>Team</strong>,</p>
+            <p>We would like to inform you that a payment has been received from the employer, and the details are as follows:</p>
+       
+<table style='border-collapse: collapse; width: 100%; max-width: 600px;'>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Receipt #:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.receiptNumber}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Registration No:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.regNo}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Customer Name:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.Name}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Transaction ID:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.Id}</td>
+  </tr>
+
+{paymentRows}
+
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Amount Paid:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>${result.Amount}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Status:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.PaymentStatus}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Transaction Date:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.date}</td>
+  </tr>
+</table>
+<br />
+
+
+<br />
+Administrator (C3 Remittances)
+<br />
+St. Christopher & Nevis Social Security Board";
+
+                string isTest = _configuration["IsTestMail"];
+                string testMail = _configuration["TestMail"];
+                string SSBMail = _configuration["SSBMail"];
+                string toMail = isTest == "1" ? testMail : SSBMail;
+
+                var projectPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Email");
+                var engine = new RazorLightEngineBuilder()
+                .UseFileSystemProject(projectPath)
+                .UseMemoryCachingProvider()
+                .Build();
+                string htmlContent = await engine.CompileRenderAsync("payment.cshtml", result);
+                byte[] pdfBytes = await GeneratePdfFromHtml(htmlContent);
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(_configuration["EmailSettings:SenderEmail"]),
+                    Subject = $"C3 Remittances Transaction Alert - Payment received from  {result.Name}",
+                    Body = bodyMessage,
+                    IsBodyHtml = true
+                };
+                mailMessage.To.Add(toMail);
+
+                using var memoryStream = new MemoryStream(pdfBytes);
+                mailMessage.Attachments.Add(new Attachment(memoryStream, "PaymentReceipt.pdf", "application/pdf"));
+                //mailMessage.Bcc.Add(toMail);
+                using var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+                {
+                    Port = int.Parse(_configuration["EmailSettings:Port"]),
+                    Credentials = new NetworkCredential(
+                      _configuration["EmailSettings:SenderEmail"],
+                      _configuration["EmailSettings:SenderPassword"]
+                  ),
+                    EnableSsl = true
+                };
+
+                await smtpClient.SendMailAsync(mailMessage);
+                return "1";
+            }
+            catch (Exception ex)
+            {
+
+                return ex.ToString();
+            }
+        }
+
+
+        private async Task<byte[]> GeneratePdfFromHtml(string htmlContent)
+        {
+            using (var htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(htmlContent)))
+            using (var outputStream = new MemoryStream())
+            {
+                var converterProperties = new ConverterProperties();
+                HtmlConverter.ConvertToPdf(htmlStream, outputStream, converterProperties);
+
+                return outputStream.ToArray();
+            }
+        }
+
+
+        private async Task<string> sendMail(TransactionReceipt result)
+        {
+
+            try
+            {
+
+                string bodyMessage; string statusColor = result.PaymentStatus.Contains("AUTHORIZED") ? "green" : "red";
+
+                if (result.types == 1)
+                {
+                    bodyMessage = $@"
+          <p>Dear <strong>{result.Name}</strong>,</p>
+          <p>We are pleased to confirm that your payment has been <strong style=""color: {statusColor};"">successfully</strong> received via our payment gateway. Below are the details of the transaction:</p>";
+                }
+
+                else if (result.types == 0)
+                {
+                    bodyMessage = $@"
+            <p>Dear <strong>{result.Name}</strong>,</p>
+            <p>We would like to inform you that your recent attempt to make a payment via our payment gateway was <strong style=""color: {statusColor};"">unsuccessful</strong>. Please find the transaction details below:</p>";
+                }
+                else
+                {
+                    bodyMessage = @"
+            <p></p>";
+                }
+
+
+
+
+                string paymentRows = "";
+                foreach (var header in result.PaymentHeaderdetails)
+                {
+                    paymentRows += $@"
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>{header.paymentCode}:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>${header.paymentAmount.ToString("F2")}</td>
+  </tr>";
+                }
+
+
+                string bordyCommon = $@"
+<table style='border-collapse: collapse; width: 100%; max-width: 600px;'>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Receipt #:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.receiptNumber}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Registration No:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.regNo}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Customer Name:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.Name}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Transaction ID:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.Id}</td>
+  </tr>
+
+{paymentRows}
+
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Amount Paid:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>${result.Amount}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Status:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd; color: {statusColor};'>{result.PaymentStatus}</td>
+  </tr>
+  <tr>
+    <td style='padding: 8px; border: 1px solid #ddd;'><strong>Transaction Date:</strong></td>
+    <td style='padding: 8px; border: 1px solid #ddd;'>{result.date}</td>
+  </tr>
+</table>
+<br />
+<p>The receipt is attached for your records.</p>
+
+<br />
+<b>Sincerely,</b>
+<br />
+Administrator (C3 Remittances)
+<br />
+St. Christopher & Nevis Social Security Board";
+
+                bodyMessage = bodyMessage + bordyCommon;
+
+                string isTest = _configuration["IsTestMail"];
+                string testMail = _configuration["TestMail"];
+                string SSBMail = _configuration["SSBMail"];
+                string toMail = isTest == "1" ? testMail : result.Email;
+
+                // Step 1: Render Razor View to HTML
+                var projectPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Email");
+                var engine = new RazorLightEngineBuilder()
+                .UseFileSystemProject(projectPath)
+                .UseMemoryCachingProvider()
+                .Build();
+
+                engine.Options.EnableDebugMode = true;
+                string htmlContentMain = await engine.CompileRenderAsync("payment.cshtml", result);
+
+                byte[] pdfBytes = await GeneratePdfFromHtml(htmlContentMain);
+
+                using var memoryStream = new MemoryStream(pdfBytes);
+                using var message = new MailMessage
+                {
+                    From = new MailAddress(_configuration["EmailSettings:SenderEmail"]),
+                    Subject = $"C3 Remittances Transaction  {result.Name}",
+                    Body = bodyMessage,
+                    IsBodyHtml = true
+                };
+
+                message.To.Add(toMail);
+
+                message.Attachments.Add(new Attachment(memoryStream, "Receipt.pdf", "application/pdf"));
+
+                using var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+                {
+                    Port = int.Parse(_configuration["EmailSettings:Port"]),
+                    Credentials = new NetworkCredential(
+                        _configuration["EmailSettings:SenderEmail"],
+                        _configuration["EmailSettings:SenderPassword"]
+                    ),
+                    EnableSsl = true
+                };
+
+                await smtpClient.SendMailAsync(message);
+                return "1";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+
+            }
+        }
+
+        [HttpPost("OfflinepayNowDataCyberSource")]
+        [AllowAnonymous]
+        public async Task<IActionResult> OfflineProcessPayment([FromBody] PaymentDetailsofflineVm modal)
+        {
+
+            try
+            {
+                if (modal == null)
+                    return BadRequest("Invalid data.");
+                var dt = await _paymentRepo.OfflinePayCharge(modal);
+                //var result = dt.AsEnumerable().Select(row => new
+                //{
+
+                //    Id = row.Field<string>("PaymentGatewayTransactionID"),
+                //    Name = row.Field<string>("RefCustomerName"),
+                //    PaymentStatus = row.Field<string>("PaymentStatus"),
+                //    Amount = row.Field<decimal>("PaymentAmount")
+                //});
+                if (dt.Id > 0)
+                {
+                    return Ok(new ResponseModel { Status = true, Message = "Payment Success", Data = dt });
+                }
+                else
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "Payment Failed" });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        [HttpGet("CardDetailsByCyber")]
+        public async Task<IActionResult> CardDetailsByCyber(int userId, int headerId)
+        {
+            try
+            {
+                var Data = await _paymentRepo.CardDetails(userId);
+                var isSelfEmp = _Context.Secusers
+                    .Where(e => e.UserId == userId)
+                    .Select(e => e.IsSelfEmployee)
+                    .FirstOrDefault();
+
+
+
+                object receipt;
+
+                if (isSelfEmp ?? false)
+                {
+
+
+                    var charges1 = _Context.ProcessSelfEmployedC3s
+                        ?.FirstOrDefault(e => e.Sec3id == headerId);
+                    receipt = new
+                    {
+                        cardNumber = Data?.CardNumber,
+                        expirationYear = Data?.CardMonthExpiry,
+                        cardHolderName = Data?.CardHolderName,
+                        securityCode = Data?.CVV,
+                        paymentMethod = Data?.CardType,
+                        monthPeriod = charges1 == null ? "" : charges1?.PeriodYear + " - " + _paymentRepo.MonthName(charges1.PerioddMonth),
+
+                        TotalContributions = charges1?.TotalContributions ?? 0,
+                        TotalFine = charges1?.TotalFine ?? 0,
+
+                        payAmt = (charges1?.TotalContributions ?? 0) + (charges1?.TotalFine ?? 0)
+                    };
+                }
+                else
+                {
+                    var charges = _Context.ProcessC3headers
+              ?.FirstOrDefault(e => e.C3headerid == headerId);
+                    receipt = new
+                    {
+                        cardNumber = Data?.CardNumber,
+                        expirationYear = Data?.CardMonthExpiry,
+                        cardHolderName = Data?.CardHolderName,
+                        securityCode = Data?.CVV,
+                        paymentMethod = Data?.CardType,
+                        monthPeriod = charges == null ? "" : charges?.PeriodYear + " - " + _paymentRepo.MonthName(charges.PerioddMonth),
+
+                        TotalSscontributions = charges?.TotalSscontributions ?? 0,
+                        sumLeavy = (charges?.TotalLevyeeemployee ?? 0) + (charges?.TotalLevyeeemployer ?? 0),
+                        TotalServayance = charges?.TotalServayance ?? 0,
+                        TotalPepenalty = charges?.TotalPepenalty ?? 0,
+                        TotalSspenalty = charges?.TotalSspenalty ?? 0,
+                        sumPenalty = (charges?.TotalPepenalty ?? 0) + (charges?.TotalSspenalty ?? 0) + (charges?.TotalLevyeepenalty ?? 0),
+                        TotalLevyeepenalty = charges?.TotalLevyeepenalty ?? 0,
+                        TotalLevyeeemployer = charges?.TotalLevyeeemployer ?? 0,
+
+                        payAmt =
+                            (charges?.TotalSscontributions ?? 0)
+                            + (charges?.TotalLevyeeemployee ?? 0)
+                            + (charges?.TotalServayance ?? 0)
+                            + (charges?.TotalPepenalty ?? 0)
+                            + (charges?.TotalSspenalty ?? 0)
+                            + (charges?.TotalLevyeepenalty ?? 0)
+                            + (charges?.TotalLevyeeemployer ?? 0)
+                    };
+                }
+
+                return Ok(new { Status = true, Message = "Data found!", Data = receipt });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something went wrong!", Data = ex });
+            }
+
+        }
+
+
+        [HttpPost("CardDetailsUpdateAndDel")]
+        public async Task<IActionResult> CardDetailsUpdateAndDel(CarddetailsModelVm obj)
+        {
+            try
+            {
+                var Data = await _paymentRepo.CardDetailUpdate(obj);
+
+                if (Data == 1)
+                {
+
+
+                    return Ok(new { Status = true, Message = "CardDetails Update Success..!", Data = "" });
+
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        Status = false,
+                        Message = "data Not found..!",
+                        Data = ""
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        [HttpGet("TransactionReport")]
+        public async Task<IActionResult> TransactionReport(int userId, int C3HeaderId, string? transactionId)
+        {
+            try
+            {
+                var data = await _paymentRepo.transacion(userId, C3HeaderId, transactionId);
+                if (data is not null)
+                {
+                    var receipt = new
+                    {
+                        data.RefCustomerName,
+                        data.PaymentGatewayTransactionID,
+                        data.PaymentStatus,
+                        data.PaymentAmount,
+                        data.CreateTime,
+                        receiptNumber = data.bimaReceiptNumber ?? data.Id.ToString("D6"),
+                        regNo = data.TransactionFor == "Self" ? _Context.ProcessSelfEmployedC3s.FirstOrDefault(e => e.Sec3id == data.C3HeaderId).Ssn : _Context.ProcessC3headers.FirstOrDefault(e => e.C3headerid == data.C3HeaderId).RegNo,
+                        data.BankName,
+                        data.checkNum,
+                        data.checkDate,
+                        data.JVNumber,
+                        data.jvDate,
+                        data.transactionDate,
+                        data.BimaRefNum,
+                        data.mode,
+                        totalSscontributions = data.totalSscontributions > 0 ? data.totalSscontributions : null,
+                        totalSspenalty = data.totalSspenalty > 0 ? data.totalSspenalty : null,
+                        totalLeavy = data.totalLeavy > 0 ? data.totalLeavy : null,
+                        totalLevyeepenalty = data.totalLevyeepenalty > 0 ? data.totalLevyeepenalty : null,
+                        totalServayance = data.totalServayance > 0 ? data.totalServayance : null,
+                        totalPepenalty = data.totalPepenalty > 0 ? data.totalPepenalty : null
+                    };
+                    return Ok(new { Status = true, Message = "data  found..!", Data = receipt });
+
+
+
+
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        Status = false,
+                        Message = "data Not found..!",
+                        Data = ""
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+
+
+
+
+        [HttpPost("saveConfigCyberSource")]
+        public async Task<IActionResult> saveConfig([FromBody] SiteSettingsVm modal)
+        {
+
+            try
+            {
+
+                var data = await _paymentRepo.saveAndGetConfigData(modal);
+                if (String.IsNullOrEmpty(modal.merchantId) && String.IsNullOrEmpty(modal.secretKey) && String.IsNullOrEmpty(modal.keyId))
+                {
+                    return Ok(new ResponseModel { Status = true, Message = "Details Found", Data = data });
+                }
+                else
+                {
+
+                    return Ok(new ResponseModel { Status = true, Message = "update success", Data = "" });
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        [HttpPost("updateStatusConfig")]
+        public async Task<IActionResult> updateStatusConfig([FromBody] SiteSettingsVm modal)
+        {
+
+            try
+            {
+
+                var data = await _paymentRepo.StatusChangeConfigData(modal);
+                if (data == 1)
+                {
+                    return Ok(new ResponseModel { Status = true, Message = "Status Change Success", Data = data });
+                }
+                else
+                {
+
+                    return BadRequest(new ResponseModel { Status = true, Message = "Status Change Failed", Data = 0 });
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        [HttpGet("TestPaymentTransactionHistory")]
+        public async Task<IActionResult> TestPaymentTransactionHistory()
+        {
+            try
+            {
+                var transData = await _paymentRepo.TestPaymentTransaction();
+                return Ok(new ResponseModel { Status = true, Message = "Payment Success", Data = transData });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+
+        [HttpPost("payNowCyberSourceTestAndLive")]
+        public async Task<IActionResult> payNowCyberSourceTestAndLive([FromBody] PaymentFormModelVm modal)
+        {
+
+            try
+            {
+
+                var dt = await _paymentRepo.PayChargeTestAndLive(modal);
+                var result = new
+                {
+
+                    Id = dt.PaymentGatewayTransactionID,
+                    Name = dt.RefCustomerName,
+                    PaymentStatus = dt.PaymentStatus,
+                    Amount = dt.PaymentAmount,
+                    date = dt.CreateTime
+                };
+
+
+                if (result.PaymentStatus == "AUTHORIZED")
+                {
+                    return Ok(new ResponseModel { Status = true, Message = "Payment Success", Data = result });
+                }
+                else
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "Payment Failed", Data = result });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return StatusCode(500, new { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+        /// <summary>
+        /// Upload to csv file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        [HttpPost("UploadCyberCsv")]
+        public async Task<IActionResult> UploadCyberCsv([FromForm] ReconcileVm reconcile)
+        {
+            if (reconcile.file == null || reconcile.file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+            try
+            {
+                var res = await _paymentRepo.UploadCyberCsv(reconcile);
+                if ((bool)res.Status)
+                {
+                    return Ok(res);
+                }
+                else
+                {
+                    return BadRequest(res);
+                }
+            }
+            catch (DbUpdateException dbEx) when (dbEx.InnerException is SqlException sqlEx)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, dbEx.Message, dbEx.StackTrace);
+
+                if (sqlEx.Number == 2627 || sqlEx.Number == 2601)
+                {
+
+                    return BadRequest(new ResponseModel
+                    {
+                        Status = false,
+                        Statuscode = 409,
+                        Message = "Duplicate entry: Transaction ID already exists.",
+                        Data = null
+                    });
+                }
+                return BadRequest(new ResponseModel
+                {
+
+                    Status = false,
+                    Statuscode = 500,
+                    Message = "SQL Error: " + sqlEx.Message,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = ex.InnerException?.Message ?? ex.Message,
+                    Data = null
+                });
+            }
+
+        }
+
+
+
+
+        /// <summary>
+        /// Upload CyberSource JSON data
+        /// </summary>
+        /// <param name="dataList"></param>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        [HttpPost("UploadCyberJson")]
+        public async Task<IActionResult> UploadCyberJson([FromBody] List<ReconciliationCyberJsonVm> dataListn, int UserId)
+        {
+            if (dataListn == null || !dataListn.Any())
+            {
+                return BadRequest("No data received.");
+            }
+
+            try
+            {
+                var res = await _paymentRepo.UploadCyberJson(dataListn, UserId);
+                if ((bool)res.Status)
+                {
+                    return Ok(res);
+                }
+                else
+                {
+                    return BadRequest(res);
+                }
+            }
+            catch (DbUpdateException dbEx) when (dbEx.InnerException is SqlException sqlEx)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, dbEx.Message, dbEx.StackTrace);
+
+                if (sqlEx.Number == 2627 || sqlEx.Number == 2601)
+                {
+                    return BadRequest(new ResponseModel
+                    {
+                        Status = false,
+                        Statuscode = 409,
+                        Message = "Duplicate entry: Transaction ID already exists.",
+                        Data = null
+                    });
+                }
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = "SQL Error: " + sqlEx.Message,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Statuscode = 500,
+                    Message = ex.InnerException?.Message ?? ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+
+
+
+        [HttpGet("GetReconciliationDataCyberData")]
+        public async Task<ResponseModel> GetReconciliationDataCyberData()
+        {
+            try
+            {
+                var data = await _paymentRepo.GetReconciliationCyberSourceAsync();
+                return data;
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return new ResponseModel
+                {
+                    Status = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Statuscode = 500,
+                    Data = null
+                };
+            }
+        }
+        [HttpGet("GetReconciliationDataCyber")]
+        public async Task<ResponseModel> GetReconciliationDataCyber(int pageNumber, int pageSize, string fromDate = null, string toDate = null, string status = null, string cardHolderName = null)
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                //if (pageNumber < 1) pageNumber = 1;
+                //if (pageSize < 1) pageSize = 10;
+                if (pageNumber < 0) pageNumber = 0;
+                if (pageSize < 1) pageSize = 10;
+
+                DateTime? sqlfromDate = fromDate == null ? null : DateTime.ParseExact(fromDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                DateTime? sqltoDate = toDate == null ? null : DateTime.ParseExact(toDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+                var data = await _paymentRepo.GetReconciliationCyberSourceAsync(pageNumber, pageSize, sqlfromDate = null, sqltoDate, status, cardHolderName);
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return new ResponseModel
+                {
+                    Status = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Statuscode = 500,
+                    Data = null
+                };
+            }
+        }
+
+        /// <summary>
+        /// Updated and inserted Reconciliation data
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("UpdateReconciliationData")]
+        public async Task<IActionResult> UpdateReconciliationData([FromBody] ReconciliationRequestModel model)
+        {
+            try
+            {
+                var response = new ResponseModel();
+
+                if (model.id == null || model.id.Length == 0)
+                {
+                    response.Status = false;
+                    response.Message = "No IDs provided.";
+                    return BadRequest(response);
+                }
+
+                if (string.IsNullOrWhiteSpace(model.ReasonsForReconciliation))
+                {
+                    response.Status = false;
+                    response.Message = "Reconciliation reason is required.";
+                    return BadRequest(response);
+                }
+
+                var payments = _Context.OnlinePayments.Where(x => model.id.Contains(x.Id)).ToList();
+
+                foreach (var payment in payments)
+                {
+                    string oldStatus = payment.IsReconciled == true ? "Reconciled" : "Unreconciled";
+                    string newStatus = model.Status == null ? "Not Set" : (model.Status == true ? "Reconciled" : "Unreconciled");
+                    var username = _Context.Secusers.Where(x => x.UserId == model.UserId).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
+                    string newEntry = $"{DateTime.Now:dd/MMM/yyyy}, by {username}, {oldStatus} ---> {newStatus}, {model.ReasonsForReconciliation?.Trim()}";
+
+                    payment.IsReconciled = true;
+                    payment.ReconciledBy = model.UserId;
+                    //payment.Notes = newEntry;
+                    payment.ReconciledOn = DateTime.Now;
+
+                    if (string.IsNullOrEmpty(payment.Notes))
+                    {
+                        payment.Notes = newEntry;
+                    }
+                    else
+                    {
+                        payment.Notes += "," + newEntry;
+                    }
+                }
+
+                await _Context.SaveChangesAsync();
+
+                response.Status = true;
+                response.Statuscode = 200;
+                response.Message = "Updated Successfully.";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new
+                {
+                    Status = false,
+                    Message = "Something went wrong.",
+                    Error = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("UpdateReconciliationNotes")]
+        public async Task<IActionResult> UpdateReconciliationNotes([FromBody] ReconciliationRequestNotes requestNotes)
+        {
+            try
+            {
+                var response = new ResponseModel();
+
+                if (requestNotes.Status == true && requestNotes.id > 0)
+                {
+                    var record = await _Context.OnlinePayments
+                        .FirstOrDefaultAsync(x => x.Id == requestNotes.id);
+
+
+                    if (record != null)
+                    {
+                        string oldStatus = record.IsReconciled == true ? "Reconciled" : "Unreconciled";
+                        string newStatus = requestNotes.Status == null ? "Not Set" : (requestNotes.Status == true ? "Reconciled" : "Unreconciled");
+                        var username = _Context.Secusers.Where(x => x.UserId == requestNotes.Userid).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
+
+                        //string newEntry = $"[{DateTime.Now:dd/MM/yyyy}] {requestNotes.Notes?.Trim()}";
+                        string newEntry = $"{DateTime.Now:dd/MMM/yyyy}, by {username}, {oldStatus} ---> {newStatus}, {requestNotes.Notes?.Trim()}";
+
+                        if (string.IsNullOrEmpty(record.Notes))
+                        {
+                            record.Notes = newEntry;
+                        }
+                        else
+                        {
+                            record.Notes += "," + newEntry;
+                        }
+                        record.ReconciledOn = DateTime.Now;
+                        record.IsReconciled = true;
+                        record.ReconciledBy = requestNotes.Userid;
+                        await _Context.SaveChangesAsync();
+                        response.Status = true;
+                        response.Statuscode = 200;
+                        response.Data = record;
+                        response.Message = "Updated Successfully.";
+                    }
+                }
+                else
+                {
+                    var record = await _Context.OnlinePayments
+                       .FirstOrDefaultAsync(x => x.Id == requestNotes.id);
+
+                    if (record != null)
+                    {
+                        string oldStatus = record.IsReconciled == true ? "Reconciled" : "Unreconciled";
+                        string newStatus = requestNotes.Status == null ? "Not Set" : (requestNotes.Status == true ? "Reconciled" : "Unreconciled");
+                        var username = _Context.Secusers.Where(x => x.UserId == requestNotes.Userid).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
+                        string newEntry = $"{DateTime.Now:dd/MMM/yyyy}, by {username}, {oldStatus} ---> {newStatus}, {requestNotes.Notes?.Trim()}";
+                        //string newEntry = $"[{DateTime.Now:dd/MM/yyyy}] {requestNotes.Notes?.Trim()}";
+                        if (string.IsNullOrEmpty(record.Notes))
+                        {
+                            record.Notes = newEntry;
+                        }
+                        else
+                        {
+                            record.Notes += "," + newEntry;
+                        }
+                        record.IsReconciled = null;
+                        record.ReconciledOn = DateTime.Now;
+                        record.ReconciledBy = requestNotes.Userid;
+                        await _Context.SaveChangesAsync();
+                        response.Status = true;
+                        response.Statuscode = 200;
+                        response.Data = record;
+                        response.Message = "Updated Successfully.";
+                    }
+
+
+                }
+
+
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return StatusCode(500, new
+                {
+                    Status = false,
+                    Message = "Something went wrong.",
+                    Error = ex.Message
+                });
+            }
+        }
+
+
+
+
+
+
+
+
+        [HttpPost("GetReconcilNotes")]
+        public async Task<IActionResult> GetReconcilNotes(int id)
+        {
+            var response = new ResponseModel();
+
+            try
+            {
+                if (id > 0)
+                {
+                    var note = await _Context.OnlinePayments
+                        .Where(x => x.Id == id)
+                        .Select(x => x.Notes)
+                        .FirstOrDefaultAsync();
+
+                    if (!string.IsNullOrEmpty(note))
+                    {
+                        var parts = note.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                        var notesArray = new List<string>();
+                        var currentNote = "";
+
+                        foreach (var part in parts)
+                        {
+                            var trimmed = part.Trim();
+
+
+                            if (DateTime.TryParseExact(trimmed, "dd/MMM/yyyy",
+                                    System.Globalization.CultureInfo.InvariantCulture,
+                                    System.Globalization.DateTimeStyles.None, out _))
+                            {
+
+                                if (!string.IsNullOrEmpty(currentNote))
+                                {
+                                    notesArray.Add(currentNote.Trim());
+                                }
+                                currentNote = trimmed;
+                            }
+                            else
+                            {
+
+                                currentNote += ", " + trimmed;
+                            }
+                        }
+
+
+                        if (!string.IsNullOrEmpty(currentNote))
+                            notesArray.Add(currentNote.Trim());
+
+                        //Sort date-wise (desc)
+                        notesArray = notesArray
+                            .OrderByDescending(n =>
+                            {
+                                var datePart = n.Split(',')[0].Trim();
+                                DateTime.TryParseExact(datePart, "dd/MMM/yyyy",
+                                    System.Globalization.CultureInfo.InvariantCulture,
+                                    System.Globalization.DateTimeStyles.None, out var parsedDate);
+                                return parsedDate;
+                            })
+                            .ToList();
+
+
+                        response.Status = true;
+                        response.Statuscode = 200;
+                        response.Data = notesArray;
+                        response.Message = "Fetched successfully.";
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response.Status = false;
+                        response.Statuscode = 404;
+                        response.Message = "No records found.";
+                        return NotFound(response);
+                    }
+                }
+                else
+                {
+                    response.Status = false;
+                    response.Statuscode = 400;
+                    response.Message = "Invalid request parameters.";
+                    return BadRequest(response);
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                response.Status = false;
+                response.Statuscode = 500;
+                response.Message = $"An error occurred: {ex.Message}";
+
+                return StatusCode(500, response);
+            }
+        }
+
+
+
+
+
+
+
+        /// <summary>
+        /// Get all Columns
+        /// </summary>
+        /// <returns></returns>
+        //[HttpGet("GetCyberSourceFields")]
+        //public IActionResult GetCyberSourceFields()
+        //{
+        //    var enumValues = Enum.GetValues(typeof(CyberSourceFields));
+        //    var data = new List<CyberSourceFieldStatus>();
+
+        //    foreach (var value in enumValues)
+        //    {
+        //        data.Add(new CyberSourceFieldStatus
+        //        {
+        //            Field = value.ToString(),
+        //            Status = true  
+        //        });
+        //    }
+
+        //    return Ok(data); 
+        //}
+
+
+        [HttpGet("GetCyberSourceFields")]
+        public IActionResult GetCyberSourceFields(int UserId)
+        {
+            var enumValues = Enum.GetValues(typeof(CyberSourceFields));
+            var data = new List<CyberSourceFieldStatus>();
+            var dataColumns = _Context.ReconciliationCyberSpaceColumns.Where(x => x.UserId == UserId).ToList();
+            foreach (var value in enumValues)
+            {
+                data.Add(new CyberSourceFieldStatus
+                {
+                    Field = value.ToString(),
+                    Status = dataColumns.Count == 0 ? true : dataColumns.FirstOrDefault(e => e.Columns == value.ToString()).IsActive ?? true
+                });
+            }
+
+            return Ok(data);
+        }
+
+
+
+
+
+        //[HttpPost("PostCyberSourceList")]
+        //public async Task<IActionResult> PostCyberSourceList([FromBody] List<PostCyberSourceVm> dataList)
+        //{
+        //    ResponseModel response = new ResponseModel();
+        //    if (dataList == null || !dataList.Any())
+        //    {
+        //        return BadRequest("No data received.");
+        //    }
+        //    try
+        //    {
+        //        List<ReconciliationCyberSpaceColumn> entities = new();
+
+
+        //        var d = await _Context.ReconciliationCyberSpaceColumns.Where(e => e.UserId == dataList[0].UserId).ToListAsync();
+        //        if (d != null && d.Count != 0)
+        //        {
+        //            foreach (var item in d)
+        //            {
+
+        //                item.IsActive = dataList.FirstOrDefault(w => w.field == item.Columns).Status;
+
+        //            }
+        //            //_Context.ReconciliationCyberSpaceColumns.AddRange(d);
+        //            await _Context.SaveChangesAsync();
+        //        }
+        //        else
+        //        {
+
+
+        //            entities = dataList.Select(item => new ReconciliationCyberSpaceColumn
+        //            {
+        //                Columns = item.field,
+        //                IsActive = item.Status,
+        //                UserId = dataList[0].UserId,
+        //                CreatedOn = DateTime.Now,
+        //                CreatedBy = dataList[0].UserId,
+        //            }).ToList();
+
+        //            _Context.ReconciliationCyberSpaceColumns.AddRange(entities);
+        //           await  _Context.SaveChangesAsync();
+        //        }
+        //        response.Status = true;
+        //        response.Message = "Data saved successfully.";
+        //        response.Data = entities;
+        //        response.Statuscode = 200;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Status = false;
+        //        response.Message = "An error occurred while saving data.";
+        //        response.Statuscode = 500;
+        //        response.Data = ex.Message; // In production, log this instead of returning
+
+        //        return StatusCode(500, response);
+        //    }
+
+        //    return Ok(response);
+        //}
+
+
+        [HttpPost("PostCyberSourceList")]
+        public async Task<IActionResult> PostCyberSourceList([FromBody] List<PostCyberSourceVm> dataList)
+        {
+            ResponseModel response = new ResponseModel();
+            if (dataList == null || !dataList.Any())
+            {
+                return BadRequest("No data received.");
+            }
+            try
+            {
+                List<ReconciliationCyberSpaceColumn> entities = new();
+
+
+                var d = await _Context.ReconciliationCyberSpaceColumns.Where(e => e.UserId == dataList[0].UserId).ToListAsync();
+                if (d != null && d.Count != 0)
+                {
+                    foreach (var item in d)
+                    {
+
+                        item.IsActive = dataList.FirstOrDefault(w => w.field == item.Columns).Status;
+
+                    }
+                    //_Context.ReconciliationCyberSpaceColumns.AddRange(d);
+                    await _Context.SaveChangesAsync();
+                    response.Status = true;
+                    response.Message = "Data saved successfully.";
+                    response.Data = d;
+                    response.Statuscode = 200;
+                }
+                else
+                {
+
+
+                    entities = dataList.Select(item => new ReconciliationCyberSpaceColumn
+                    {
+                        Columns = item.field,
+                        IsActive = item.Status,
+                        UserId = dataList[0].UserId,
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = dataList[0].UserId,
+                    }).ToList();
+
+                    _Context.ReconciliationCyberSpaceColumns.AddRange(entities);
+                    await _Context.SaveChangesAsync();
+                    response.Status = true;
+                    response.Message = "Data saved successfully.";
+                    response.Data = entities;
+                    response.Statuscode = 200;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                response.Status = false;
+                response.Message = "An error occurred while saving data.";
+                response.Statuscode = 500;
+                response.Data = ex.Message;
+
+                return StatusCode(500, response);
+            }
+
+            return Ok(response);
+        }
+
+
+
+        [HttpGet("ConfirmEmailSignalR")]
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(int userId, string token, IHubContext<NotificationHub> _hubContext)
+        {
+            //var user = _Context.Secusers.FirstOrDefault(u => u.UserId == userId); /*&& u.Password == token);*/
+            //if (user == null) return BadRequest("Invalid or expired token");
+
+            //user.IsEmailConfirmed = true;
+            //user.EmailVerificationToken = null;
+            //await dbContext.SaveChangesAsync();
+
+
+            // await _hubContext.Clients.User(userId.ToString()).SendAsync("EmailVerified");
+            //await _hubContext.Clients.All.SendAsync("EmailVerified");
+            await _hubContext.Clients.All.SendAsync("EmailVerified", "atul.r@mipl.us", true);
+
+            return Content(" Email confirmed successfully! You can return to the app.");
+        }
+
+        [HttpGet("getCardHolderName")]
+        public async Task<IActionResult> CardHolders()
+        {
+            // If you want all cardholder names for a specific user
+            try
+            {
+                var cardHolders = await _Context.UserCardDetails
+                                                    .Select(u => new { u.CardHolderName, u.UserId })
+                                                    .ToListAsync();
+
+
+                return Ok(new { status = true, msg = "data found", data = cardHolders });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                var data = new
+                {
+
+                    Status = false,
+                    Message = "An error occurred while saving data.",
+                    Statuscode = 500,
+                    Data = ex.Message
+                };
+
+                return StatusCode(500, data);
+            }
+        }
+
+        [HttpGet("getOfflinePaymentsDetails")]
+        public async Task<IActionResult> getOfflinePaymentsDetails(string receiptId, int userId)
+        {
+            try
+            {
+                var secuser = _Context.Secusers.Where(e => e.UserId == userId).Select(e => new { e.LoginId, e.Password }).FirstOrDefault();
+
+                string Emp_surl = _configuration["ServiceConfig:ServiceUriString"];
+                string Emp_sURL = $"{Emp_surl}/api/payment/details/{receiptId}";
+                HttpResponseMessage getresponse;
+                using (var gethttpClient = new HttpClient() { BaseAddress = new Uri(Emp_sURL), Timeout = TimeSpan.FromMinutes(2) })
+                {
+                    gethttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+                    var getplainTextBytes = _configuration["EnableBEMAAuthInsteadOfLocal"] == "1" ? System.Text.Encoding.UTF8.GetBytes(_configuration["ServiceConfig:AuthUser"] + ":" + _configuration["ServiceConfig:AuthPass"]) : Encoding.UTF8.GetBytes(secuser.LoginId + ":" + secuser.Password);
+
+                    string getval = Convert.ToBase64String(getplainTextBytes);
+                    gethttpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + getval);
+
+                    getresponse = await gethttpClient.GetAsync(Emp_sURL);
+                }
+                var getcustomerJsonString = await getresponse.Content.ReadAsStringAsync();
+
+                if (getresponse.StatusCode == HttpStatusCode.OK)
+                {
+                    var outputData = JsonConvert.DeserializeObject<offilinePaymentResonseBimaVM>(getcustomerJsonString);
+
+                    return Ok(new ResponseModel
+                    {
+                        Status = true,
+                        Message = "payment data found",
+                        Data = outputData,
+                        Statuscode = 200
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseModel
+                    {
+                        Status = false,
+
+                        Message = getcustomerJsonString,
+                        Statuscode = 400
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                var data = new
+                {
+
+                    Status = false,
+                    Message = "An error occurred while saving data.",
+                    Statuscode = 500,
+                    Data = ex.Message
+                };
+
+                return StatusCode(500, data);
+            }
+
+
+        }
+
+
+    }
+}

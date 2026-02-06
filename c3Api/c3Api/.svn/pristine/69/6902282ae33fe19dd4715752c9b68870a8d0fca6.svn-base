@@ -1,0 +1,86 @@
+﻿using C3Wizard.COMMONPROP;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardHelper.ViewModels
+{
+  public class C3HeaderVM
+  {
+    public int HeaderID { get; set; }
+    public int userId { get; set; }
+    public int PMonth { get; set; }
+    public string RegNo { get; set; }
+    public string period_Month { get; set; }
+    public string Period_year { get; set; }
+    public decimal TOTAL_WAGES { get; set; }
+    public decimal TOTALSERVAYANCE { get; set; }
+    public decimal TOTALSSCONTRIBUTIONS { get; set; }
+    public decimal TOTALSSPENALTY { get; set; }
+    public decimal TOTALLEVYEEEMPLOYEE { get; set; }
+    public decimal TOTALLEVYEEEMPLOYER { get; set; }
+    public decimal TOTALLEVYEEPENALTY { get; set; }
+    public string Insert_Datetimeinfo { get; set; }
+    public string Inserted_ByName { get; set; }
+    public string Modified_On { get; set; }
+    public string Modified_ByName { get; set; }
+    public string C3_SubmittedByName { get; set; }
+    public string C3_SubmittedBy { get; set; }
+    public bool Is_Fianalize { get; set; }
+    public bool isNilReturn { get; set; }
+    public bool Is_submitted { get; set; }
+    public bool C3_IsFinalized { get; set; }
+    public bool IsImportFromBEMA { get; set; }
+    public bool ispaid { get; set; } = false;
+    public string? payReason { get; set; }
+    public List<TransactionDetails>? PayDetails { get; set; }
+    public List<userAndCompny>? users { get; set; }
+    public List<userAndCompny>? company { get; set; }
+    public int Schedule_NO { get; set; }
+    public string OrderName { get; set; }
+    public string OrderKey { get; set; }
+    public decimal TOTALPEPENALTY { get; set; }
+    public decimal TotalSSBpenanlity { get; set; }
+    public decimal payAmt { get; set; }
+    public string IsPaidStatus { get; set; }
+    public string? Notes { get; set; }
+  }
+
+
+  public class Paymentdata
+  {
+    public List<C3HeaderVM>? Dir { get; set; }
+    public List<C3HeaderVM>? Company { get; set; }
+    public List<C3HeaderVM>? Self { get; set; }
+  }
+
+  public class userAndCompny
+  {
+    public string? Name { get; set; }
+    public string? Id { get; set; }
+
+    public bool? IsPPOC { get; set; }
+
+  }
+
+  public class editC3Vm
+  {
+    public int headerId { get; set; }
+    public bool? isNilReturn { get; set; }
+    public int CompanyId { get; set; }
+    public List<string>? popUpList { get; set; }
+  }
+
+  public class editDirC3Vm
+  {
+    public int HeaderId { get; set; }
+    public int CompanyId { get; set; }
+    public int monthno { get; set; }
+    public bool? isNilReturn { get; set; }
+    public int Year { get; set; }
+    public List<string>? popUpList { get; set; }
+  }
+
+}

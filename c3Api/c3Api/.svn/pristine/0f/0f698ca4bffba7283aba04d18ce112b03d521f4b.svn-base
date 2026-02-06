@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CyberSource.Rest.Client" Version="0.0.1.51" />
+    <PackageReference Include="EPPlus" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="PayPal" Version="1.9.1" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\C3Wizard.COMMONPROP\C3Wizard.COMMONPROP.csproj" />
+    <ProjectReference Include="..\C3WizardData\C3WizardData.csproj" />
+    <ProjectReference Include="..\C3WizardHelper\C3WizardHelper.csproj" />
+    <ProjectReference Include="..\C3WizardLayer\C3WizardLayer.csproj" />
+  </ItemGroup>
+
+</Project>

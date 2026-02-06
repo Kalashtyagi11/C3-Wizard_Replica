@@ -1,0 +1,2139 @@
+﻿using C3Wizard.COMMONPROP;
+using C3WizardHelper.ViewModels;
+using C3WizardLayer.BusinessObjects;
+using C3WizardLayer.DataObjects;
+using C3WizardRepository.Interface;
+using C3WizardRepository.Repository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Data;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using static System.Net.Mime.MediaTypeNames;
+using C3WizardRepository.Common;
+using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using C3WizardData.Models;
+using Azure;
+using Microsoft.Reporting.NETCore;
+using CrystalDecisions.ReportAppServer.DataDefModel;
+using Microsoft.ReportingServices.ReportProcessing.ReportObjectModel;
+using static C3Wizard.COMMONPROP.C3Contributions;
+
+namespace C3WIZARDWebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    //[Authorize]
+    public class NonDirectorController : ControllerBase
+    {
+
+        private readonly NonDirectorRepo _NonDirectorRepo;
+        private readonly RepoC3 _C3;
+        private readonly IConfiguration _configuration;
+        private readonly C3wizardContext _context;
+        //private readonly ConnectionInfo ConnectionInfo;
+        public NonDirectorController(NonDirectorRepo NonDirectorRepo, RepoC3 c3, IConfiguration configuration, C3wizardContext context)
+        {
+            _NonDirectorRepo = NonDirectorRepo;
+            _C3 = c3;
+            _configuration = configuration;
+            _context = context;
+        }
+
+
+
+        [HttpPost("NewDirectorDetailsC3")]
+        public async Task<IActionResult> NewDirectorDetailsC3(int monthNo, string Year,/* string Monthtype,*/ int CompanyId, List<PayPeriod1> CmbPayPeriod, bool isNilReturn)
+        {
+            try
+            {
+                //1
+                var periodList = _NonDirectorRepo.PayPeriodDropDownData(CompanyId);
+                var data = isNilReturn ? new List<C3Contributions>() : await _NonDirectorRepo.LoadDirectorC3(monthNo, Year, CompanyId, CmbPayPeriod, 0);
+
+                foreach (var item in data)
+                {
+                    if (item.PayPeriod == "W")
+                        item.PayPeriod = "W - Weekly";
+                    if (item.PayPeriod == "M")
+                        item.PayPeriod = "M - Monthly";
+                    if (item.PayPeriod == "E2W")
+                        item.PayPeriod = "E2W - Every Two Weeks"; // retObj._payPeriodforlist = "Every Two Weeks"; Old Code             
+                    if (item.PayPeriod == "2M")
+                        item.PayPeriod = "2M - Twice Monthly"; //retObj._payPeriodforlist = "Twice Monthly";
+                }
+
+                if (data != null)
+                {
+                    var isC3Created = _context.ProcessC3headers.Where(e => e.PerioddMonth == monthNo.ToString() && e.PeriodYear == Year && e.EmployerId == CompanyId && e.ForDirector == true)?.OrderByDescending(e => e.ScheduleNo)?.FirstOrDefault();
+                    string msg = isC3Created != null && (isC3Created.IsSubmitted ?? false) ? "C3 has already been submitted for this month.Do you want to create a new C3 with another schedule " + (isC3Created.ScheduleNo + 1) : "";
+
+
+                    return Ok(new { Status = true, Message = "data found..!", Msg = msg, Data = new { isNilReturn, data, periodList } });
+                }
+                return BadRequest(new { Status = false, Message = "data Not found..!", Data = "" });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = null });
+            }
+        }
+
+        [HttpGet("NewDirectorMainDetails")]
+        public async Task<IActionResult> NewDirectorMainDetails(int CompanyId)
+        {
+            try
+            {
+                var data = await _NonDirectorRepo.load_defaults(CompanyId);
+                var periodList = _NonDirectorRepo.PayPeriodDropDownData(CompanyId);
+                var data1 = data.Select(e => new C3HeaderVM
+                {
+                    HeaderID = e.HeaderID,
+                    RegNo = e.RegNo,
+                    period_Month = e.period_Month,
+                    Period_year = e.Period_year,
+                    TOTAL_WAGES = e.TOTAL_WAGES,
+                    TOTALSSCONTRIBUTIONS = e.TOTALSSCONTRIBUTIONS,
+                    TOTALLEVYEEPENALTY = e.TOTALLEVYEEPENALTY,
+                    TOTALLEVYEEEMPLOYEE = e.TOTALLEVYEEEMPLOYEE,
+                    Insert_Datetimeinfo = e.Insert_Datetimeinfo,
+                    Is_Fianalize = e.Is_Fianalize,
+                    Is_submitted = e.Is_submitted,
+                    Schedule_NO = e.Schedule_NO,
+                    isNilReturn = e.isNilReturn
+                }).ToList();
+                if (data != null)
+                {
+                    return Ok(new ResponseModel { Status = true, Message = "data found..!", Data = new { data1, periodList } });
+                }
+                return Ok(new ResponseModel { Status = false, Message = "data Not found..!", Data = null });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = null });
+            }
+        }
+
+
+
+        [HttpPost("SaveNewDirector")]
+        public async Task<IActionResult> SaveNewDirector([FromBody] saveDirPayrolVM obj)//(string MonthName, int monthNum, int CompanyId, int year, List<PayPeriod1> CmbPayPeriod, List<string> ssnList, bool directorExistContinue, int UserID, string MachineInfo, string User_Name, int H_Id, bool ispayperiodchange = false)
+        {
+            try
+            {
+                bool isSave = false;
+                string PatPmessage = "";
+
+                if (obj.MonthNum == 0)
+                {
+                    PatPmessage += "pay period Month \n";
+                }
+                if (obj.Year == 0)
+                {
+                    PatPmessage += "pay period Year \n";
+                }
+                if (obj.CmbPayPeriod != null)
+                {
+                    if (obj.CmbPayPeriod.Count <= 0)
+                    {
+                        PatPmessage += "pay period \n";
+                    }
+                }
+                if (obj.SelectList != null)
+                {
+                    if (obj.SelectList.Count <= 0)
+                    {
+                        PatPmessage += "Select List Fill \n";
+                    }
+                }
+                else
+                {
+                    PatPmessage += "pay period \n";
+                }
+                if (PatPmessage != "")
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "C3 Wizard Please select" + PatPmessage });
+
+                }
+                if (obj.IsPayPeriodChange != true)
+                {
+
+                    isSave = true;
+                    var msg = await _NonDirectorRepo.SaveNContinue(null, isSave, obj.DirectorExistContinue, obj.UserID, obj.MachineInfo, obj.User_Name, obj.Year, /*MonthName,*/ obj.MonthNum, obj.CompanyId, obj.CmbPayPeriod, obj.SelectList, obj.H_Id, false, false, false, false/*, false, false, false, false*/, 1);
+
+
+
+                    return Ok(new ResponseModel { Status = true, Message = msg, Data = null });
+                }
+                else
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "Please click on Create button to fetch the data for this month !" });
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        [HttpPost("EditDirectorPayrollView")]
+        public async Task<IActionResult> EditDirectorPayrollView(editDirC3Vm obj) //(int HeaderId, int CompanyId, int monthno, int Year,bool isPopup = false)
+        {
+            try
+            {
+
+                // var periodList = _NonDirectorRepo.PayPeriodDropDownData(CompanyId);
+                var Alldata = await _NonDirectorRepo.NonDirectorRepoEdit(obj.HeaderId, obj.CompanyId, obj.monthno, obj.Year);
+
+                //string Mvalue = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(obj.monthno);
+                int daysin_month = DateTime.DaysInMonth(obj.Year, obj.monthno);
+                string monthval = obj.monthno <= 9 ? "0" + obj.monthno.ToString() : obj.monthno.ToString();
+                DateTime Today_date = DateTime.ParseExact(("01/" + monthval + "/" + obj.Year), Helper.DateFormat, CultureInfo.InvariantCulture);
+                DateTime? Todaydate = DateTime.ParseExact(("01/" + monthval + "/" + obj.Year), Helper.DateFormat, CultureInfo.InvariantCulture);
+
+                DateTime? end_date = Todaydate != null ? (DateTime?)((DateTime)Todaydate).AddDays(daysin_month - 1) : null;
+                Alldata = Alldata.DistinctBy(e => (e.C3HEADERID, e.SSN)).Where(x => (x.Date_terminated == null || Convert.ToDateTime(x.Date_terminated) >= Todaydate) && (x.Date_Joining == null || Convert.ToDateTime(x.Date_Joining) <= end_date)).ToList();
+
+                var dataEdit = Alldata.DistinctBy(e => (e.C3HEADERID, e.SSN)).Where(e => e.C3HEADERID != 0).ToList();
+
+                ProcessC3header C3headers = _context.ProcessC3headers.Where(p => p.C3headerid == obj.HeaderId && p.EmployerId == obj.CompanyId)?.FirstOrDefault();
+
+
+                var header = new
+                {
+                    headerID = dataEdit?.FirstOrDefault()?.C3HEADERID ?? C3headers?.C3headerid,
+                    period_year = dataEdit?.FirstOrDefault()?.Period_year ?? C3headers?.PeriodYear,
+                    period_Month = dataEdit?.FirstOrDefault()?.period_Month ?? C3headers?.PerioddMonth,
+                    isNilReturn = obj.isNilReturn == null ? C3headers.isNilReturn : obj.isNilReturn
+                };
+
+
+                if (C3headers != null)
+                {
+                    if (C3headers.OrderName == "employeeName")
+                    {
+                        var data = dataEdit.GroupBy(x => x.PayFreq)
+                                  .Select(group => new
+                                  {
+                                      PayPeriod = group.Key,
+                                      Employees = C3headers?.OrderKey == "asc" ? group.OrderBy(x => x.PayFreq).ThenBy(x => x.EmployeeName).ToList()
+                                          : group.OrderBy(x => x.PayFreq).OrderByDescending(x => x.EmployeeName).ToList()
+                                  }).OrderBy(x => x.PayPeriod).ToList();
+
+                        dataEdit = data.SelectMany(g => g.Employees).ToList();
+                    }
+                    if (C3headers.OrderName == "ssn")
+                    {
+                        var data = dataEdit.GroupBy(x => x.PayFreq)
+                                  .Select(group => new
+                                  {
+                                      PayPeriod = group.Key,
+                                      Employees = C3headers?.OrderKey == "asc" ? group.OrderBy(x => x.PayFreq).ThenBy(x => x.SocialSecurity).ToList()
+                                          : group.OrderByDescending(x => x.SocialSecurity).ToList()
+                                  }).OrderBy(x => x.PayPeriod).ToList();
+
+                        dataEdit = data.SelectMany(g => g.Employees).ToList();
+                    }
+                }
+
+                foreach (var item in dataEdit)
+                {
+                    if (item.PayPeriod == "W")
+                        item.PayPeriod = "W - Weekly";
+                    if (item.PayPeriod == "M")
+                        item.PayPeriod = "M - Monthly";
+                    if (item.PayPeriod == "E2W")
+                        item.PayPeriod = "E2W - Every Two Weeks";
+                    if (item.PayPeriod == "2M")
+                        item.PayPeriod = "2M - Twice Monthly";
+                }
+                List<C3Contributions> zeroC3HEADERID = null;
+
+                if (obj.isNilReturn == null && !(C3headers?.isNilReturn ?? false))
+                {
+                    if (obj.popUpList == null)
+                    {
+                        zeroC3HEADERID = new List<C3Contributions>();
+
+                        zeroC3HEADERID = Alldata.DistinctBy(e => (e.C3HEADERID, e.SSN)).Where(x => x.C3HEADERID == 0).ToList();
+
+                    }
+                    else
+                    {
+
+                        Alldata.RemoveAll(e => e.C3HEADERID == 0 && obj.popUpList.Contains(e.SSN));
+                        //allEmployeeList.ForEach(r => r.emp_add_remove = true);
+                        dataEdit = Alldata;
+                        //dataEdit.Where(d=>d.emp_add_remove==false).ForEach(r => r.emp_add_remove = true);
+
+
+                        foreach (var item in dataEdit.Where(d => !d.emp_add_remove))
+                        {
+                            item.emp_add_remove = true;
+                            if (item.PayPeriod == "W")
+                                item.PayPeriod = "W - Weekly";
+                            if (item.PayPeriod == "M")
+                                item.PayPeriod = "M - Monthly";
+                            if (item.PayPeriod == "E2W")
+                                item.PayPeriod = "E2W - Every Two Weeks";
+                            if (item.PayPeriod == "2M")
+                                item.PayPeriod = "2M - Twice Monthly";
+                        }
+                    }
+                }
+                else if (obj.isNilReturn == null && (C3headers?.isNilReturn ?? true))
+                {
+                    dataEdit = new List<C3Contributions>();
+                }
+                else
+                {
+                    if (obj.isNilReturn == true)
+                    {
+                        zeroC3HEADERID = null;
+                        dataEdit = new List<C3Contributions>();
+                    }
+                    else if (obj.isNilReturn == false)
+                    {
+                        List<PayPeriod1> payperiodList = JsonConvert.DeserializeObject<List<PayPeriod1>>("[{ \"Key\":\"W - Weekly\",\"Value\":\"W\"}, { \"Key\":\"M - Monthly\",\"Value\":\"M\"}, { \"Key\":\"E2W - Every Two Weeks\",\"Value\":\"E2W\"}, { \"Key\":\"2M - Twice Monthly\",\"Value\":\"2M\"}]");
+                        var employee = await _NonDirectorRepo.LoadDirectorC3(obj.monthno, obj.Year.ToString(), obj.CompanyId, payperiodList, 0);
+
+                        foreach (var item in employee)
+                        {
+                            if (item.PayPeriod == "W")
+                                item.PayPeriod = "W - Weekly";
+                            if (item.PayPeriod == "M")
+                                item.PayPeriod = "M - Monthly";
+                            if (item.PayPeriod == "E2W")
+                                item.PayPeriod = "E2W - Every Two Weeks";
+                            if (item.PayPeriod == "2M")
+                                item.PayPeriod = "2M - Twice Monthly";
+                        }
+
+                        zeroC3HEADERID = dataEdit.Count == 0 ? employee : dataEdit.Where(e => e.C3HEADERID == 0).ToList();
+                        dataEdit = dataEdit.Count == 0 ? employee : dataEdit;
+                        if (dataEdit.Count == zeroC3HEADERID.Count)
+                        {
+                            zeroC3HEADERID = null;
+                        }
+                        else
+                        {
+                            dataEdit.RemoveAll(e => e.C3HEADERID == 0);
+                        }
+
+                    }
+                }
+
+                return Ok(new ResponseModel { Status = true, Message = "data found", Data = new { dataEdit, header, popUpList = zeroC3HEADERID } });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = ex });
+            }
+        }
+
+        [HttpPost("EditDirectorPayroll")]
+        public async Task<IActionResult> EditDirectorPayroll([FromBody] EditDirPayrolVM obj)
+        {
+            try
+            {
+                bool isSave = false;
+                string PatPmessage = "";
+
+                if (obj.MonthNum == 0)
+                {
+                    PatPmessage += "pay period Month \n";
+                }
+                if (obj.Year == 0)
+                {
+                    PatPmessage += "pay period Year \n";
+                }
+                if (obj.CmbPayPeriod != null)
+                {
+                    if (obj.CmbPayPeriod.Count <= 0)
+                    {
+                        PatPmessage += "pay period \n";
+                    }
+                }
+                else
+                {
+                    PatPmessage += "pay period \n";
+                }
+                if (PatPmessage != "")
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "C3 Wizard Please select" + PatPmessage });
+
+                }
+                if (obj.IsPayPeriodChange != true)
+                {
+                    //bool M_SPP = true;
+                    isSave = true;
+                    var msg = await _NonDirectorRepo.SaveNContinue(obj.EditDirPayrolList, isSave, obj.DirectorExistContinue, obj.UserID, obj.MachineInfo, obj.User_Name, obj.Year,/* obj.MonthName,*/ obj.MonthNum, obj.CompanyId, obj.CmbPayPeriod, null, obj.H_Id, false, false, false, false,/* false, false, M_SPP, false,*/ 1);
+
+
+
+                    return Ok(new ResponseModel { Status = true, Message = msg, Data = null });
+                }
+                else
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "Please click on Create button to fetch the data for this month !" });
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = null });
+            }
+        }
+
+
+
+
+        [HttpPost("PreviewDirectorPayroll")]
+        public async Task<IActionResult> PreviewDirectorPayroll([FromBody] DirPayrollpreviewVM obj/*string MonthName, int monthNum, int CompanyId, int year, List<PayPeriod1> CmbPayPeriod, List<string> SelectList, bool directorExistContinue, int UserID, string MachineInfo, string User_Name, int H_Id, bool ispayperiodchange = false*/)
+        {
+            try
+            {
+                bool isSave = false;
+                string PatPmessage = "";
+
+                if (obj.MonthNum == 0)
+                {
+                    PatPmessage += "pay period Month \n";
+                }
+                if (obj.Year == 0)
+                {
+                    PatPmessage += "pay period Year \n";
+                }
+                if (obj.CmbPayPeriod != null)
+                {
+                    if (obj.CmbPayPeriod.Count <= 0)
+                    {
+                        PatPmessage += "pay period \n";
+                    }
+                }
+                else
+                {
+                    PatPmessage += "pay period \n";
+                }
+                if (PatPmessage != "")
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "C3 Wizard Please select" + PatPmessage });
+
+                }
+                if (obj.IsPayPeriodChange != true)
+                {
+                    //bool M_SPP=true;
+                    isSave = false;
+                    var dataPreview = await _NonDirectorRepo.SaveNContinue(null, isSave, obj.DirectorExistContinue, obj.UserID, obj.MachineInfo, obj.UserName, obj.Year, /*obj.MonthName,*/ obj.MonthNum, obj.CompanyId, obj.CmbPayPeriod, obj.SelectList, obj.HId, false, false, false, false/*, false, false, M_SPP, false*/, 1);
+                    var json = JsonConvert.DeserializeObject<previewDirectorVm>(dataPreview);
+
+
+                    return Ok(new ResponseModel { Status = true, Message = "Data Found...!", Data = json });
+                }
+                else
+                {
+                    return Ok(new ResponseModel { Status = false, Message = "Please click on Create button to fetch the data for this month !" });
+                }
+
+
+
+            }
+            catch (Exception ex)
+
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = null });
+            }
+        }
+
+
+        [HttpPost("FinalizeSaveAndSubmit")]
+        public async Task<IActionResult> FinalizeSaveAndSubmit([FromBody] DirPayrollpreviewSubmitVM obj)//(bool confirm, List<C3Contributions> list, int Year, string MonthName, int monthIndex, int CompanyId, List<PayPeriod1> CmbPayPeriod, bool directorExistContinue, string User_Name, int UserID)
+        {
+            try
+            {
+                var msg = await _NonDirectorRepo.Button_Finalize_Click(obj.confirm, obj.list, obj.Year, obj.MonthName, obj.MonthNum, obj.CompanyId, obj.CmbPayPeriod, obj.DirectorExistContinue, obj.UserName, obj.UserID, obj.MachineInfo);
+
+                return Ok(new ResponseModel { Status = true, Message = msg, Data = null });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong..!", Data = null });
+            }
+        }
+
+
+
+
+        [HttpPost("C3Report_Delete_Click")]
+        public async Task<IActionResult> C3Report_Delete_Click(int HeaderID)
+        {
+            try
+            {
+                var isSubmitted = _context.ProcessC3headers.FirstOrDefault(p => p.C3headerid == HeaderID);
+                if ((isSubmitted?.IsSubmitted ?? false) || (isSubmitted?.IsSentForEdit ?? false))
+                {
+                    return Ok(new ResponseModel
+                    {
+                        Status = true,  // Indicate success
+                        Message = "Deletion is not allowed as this record has already been submitted for SSB.",
+                        Data = "",
+                        Statuscode = 200
+                    });
+                }
+
+                var status = await _NonDirectorRepo.C3Report_Delete(HeaderID);
+                if (status)
+                {
+                    return Ok(new ResponseModel { Status = true, Message = "Director payroll deleted successfully" });
+                }
+                return Ok(new ResponseModel { Status = false, Message = "Director payroll deleted Failed" });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong", Data = ex });
+            }
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet("NWDirectorReports")]
+        public async Task<IActionResult> NWDirectorReports(int? MonthF, int? MonthTO, string? Year, string? endYear, int CompanyId)
+        {
+
+            try
+            {
+                //int? F_month = MonthF > 0 ? MonthF : null;
+                //int? T_month = MonthTO > 0 ? MonthTO : null;
+
+                //string value = Year;
+                //string S_year = Year;
+
+                int? StartMonths = null;
+                int? endMonths = null;
+
+                // 1. FromMonth >= and ToMonth is null
+                if (MonthF != null && MonthF > 0 && (MonthTO == null || MonthTO <= 0))
+                {
+                    StartMonths = MonthF;
+                    endMonths = null; // No upper bound
+                }
+                // 2. FromMonth >= and ToMonth <=
+                else if (MonthF != null && MonthF > 0 && MonthTO != null && MonthTO > 0)
+                {
+                    StartMonths = MonthF;
+                    endMonths = MonthTO;
+                }
+                // 3. FromMonth is null and ToMonth <=
+                else if ((MonthF == null || MonthF <= 0) && MonthTO != null && MonthTO > 0)
+                {
+                    StartMonths = null;
+                    endMonths = MonthTO;
+                }
+                // 4. FromMonth is null and ToMonth is null
+                else if ((MonthF == null || MonthF <= 0) && (MonthTO == null || MonthTO <= 0))
+                {
+                    StartMonths = null;
+                    endMonths = null;
+                }
+                int? StartYear = null;
+                int? EndYear = null;
+
+                // --- Year Logic ---
+                if (Year != null && Convert.ToInt32(Year) > 0 && (endYear == null || Convert.ToInt32(endYear) <= 0))
+                {
+                    StartYear = Convert.ToInt32(Year);
+                    EndYear = null;
+                }
+                else if (Year != null && Convert.ToInt32(Year) > 0 && endYear != null && Convert.ToInt32(endYear) > 0)
+                {
+                    StartYear = Convert.ToInt32(Year);
+                    EndYear = Convert.ToInt32(endYear);
+                }
+                else if ((Year == null || Convert.ToInt32(Year) <= 0) && endYear != null && Convert.ToInt32(endYear) > 0)
+                {
+                    StartYear = null;
+                    EndYear = Convert.ToInt32(endYear);
+                }
+                else if ((Year == null || Convert.ToInt32(Year) <= 0) && (endYear == null || Convert.ToInt32(endYear) <= 0))
+                {
+                    StartYear = null;
+                    EndYear = null;
+                }
+
+                List<C3Header> listDVOC3Header = new List<C3Header>();
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                SqlCommand cmd = new SqlCommand("Get_Director_C3_Genrated_data", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                sqlAdapter.Fill(dt);
+                staticConnection.Close();
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        bool issubmited = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                        bool isfinalize = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                        int C3month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+                        int C3year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                        if ((issubmited == true || isfinalize == true))
+                        {
+                            C3Header Obj = new C3Header();
+                            Obj.HeaderID = Convert.IsDBNull(row["C3HEADERID"]) ? 0 : int.Parse(row["C3HEADERID"].ToString());
+                            Obj.RegNo = Convert.IsDBNull(row["RegNo"]) ? null : row["RegNo"].ToString();
+                            Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName((Convert.ToInt32(row["PERIODD_MONTH"])).ToString());
+                            Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                            Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+                            Obj.P_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                            Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+                            Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+                            Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+                            Obj.TOTALSERVAYANCE = Convert.IsDBNull(row["TOTAL_SERVAYANCE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SERVAYANCE"].ToString())));
+                            Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString("dd-MM-yyyy");
+                            //Obj.Insert_Datetime = Convert.IsDBNull(row["Insert_Datetime"]) ? DateTime.Parse("01/01/1900") : DateTime.Parse(row["Insert_Datetime"].ToString());
+                            Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                            Obj.Is_submitted = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                            Obj.C3_IsFinalized = !Obj.C3_IsFinalized;
+                            Obj.IssubmittedShow = (bool)Obj.Is_submitted ? "C3 Submitted" : "C3 not Submitted";
+                            Obj.Issubmittedcolor = (bool)Obj.Is_submitted ? "Black" : "Red";
+                            Obj.IssubmittedShowimg = (bool)Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+                            Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                            Obj.TOTALLEVYEEPENALTY = Convert.IsDBNull(row["TOTAL_LEVYEEPENALTY"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEPENALTY"].ToString())));
+                            Obj.IsPaid = _context.OnlinePayments.Any(e => e.C3HeaderId == Obj.HeaderID && (e.PaymentStatus == "AUTHORIZED" || e.PaymentStatus == "Offline Payment"));
+                            Obj.isNilReturn = Convert.IsDBNull(row["isNilReturn"]) ? false : bool.Parse(row["isNilReturn"].ToString());
+                            listDVOC3Header.Add(Obj);
+                        }
+                    }
+                    //listDVOC3Header = S_year != null ? listDVOC3Header.Where(x => Convert.ToInt32(x.Period_year) >= Convert.ToInt32(S_year) && Convert.ToInt32(x.Period_year) <= Convert.ToInt32(endYear)).ToList() : listDVOC3Header;
+                    ////listDVOC3Header = F_month != -1 ? listDVOC3Header.Where(x => x.p_Month >= F_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+                    ////listDVOC3Header = T_month != -1 ? listDVOC3Header.Where(x => x.p_Month <= T_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+                    //listDVOC3Header = (F_month != null && F_month > 0) ? listDVOC3Header.Where(x => x.p_Month >= F_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+                    //listDVOC3Header = (T_month != null && T_month > 0) ? listDVOC3Header.Where(x => x.p_Month <= T_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+
+
+                    var repotList = listDVOC3Header.Select(e => new
+                    {
+                        Year = e.P_year,
+                        month = e.period_Month,
+                        monthno = e.p_Month,
+                        totalWages = e.TOTAL_WAGES,
+                        Levy = e.TOTALLEVYEEEMPLOYEE,
+                        createDate = e.Insert_Datetimeinfo,
+                        schedule = e.Schedule_NO,
+                        color = e.Issubmittedcolor,
+                        HeaderID = e.HeaderID,
+                        TOTALLEVYEEPENALTY = e.TOTALLEVYEEPENALTY,
+                        Is_submitted = e.Is_submitted,
+                        ispaid = e.IsPaid,
+                        payAmt = e.TOTALLEVYEEEMPLOYEE + e.TOTALLEVYEEPENALTY,
+                        isNilReturn = e.isNilReturn,
+                    });
+
+                    DateTime? startDate0 = null;
+                    DateTime? endDate0 = null;
+
+                    if (StartYear != null)
+                    {
+                        if (StartMonths != null)
+                            startDate0 = new DateTime(StartYear.Value, StartMonths.Value, 1);
+                        else
+                            startDate0 = new DateTime(StartYear.Value, 1, 1); // Defaults to Jan if month missing
+                    }
+
+                    // Rule: Determine End Date (show until this point)
+                    if (EndYear != null)
+                    {
+                        if (endMonths != null)
+                            endDate0 = new DateTime(EndYear.Value, endMonths.Value, DateTime.DaysInMonth(EndYear.Value, endMonths.Value));
+                        else
+                            endDate0 = new DateTime(EndYear.Value, 12, 31); // Defaults to Dec if month missing
+                    }
+
+                    // --- DVOC3Header Filtering ---
+                    if (repotList != null)
+                    {
+                        repotList = repotList.AsEnumerable();
+
+                        if (startDate0 != null || endDate0 != null)
+                        {
+                            repotList = repotList.Where(p =>
+                            {
+                                int year = Convert.ToInt32(p.Year);
+                                int month = Convert.ToInt32(p.monthno);
+                                DateTime periodDate = new DateTime(year, month, 1);
+
+                                return (!startDate0.HasValue || periodDate >= startDate0.Value) &&
+           (!endDate0.HasValue || periodDate <= endDate0.Value);
+                            }).ToList();
+                        }
+                    }
+
+                    return Ok(new ResponseModel { Status = true, Message = "data found", Data = repotList });
+                }
+                else
+                {
+
+                    return Ok(new ResponseModel { Status = true, Message = "data found", Data = null });
+                }
+                //}
+            }
+            catch (Exception ex)
+            {
+                //Login login = new Login();
+                //login.Error_Log(ex.Message);
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong" });
+            }
+
+
+        }
+        //[HttpGet("Director/GenerateDirectorC3Report")]
+        //public async Task<IActionResult> check_batch_created_Director(string Month, string year, int companyId, int C3HEADERID, bool generatePdf = false)
+        //{
+        //    DataTable dt = new DataTable();
+
+        //    using (SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection)
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand("Generate_Director_C3_Report", staticConnection))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.Parameters.AddWithValue("@Month", Month);
+        //            cmd.Parameters.AddWithValue("@Year", year);
+        //            cmd.Parameters.AddWithValue("@CompanyId", companyId);
+        //            cmd.Parameters.AddWithValue("@C3HEADERID", C3HEADERID);
+
+        //            if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+        //            SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+        //            sqlAdapter.Fill(dt);
+        //        }
+        //    }
+
+        //    if (dt.Rows.Count == 0)
+        //    {
+        //        return NotFound("No data found.");
+        //    }
+
+        //    // Add serial number
+        //    int c3count = 0;
+        //    foreach (DataRow row in dt.Rows)
+        //    {
+        //        row[0] = ++c3count;
+        //    }
+
+        //    var obj = new dirDataReportsVm
+        //    {
+        //        nameOfEmployer = dt.Rows[0]["company_name"].ToString(),
+        //        address = dt.Rows[0]["company_address"].ToString(),
+        //        tradeName = dt.Rows[0]["trade_name"].ToString(),
+        //        empRegNo = dt.Rows[0]["company_reg_no"].ToString(),
+        //        month = dt.Rows[0]["current_month"].ToString(),
+        //        AccountantGenreal = "0.00",
+        //        dirReportsList = new List<dirReportsListVm>(),
+        //        totalFeesDir = "0.00",
+        //        leavyPanelty = dt.Rows[0]["TOTAL_LEVYEEPENALTY"].ToString(),
+        //        noOfDir = dt.Rows.Count,
+        //        OrderName = dt.Rows[0]["OrderName"]?.ToString(),
+        //        OrderKey = dt.Rows[0]["OrderKey"]?.ToString()
+        //    };
+
+        //    decimal total = 0;
+        //    decimal totaldeductlavy = 0;
+
+        //    foreach (DataRow row in dt.Rows)
+        //    {
+        //        var dirReport = new dirReportsListVm
+        //        {
+        //            socialSecNum = row["social_security_no"].ToString(),
+        //            nameOfDir = row["emp_name"].ToString(),
+        //            WAGES1 = Convert.ToDecimal(row["first_week_of_salary"] ?? 0),
+        //            WAGES2 = Convert.ToDecimal(row["second_week_of_salary"] ?? 0),
+        //            WAGES3 = Convert.ToDecimal(row["third_week_of_salary"] ?? 0),
+        //            WAGES4 = Convert.ToDecimal(row["four_week_of_salary"] ?? 0),
+        //            WAGES5 = Convert.ToDecimal(row["five_week_of_salary"] ?? 0),
+        //            Remarks = row["Remarks"]?.ToString(),
+        //            deduct_leavy_wages = Convert.ToDecimal(row["deduct_leavy_wages"]),
+        //            total_wages = Convert.ToDecimal(row["total_wages"]),
+        //            pay_period = row["pay_period"].ToString()
+        //        };
+        //        total += dirReport.total_wages;
+        //        totaldeductlavy += dirReport.deduct_leavy_wages;
+        //        obj.dirReportsList.Add(dirReport);
+        //    }
+
+        //    obj.totalFeesDir = total.ToString("F2");
+        //    obj.TotalLevy = totaldeductlavy.ToString("F2");
+        //    obj.AccountantGenreal = (totaldeductlavy + Convert.ToDecimal(obj.leavyPanelty)).ToString("F2");
+
+        //    // Apply ordering
+        //    if (obj.dirReportsList.Count > 0)
+        //    {
+        //        if (obj.OrderName == "employeeName")
+        //        {
+        //            var grouped = obj.dirReportsList.GroupBy(x => x.pay_period)
+        //                .Select(g => new
+        //                {
+        //                    PayPeriod = g.Key,
+        //                    Employees = obj.OrderKey == "asc"
+        //                        ? g.OrderBy(x => x.nameOfDir).ToList()
+        //                        : g.OrderByDescending(x => x.nameOfDir).ToList()
+        //                })
+        //                .OrderBy(x => x.PayPeriod).ToList();
+
+        //            obj.dirReportsList = grouped.SelectMany(g => g.Employees).ToList();
+        //        }
+        //        else if (obj.OrderName == "ssn")
+        //        {
+        //            var grouped = obj.dirReportsList.GroupBy(x => x.pay_period)
+        //                .Select(g => new
+        //                {
+        //                    PayPeriod = g.Key,
+        //                    Employees = obj.OrderKey == "asc"
+        //                        ? g.OrderBy(x => x.socialSecNum).ToList()
+        //                        : g.OrderByDescending(x => x.socialSecNum).ToList()
+        //                })
+        //                .OrderBy(x => x.PayPeriod).ToList();
+
+        //            obj.dirReportsList = grouped.SelectMany(g => g.Employees).ToList();
+        //        }
+        //    }
+
+        //    // 🧾 PDF Generation
+        //    if (generatePdf)
+        //    {
+        //        string rdlcFile = dt.Rows.Count <= 8 ? "DirectorC3Report.rdlc" : "DirectorC3more8Report.rdlc";
+        //        string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Report", rdlcFile);
+
+        //        if (!System.IO.File.Exists(reportPath))
+        //        {
+        //            return NotFound("RDLC file not found.");
+        //        }
+
+        //        LocalReport report = new LocalReport();
+        //        report.ReportPath = reportPath;
+        //        report.DataSources.Add(new ReportDataSource("C3Report", dt)); // dataset name in RDLC
+
+        //        var renderedBytes = report.Render("PDF");
+
+        //        return File(renderedBytes, "application/pdf", $"DirectorC3Report_{Month}_{year}.pdf");
+        //    }
+
+        //    // 🟢 Return as JSON (view model)
+        //    return Ok(obj);
+        //}
+
+        [HttpGet("C3Report/DownloadDirectorPdf")]
+        public async Task<IActionResult> DownloadDirectorPdf(string month, string year, int companyId, int c3HeaderId, bool ispaid, bool isDraft)
+        {
+            try
+            {
+                if (DateTime.TryParseExact(month, "MMMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+                {
+                    month = date.Month.ToString();
+
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        Status = true,
+                        Message = "Invalid month Name"
+                    });
+                }
+                DataTable dt = new DataTable();
+
+                using (SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection)
+                {
+                    using (SqlCommand cmd = new SqlCommand("Generate_Director_C3_Report", staticConnection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@Month", month);
+                        cmd.Parameters.AddWithValue("@Year", year);
+                        cmd.Parameters.AddWithValue("@CompanyId", companyId);
+                        cmd.Parameters.AddWithValue("@C3HEADERID", c3HeaderId);
+
+                        await staticConnection.OpenAsync();
+                        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                        adapter.Fill(dt);
+                        await staticConnection.CloseAsync();
+                    }
+                }
+
+                if (dt.Rows.Count == 0)
+                {
+                    return BadRequest("No data found for Director C3 report.");
+                }
+                int c3count = 0;
+                foreach (DataRow row in dt.Rows)
+                {
+                    row[0] = ++c3count;
+                }
+
+                string rdlcFile = dt.Rows.Count <= 8 ? "DirectorC3Report.rdlc" : "DirectorC3more8Report.rdlc";
+                string reportPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Report", rdlcFile);
+
+                if (!System.IO.File.Exists(reportPath))
+                {
+                    return BadRequest($"RDLC file not found: {reportPath}");
+                }
+
+                LocalReport report = new LocalReport();
+                report.ReportPath = reportPath;
+
+                report.DataSources.Add(new ReportDataSource("C3Report", dt));
+
+                report.EnableExternalImages = true;
+
+                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagepaid.png");
+                string watermarkImage = "";
+
+                if (ispaid && System.IO.File.Exists(imagePath))
+                {
+                    // Use file:// URI path
+                    watermarkImage = "file:///" + imagePath.Replace("\\", "/");
+                }
+                if (isDraft)
+                {
+                    string imagePathd = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagedraft.png");
+                    watermarkImage = "file:///" + imagePathd.Replace("\\", "/");
+                }
+                report.SetParameters(new ReportParameter("WatermarkImage", watermarkImage));
+
+                var result = report.Render("PDF");
+                return File(result, "application/pdf", $"DirectorC3Report_{month}_{year}.pdf");
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return BadRequest($"Error generating Director C3 PDF: {ex.Message}");
+            }
+        }
+
+        [HttpGet("checkDirectorReports")]
+        public async Task<IActionResult> checkDirectorReports(string monthId, string year, int companyId, int c3HeaderId/*, bool is_dash*/)
+        {
+
+            try
+            {
+                if (DateTime.TryParseExact(monthId, "MMMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+                {
+                    monthId = date.Month.ToString();
+
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        Status = true,
+                        Message = "Invalid month Name"
+                    });
+                }
+
+                var reportsData = await _NonDirectorRepo.check_batch_created_Director(monthId, year, companyId, c3HeaderId);
+                if (reportsData != null)
+                {
+                    if (reportsData.dirReportsList == null)
+                    {
+                        var result = (from c3 in _context.ProcessC3headers
+                                      join company in _context.MasterCompanies
+                                        on c3.EmployerId equals company.CompanyId
+                                      where c3.C3headerid == c3HeaderId
+                                            && c3.isNilReturn == true
+                                            && c3.EmployerId == companyId
+                                      select new
+                                      {
+                                          isNilData = (c3.isNilReturn ?? false),
+                                          month_year = _C3.MonthName(Convert.ToInt32(c3.PerioddMonth)) + " - " + c3.PeriodYear,
+                                          company_name = company.CompanyName,
+                                          trade_name = company.TradeName,
+                                          company_address = company.Address1 +
+                                                            (string.IsNullOrEmpty(company.Address2) ? "" : " " + company.Address2) +
+                                                            ", " + (company.City ?? ""),
+                                          company_reg_no = company.RegNumber
+                                      }).FirstOrDefault();
+
+                        return Ok(new ResponseModel
+                        {
+                            Status = true,  // Indicate success
+                            Message = "NIL return  data get successfully.",
+                            Data = result,
+                            Statuscode = 200
+                        });
+                    }
+
+
+                    return Ok(new ResponseModel { Status = true, Message = "Data Found..!", Data = reportsData });
+                }
+                else
+                {
+
+                    return Ok(new ResponseModel { Status = false, Message = "Data Not Found..!", Data = null });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+
+                return Ok(new ResponseModel { Status = false, Message = "Something Went Wrong", Data = ex });
+            }
+        }
+        private string MonthName(string m_no)
+        {
+            string Month = "";
+            switch (m_no)
+            {
+                //case "1" or "0":
+                //    Month = "January";
+                //    break;
+                case "1":
+                    Month = "January";
+                    break;
+                case "2":
+                    Month = "February";
+                    break;
+                case "3":
+                    Month = "March";
+                    break;
+                case "4":
+                    Month = "April";
+                    break;
+                case "5":
+                    Month = "May";
+                    break;
+                case "6":
+                    Month = "June";
+                    break;
+                case "7":
+                    Month = "July";
+                    break;
+                case "8":
+                    Month = "August";
+                    break;
+                case "9":
+                    Month = "September";
+                    break;
+                case "10":
+                    Month = "October";
+                    break;
+                case "11":
+                    Month = "November";
+                    break;
+                case "12":
+                    Month = "December";
+                    break;
+                default:
+                    Month = string.Empty;
+                    break;
+            }
+
+
+            return Month;
+        }
+        //private string MonthName(string m_no)
+        //{
+        //  string Month = "";
+        //  switch (m_no)
+        //  {
+        //    case "0":
+        //      Month = "January";
+        //      break;
+        //    case "1":
+        //      Month = "February";
+        //      break;
+        //    case "2":
+        //      Month = "March";
+        //      break;
+        //    case "3":
+        //      Month = "April";
+        //      break;
+        //    case "4":
+        //      Month = "May";
+        //      break;
+        //    case "5":
+        //      Month = "June";
+        //      break;
+        //    case "6":
+        //      Month = "July";
+        //      break;
+        //    case "7":
+        //      Month = "August";
+        //      break;
+        //    case "8":
+        //      Month = "September";
+        //      break;
+        //    case "9":
+        //      Month = "October";
+        //      break;
+        //    case "10":
+        //      Month = "November";
+        //      break;
+        //    case "11":
+        //      Month = "December";
+        //      break;
+        //    default:
+        //      Month = string.Empty;
+        //      break;
+        //  }
+        //  return Month;
+        //}
+
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("NWSaveNContinue")]
+        public async Task<IActionResult> NWSaveNContinue([FromBody] SaveNContinueRequest request)
+        {
+            try
+            {
+                int TextChanged = 0;
+                bool ListHavingItems = false;
+                bool w = false; bool m = false; bool b = false; bool s = false;
+                bool Nw = false; bool Nm = false; bool Nb = false; bool Ns = false;
+                bool W_SPP = false; bool E_2W_SPP = false; bool M_SPP = false; bool T_M_SPP = false;
+
+                if (request.CmbPayPeriod == null)
+                {
+                    return BadRequest(new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Please click on Create button to fetch the data for the selected period.",
+                        Data = null,
+                    });
+                }
+                foreach (var item in request.CmbPayPeriod)
+                {
+                    if (item.Value == "W")
+                    { Nw = true; W_SPP = true; }
+                    else if (item.Value == "M")
+                    { Nm = true; M_SPP = true; }
+                    else if (item.Value == "E2W")
+                    { Nb = true; E_2W_SPP = true; }
+                    else if (item.Value == "2M")
+                    { Ns = true; T_M_SPP = true; }
+
+                    if (item.Value == "W")
+                    { w = true; W_SPP = true; }
+                    else if (item.Value == "M")
+                    { m = true; M_SPP = true; }
+                    else if (item.Value == "E2W")
+                    { b = true; E_2W_SPP = true; }
+                    else if (item.Value == "2M")
+                    { s = true; T_M_SPP = true; }
+                    else if (item.Value == "All")
+                    {
+                        Nw = true; W_SPP = true;
+                        Nm = true; M_SPP = true;
+                        Nb = true; E_2W_SPP = true;
+                        Ns = true; T_M_SPP = true;
+
+                        m = true; M_SPP = true;
+                        w = true; W_SPP = true;
+                        b = true; E_2W_SPP = true;
+                        s = true; T_M_SPP = true;
+                    }
+                }
+                if (request.H_Id != 0)
+                {
+                    string Payperiodchange = "";
+                    Payperiodchange += W_SPP == Nw ? "" : "Weekly";
+                    Payperiodchange += M_SPP == Nm ? "" : "Monthly";
+                    Payperiodchange += E_2W_SPP == Nb ? "" : "Every Two Weeks";
+                    Payperiodchange += T_M_SPP == Ns ? "" : "Twice in a Month";
+
+                    if (Payperiodchange != "")
+                    {
+
+                        return Ok(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Please click on Create button to fetch the data for the selected period.",
+                            Data = null,
+                        });
+                    }
+                }
+                else
+                {
+                    string Payperiodchange = "";
+                    Payperiodchange += W_SPP == Nw ? "" : "Weekly";
+                    Payperiodchange += M_SPP == Nm ? "" : "Monthly";
+                    Payperiodchange += E_2W_SPP == Nb ? "" : "Every Two Weeks";
+                    Payperiodchange += T_M_SPP == Ns ? "" : "Twice in a Month";
+
+                    if (Payperiodchange != "")
+                    {
+
+                        return Ok(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Please click on Create button to fetch the data for selected period.",
+                            Data = null,
+
+                        });
+                    }
+                }
+
+                bool IsWeekfifth = false;
+                string fyear = request.Year.ToString();
+                int fmonthno = request.Monthno;
+                string fMvalue = request.MonthName;
+                string fmonthval = fmonthno <= 9 ? "0" + fmonthno.ToString() : fmonthno.ToString();
+                DateTime? newFrom_date = DateTime.ParseExact(("01/" + fmonthval + "/" + fyear), Helper.DateFormat, CultureInfo.InvariantCulture);
+                int daysfMonth = DateTime.DaysInMonth(int.Parse(fyear), fmonthno);
+                DateTime? newTo_date = newFrom_date.Value.AddDays(daysfMonth - 1);
+                request.schedule_no = _C3.GetMaxScheduleNo(request.Monthno, Convert.ToInt32(fyear), request.CompanyId);
+                UserVM CompanyDetails = _C3.GetCompanyDetails(request.CompanyId);
+                if (request.H_Id == 0)
+                {
+                    SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                    if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                    SqlCommand cmd = new SqlCommand("check_Director_C3Created", staticConnection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)fmonthno ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)fyear ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)request.CompanyId ?? (object)DBNull.Value));
+                    SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    sqlAdapter.Fill(dt);
+                    staticConnection.Close();
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow row = dt.Rows[0];
+                        request.H_Id = Convert.ToInt32(row["C3HEADERID"]);
+                        request.schedule_no = Convert.ToInt32(row["Schedule_NO"]) == 0 ? 1 : Convert.ToInt32(row["Schedule_NO"]);
+                        //if (request.IsSave)
+                        //{
+                        //    return Ok(new ResponseModel
+                        //    {
+                        //        Status = false,
+                        //        Message = "A C3 for this month  already exists .",
+                        //        Data = null,
+                        //        Statuscode = 200
+                        //    });
+                        //}
+
+                    }
+                }
+
+                int monthno = request.Monthno;
+                string monthval = monthno <= 9 ? "0" + monthno.ToString() : monthno.ToString();
+                int Latemonths = (DateTime.Now.Year - int.Parse(fyear)) * 12 + DateTime.Now.Month - monthno;
+                Latemonths = Latemonths >= -6 && Latemonths <= 0 ? 0 : Latemonths;
+                DateTime Today_date = DateTime.ParseExact(("01/" + monthval + "/" + fyear), Helper.DateFormat, CultureInfo.InvariantCulture);
+
+                List<BLDeductionsTaxTableDetails> DeductionsTaxDetailslist = BLDeductionsTaxTableDetails.DeductionsTaxTableDetailsCollection().ToList();
+
+                //DeductionsTaxDetailslist = DeductionsTaxDetailslist.Where(x => x.TaxYear == fyear).ToList();
+                DeductionsTaxDetailslist = DeductionsTaxDetailslist.Where(x => Today_date >= x.StartDate && Today_date <= x.EndDate).ToList();
+                if (DeductionsTaxDetailslist.Count > 0)
+                {
+
+                    List<C3Contributions> obj_list = new List<C3Contributions>();
+                    List<C3Contributions> Not_Selected_list = new List<C3Contributions>();
+                    decimal? amount = 0;
+                    List<BLDeductionsTaxTableDetails> WeelelyDeductionsTaxDetailslist = DeductionsTaxDetailslist.Where(x => x.PayPeriod == "W").ToList();
+                    List<BLDeductionsTaxTableDetails> E2_WeekDeductionsTaxDetailslist = DeductionsTaxDetailslist.Where(x => x.PayPeriod == "E2W").ToList();//Changed B to 
+                    List<BLDeductionsTaxTableDetails> MonthlyDeductionsTaxDetailslist = DeductionsTaxDetailslist.Where(x => x.PayPeriod == "M").ToList();
+                    List<BLDeductionsTaxTableDetails> Twoice_In_MonthDeductionsTaxDetailslist = DeductionsTaxDetailslist.Where(x => x.PayPeriod == "2M").ToList();
+
+
+                    if (Twoice_In_MonthDeductionsTaxDetailslist.Count > 0)
+                    {
+                        if (request.AllEmployeeList_List.Count > 0)
+                        {
+                            foreach (var i in request.AllEmployeeList_List)
+                            {
+                                bool ear = (bool)i.emp_add_remove;
+                                var PayFreq = i.PayFreq.ToString();
+                                if (ear && s && PayFreq == "2M")
+                                {
+                                    ListHavingItems = true;
+                                    C3Contributions obj = new C3Contributions();
+                                    obj.SSN = i.SSN.ToString();
+                                    obj.SSND = i.SSND.ToString();
+                                    obj.C3HEADERID = i.C3HEADERID;
+                                    obj.EmployeeName = i.EmployeeName.ToString();
+                                    obj.WEEK1 = i.WEEK1;
+                                    obj.WEEK2 = i.WEEK2;
+                                    obj.WEEK3 = i.WEEK3;
+                                    obj.WEEK4 = i.WEEK4;
+                                    obj.WEEK5 = i.WEEK5;
+                                    obj.WAGES1 = i.WAGES1;
+                                    obj.WAGES2 = i.WAGES2;
+                                    obj.WAGES3 = i.WAGES3;
+                                    obj.WAGES4 = i.WAGES4;
+                                    obj.WAGES5 = i.WAGES5;
+                                    obj.HPAY = i.HPAY;
+                                    obj.BONUS = i.BONUS;
+                                    //obj.Date_Joining = null;
+                                    //obj.Date_terminated = null;
+                                    obj.Date_Joining = i.Date_Joining;
+                                    obj.Date_terminated = i.Date_terminated;
+                                    obj.IsWeekfifth = i.IsWeekfifth;
+                                    obj.T_C_Date = request.H_Id > 0 ? obj.C3HEADERID > 0 ? (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null);
+                                    obj.PayFreq = "2M";
+                                    obj.Department = i.Department;
+                                    obj.ISSelectedWEEK1 = obj.WEEK1 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK2 = obj.WEEK2 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK3 = obj.WEEK3 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK4 = obj.WEEK4 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK5 = obj.WEEK5 == true ? "\u221A" : "X";
+                                    obj.TotalWadeges = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    amount = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+
+                                    decimal? Total_weekly = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? w1_amt = obj.WAGES1, w2_amt = obj.WAGES2, w3_amt = obj.WAGES3, w4_amt = obj.WAGES4, w5_amt = obj.WAGES5;
+
+                                    var W1_TMDTDL = Twoice_In_MonthDeductionsTaxDetailslist.Where(x => x.OverAmt < w1_amt).ToList();
+                                    decimal? W1_LEVYEE = _NonDirectorRepo.Levy_amount(W1_TMDTDL, w1_amt);
+                                    var W2_TMDTDL = Twoice_In_MonthDeductionsTaxDetailslist.Where(x => x.OverAmt < w2_amt).ToList();
+                                    decimal? W2_LEVYEE = _NonDirectorRepo.Levy_amount(W2_TMDTDL, w2_amt);
+                                    var W3_TMDTDL = Twoice_In_MonthDeductionsTaxDetailslist.Where(x => x.OverAmt < w3_amt).ToList();
+                                    decimal? W3_LEVYEE = _NonDirectorRepo.Levy_amount(W3_TMDTDL, w3_amt);
+                                    var W4_TMDTDL = Twoice_In_MonthDeductionsTaxDetailslist.Where(x => x.OverAmt < w4_amt).ToList();
+                                    decimal? W4_LEVYEE = _NonDirectorRepo.Levy_amount(W4_TMDTDL, w4_amt);
+                                    var W5_TMDTDL = Twoice_In_MonthDeductionsTaxDetailslist.Where(x => x.OverAmt < w5_amt).ToList();
+                                    decimal? W5_LEVYEE = _NonDirectorRepo.Levy_amount(W5_TMDTDL, w5_amt);
+
+                                    decimal? amount_TMDTDL = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    var Total_TMDTDL = Twoice_In_MonthDeductionsTaxDetailslist.Where(x => x.OverAmt < amount).ToList();
+                                    decimal? totalmonthwageslevy = _NonDirectorRepo.Levy_amount(Total_TMDTDL, amount_TMDTDL);
+                                    decimal? totallevy = W1_LEVYEE + W2_LEVYEE + W3_LEVYEE + W4_LEVYEE + W5_LEVYEE;
+
+                                    obj.LEVYEE = (amount_TMDTDL >= 6500 ? totalmonthwageslevy : totallevy) + (obj.BONUS > 1500 ? ((obj.BONUS * 8) / 100) : 0);
+                                    amount = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+
+                                    bool Is_Emp_D = i.IsemployeeDirector;
+
+
+                                    decimal? Total_w_amt = obj.WAGES1 + +obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? weeekly_amount = IsWeekfifth ? Total_w_amt / 5 : Total_w_amt / 4;
+
+
+                                    obj.Levy_Penalty = Latemonths >= 2 ? ((obj.LEVYEE) * (8 + Latemonths)) / 100 : 0;
+                                    obj.Remarks = i.Remarks.ToString();
+                                    obj.IsemployeeDirector = false;
+                                    obj.BirthDate = i.BirthDate;
+                                    obj.emp_add_remove = i.emp_add_remove;
+                                    obj_list.Add(obj);
+                                }
+                                else if ((!ear || !w) && PayFreq == "2M")
+                                {
+                                    C3Contributions Not_obj = new C3Contributions();
+                                    Not_obj.SSN = i.SSN.ToString();
+                                    Not_obj.SSND = i.SSND.ToString();
+                                    Not_obj.EmployeeName = i.EmployeeName.ToString();
+                                    Not_obj.WEEK1 = i.WEEK1;
+                                    Not_obj.WEEK2 = i.WEEK2;
+                                    Not_obj.WEEK3 = i.WEEK3;
+                                    Not_obj.WEEK4 = i.WEEK4;
+                                    Not_obj.WEEK5 = i.WEEK5;
+                                    Not_obj.WAGES1 = i.WAGES1;
+                                    Not_obj.WAGES2 = i.WAGES2;
+                                    Not_obj.WAGES3 = i.WAGES3;
+                                    Not_obj.WAGES4 = i.WAGES4;
+                                    Not_obj.WAGES5 = i.WAGES5;
+                                    Not_obj.HPAY = i.HPAY;
+                                    Not_obj.BONUS = i.BONUS;
+                                    Not_obj.Date_Joining = i.Date_Joining;
+                                    Not_obj.Date_terminated = i.Date_terminated;
+                                    Not_obj.PayFreq = "2M";
+                                    Not_obj.BirthDate = i.BirthDate;
+                                    Not_obj.emp_add_remove = i.emp_add_remove;
+                                    Not_Selected_list.Add(Not_obj);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Data not found for twoice in a month levy deductions details for this year",
+                            Data = null,
+                            Statuscode = 200
+                        });
+                    }
+                    if (E2_WeekDeductionsTaxDetailslist.Count > 0)
+                    {
+                        if (request.AllEmployeeList_List.Count > 0)
+                        {
+                            foreach (var i in request.AllEmployeeList_List)
+                            {
+                                bool ear = (bool)i.emp_add_remove;
+                                var PayFreq = i.PayFreq.ToString();
+                                if (ear && b && PayFreq == "E2W")
+                                {
+                                    ListHavingItems = true;
+                                    C3Contributions obj = new C3Contributions();
+                                    obj.SSN = i.SSN.ToString();
+                                    obj.SSND = i.SSND.ToString();
+                                    obj.C3HEADERID = i.C3HEADERID;
+                                    obj.EmployeeName = i.EmployeeName.ToString();
+                                    obj.WEEK1 = i.WEEK1;
+                                    obj.WEEK2 = i.WEEK2;
+                                    obj.WEEK3 = i.WEEK3;
+                                    obj.WEEK4 = i.WEEK4;
+                                    obj.WEEK5 = i.WEEK5;
+                                    obj.WAGES1 = i.WAGES1;
+                                    obj.WAGES2 = i.WAGES2;
+                                    obj.WAGES3 = i.WAGES3;
+                                    obj.WAGES4 = i.WAGES4;
+                                    obj.WAGES5 = i.WAGES5;
+                                    obj.HPAY = i.HPAY;
+                                    obj.BONUS = i.BONUS;
+                                    obj.Date_Joining = i.Date_Joining;
+                                    obj.Date_terminated = i.Date_terminated;
+                                    obj.IsWeekfifth = i.IsWeekfifth;
+                                    obj.T_C_Date = request.H_Id > 0 ? obj.C3HEADERID > 0 ? (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null);
+                                    obj.PayFreq = "E2W";
+                                    obj.Department = i.Department;
+                                    obj.ISSelectedWEEK1 = obj.WEEK1 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK2 = obj.WEEK2 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK3 = obj.WEEK3 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK4 = obj.WEEK4 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK5 = obj.WEEK5 == true ? "\u221A" : "X";
+                                    obj.TotalWadeges = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    amount = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? Total_weekly = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? w1_amt = obj.WAGES1, w2_amt = obj.WAGES2, w3_amt = obj.WAGES3, w4_amt = obj.WAGES4, w5_amt = obj.WAGES5;
+
+                                    var W1_EDTDL = E2_WeekDeductionsTaxDetailslist.Where(x => x.OverAmt < w1_amt).ToList();
+                                    decimal? W1_LEVYEE = _NonDirectorRepo.Levy_amount(W1_EDTDL, w1_amt);
+                                    var W2_EDTDL = E2_WeekDeductionsTaxDetailslist.Where(x => x.OverAmt < w2_amt).ToList();
+                                    decimal? W2_LEVYEE = _NonDirectorRepo.Levy_amount(W2_EDTDL, w2_amt);
+                                    var W3_EDTDL = E2_WeekDeductionsTaxDetailslist.Where(x => x.OverAmt < w3_amt).ToList();
+                                    decimal? W3_LEVYEE = _NonDirectorRepo.Levy_amount(W3_EDTDL, w3_amt);
+                                    var W4_EDTDL = E2_WeekDeductionsTaxDetailslist.Where(x => x.OverAmt < w4_amt).ToList();
+                                    decimal? W4_LEVYEE = _NonDirectorRepo.Levy_amount(W4_EDTDL, w4_amt);
+                                    var W5_EDTDL = E2_WeekDeductionsTaxDetailslist.Where(x => x.OverAmt < w5_amt).ToList();
+                                    decimal? W5_LEVYEE = _NonDirectorRepo.Levy_amount(W5_EDTDL, w5_amt);
+
+                                    decimal? amount_EDTDL = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    var Total_EDTDL = E2_WeekDeductionsTaxDetailslist.Where(x => x.OverAmt < amount_EDTDL).ToList();
+                                    decimal? totalmonthwageslevy = _NonDirectorRepo.Levy_amount(Total_EDTDL, amount_EDTDL);
+                                    decimal? totallevy = W1_LEVYEE + W2_LEVYEE + W3_LEVYEE + W4_LEVYEE + W5_LEVYEE;
+                                    obj.LEVYEE = (amount_EDTDL >= 6500 ? totalmonthwageslevy : totallevy) + (obj.BONUS > 1500 ? ((obj.BONUS * 8) / 100) : 0);
+
+
+                                    amount = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    bool Is_Emp_D = i.IsemployeeDirector;
+
+
+                                    decimal? Total_w_amt = obj.WAGES1 + +obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? weeekly_amount = IsWeekfifth ? Total_w_amt / 5 : Total_w_amt / 4;
+
+
+                                    obj.Levy_Penalty = Latemonths >= 2 ? ((obj.LEVYEE) * (8 + Latemonths)) / 100 : 0;
+                                    obj.Remarks = i.Remarks.ToString();
+                                    obj.IsemployeeDirector = false;
+                                    obj.BirthDate = i.BirthDate;
+                                    obj.emp_add_remove = i.emp_add_remove;
+                                    obj_list.Add(obj);
+                                }
+                                else if ((!ear || !w) && PayFreq == "E2W")
+                                {
+                                    C3Contributions Not_obj = new C3Contributions();
+                                    Not_obj.SSN = i.SSN.ToString();
+                                    Not_obj.SSND = i.SSND.ToString();
+                                    Not_obj.EmployeeName = i.EmployeeName.ToString();
+                                    Not_obj.WEEK1 = i.WEEK1;
+                                    Not_obj.WEEK2 = i.WEEK2;
+                                    Not_obj.WEEK3 = i.WEEK3;
+                                    Not_obj.WEEK4 = i.WEEK4;
+                                    Not_obj.WEEK5 = i.WEEK5;
+                                    Not_obj.WAGES1 = i.WAGES1;
+                                    Not_obj.WAGES2 = i.WAGES2;
+                                    Not_obj.WAGES3 = i.WAGES3;
+                                    Not_obj.WAGES4 = i.WAGES4;
+                                    Not_obj.WAGES5 = i.WAGES5;
+                                    Not_obj.HPAY = i.HPAY;
+                                    Not_obj.BONUS = i.BONUS;
+                                    Not_obj.Date_Joining = i.Date_Joining;
+                                    Not_obj.Date_terminated = i.Date_terminated;
+                                    Not_obj.PayFreq = "E2W";
+                                    Not_obj.BirthDate = i.BirthDate;
+                                    Not_obj.emp_add_remove = i.emp_add_remove;
+                                    Not_Selected_list.Add(Not_obj);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        return BadRequest(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Data not found for E2 weekly levy deductions  details for this year",
+                            Data = null,
+                            Statuscode = 200
+                        });
+
+                    }
+                    if (MonthlyDeductionsTaxDetailslist.Count > 0)
+                    {
+                        if (request.AllEmployeeList_List.Count > 0)
+                        {
+                            foreach (var i in request.AllEmployeeList_List)
+                            {
+                                bool ear = (bool)i.emp_add_remove;
+                                var PayFreq = i.PayFreq.ToString();
+                                if (ear && m && PayFreq == "M")
+                                {
+                                    ListHavingItems = true;
+                                    C3Contributions obj = new C3Contributions();
+                                    obj.SSN = i.SSN.ToString();
+                                    obj.SSND = i.SSND.ToString();
+                                    obj.C3HEADERID = i.C3HEADERID;
+                                    obj.EmployeeName = i.EmployeeName.ToString();
+                                    obj.WEEK1 = i.WEEK1;
+                                    obj.WEEK2 = i.WEEK2;
+                                    obj.WEEK3 = i.WEEK3;
+                                    obj.WEEK4 = i.WEEK4;
+                                    obj.WEEK5 = i.WEEK5;
+                                    obj.WAGES1 = i.WAGES1;
+                                    obj.WAGES2 = i.WAGES2;
+                                    obj.WAGES3 = i.WAGES3;
+                                    obj.WAGES4 = i.WAGES4;
+                                    obj.WAGES5 = i.WAGES5;
+                                    obj.HPAY = i.HPAY;
+                                    obj.BONUS = i.BONUS;
+                                    obj.Date_Joining = i.Date_Joining;
+                                    obj.Date_terminated = i.Date_terminated;
+                                    obj.IsWeekfifth = i.IsWeekfifth;
+                                    obj.T_C_Date = request.H_Id > 0 ? obj.C3HEADERID > 0 ? (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null);
+                                    obj.PayFreq = "M";
+                                    obj.Department = i.Department;
+                                    obj.ISSelectedWEEK1 = obj.WEEK1 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK2 = obj.WEEK2 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK3 = obj.WEEK3 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK4 = obj.WEEK4 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK5 = obj.WEEK5 == true ? "\u221A" : "X";
+                                    obj.TotalWadeges = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    amount = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+
+                                    obj.LEVYEE = (((amount) * 8) / 100) + (obj.BONUS > 1500 ? ((obj.BONUS * 8) / 100) : 0);
+
+                                    decimal? Total_w_amt = obj.WAGES1 + +obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? weeekly_amount = IsWeekfifth ? Total_w_amt / 5 : Total_w_amt / 4;
+
+
+                                    obj.Levy_Penalty = Latemonths >= 2 ? ((obj.LEVYEE) * (8 + Latemonths)) / 100 : 0;
+                                    obj.Remarks = i.Remarks.ToString();
+                                    obj.IsemployeeDirector = false;
+                                    obj.BirthDate = i.BirthDate;
+                                    obj.emp_add_remove = i.emp_add_remove;
+                                    obj_list.Add(obj);
+                                }
+                                else if ((!ear || !w) && PayFreq == "M")
+                                {
+                                    C3Contributions Not_obj = new C3Contributions();
+                                    Not_obj.SSN = i.SSN.ToString();
+                                    Not_obj.SSND = i.SSND.ToString();
+                                    Not_obj.EmployeeName = i.EmployeeName.ToString();
+                                    Not_obj.WEEK1 = i.WEEK1;
+                                    Not_obj.WEEK2 = i.WEEK2;
+                                    Not_obj.WEEK3 = i.WEEK3;
+                                    Not_obj.WEEK4 = i.WEEK4;
+                                    Not_obj.WEEK5 = i.WEEK5;
+                                    Not_obj.WAGES1 = i.WAGES1;
+                                    Not_obj.WAGES2 = i.WAGES2;
+                                    Not_obj.WAGES3 = i.WAGES3;
+                                    Not_obj.WAGES4 = i.WAGES4;
+                                    Not_obj.WAGES5 = i.WAGES5;
+                                    Not_obj.HPAY = i.HPAY;
+                                    Not_obj.BONUS = i.BONUS;
+                                    Not_obj.Date_Joining = i.Date_Joining;
+                                    Not_obj.Date_terminated = i.Date_terminated;
+                                    Not_obj.PayFreq = "M";
+                                    Not_obj.BirthDate = i.BirthDate;
+                                    Not_obj.emp_add_remove = i.emp_add_remove;
+                                    Not_Selected_list.Add(Not_obj);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        return BadRequest(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Data not found  for monthly levy deductions  details for this year",
+                            Data = null,
+                            Statuscode = 200
+                        });
+                    }
+                    if (WeelelyDeductionsTaxDetailslist.Count > 0)
+                    {
+                        if (request.AllEmployeeList_List.Count > 0)
+                        {
+                            foreach (var i in request.AllEmployeeList_List)
+                            {
+                                bool ear = i.emp_add_remove;
+                                var PayFreq = i.PayFreq.ToString();
+                                if (ear && w && PayFreq == "W")
+                                {
+                                    ListHavingItems = true;
+                                    C3Contributions obj = new C3Contributions();
+                                    obj.SSN = i.SSN.ToString();
+                                    obj.SSND = i.SSND.ToString();
+                                    obj.EmployeeName = i.EmployeeName.ToString();
+                                    obj.C3HEADERID = i.C3HEADERID;
+                                    obj.WEEK1 = (bool)i.WEEK1;
+                                    obj.WEEK2 = (bool)i.WEEK2;
+                                    obj.WEEK3 = (bool)i.WEEK3;
+                                    obj.WEEK4 = (bool)i.WEEK4;
+                                    obj.WEEK5 = (bool)i.WEEK5;
+                                    obj.WAGES1 = (decimal)i.WAGES1;
+                                    obj.WAGES2 = (decimal)i.WAGES2;
+                                    obj.WAGES3 = (decimal)i.WAGES3;
+                                    obj.WAGES4 = (decimal)i.WAGES4;
+                                    obj.WAGES5 = (decimal)i.WAGES5;
+                                    obj.HPAY = (decimal)i.HPAY;
+                                    obj.BONUS = (decimal)i.BONUS;
+                                    obj.Date_Joining = i.Date_Joining;
+                                    obj.Date_terminated = i.Date_terminated;
+                                    obj.IsWeekfifth = i.IsWeekfifth;
+                                    obj.T_C_Date = request.H_Id > 0 ? obj.C3HEADERID > 0 ? (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null) : (obj.Date_terminated != null ? "T" : obj.Date_Joining != null ? "C" : null);
+                                    obj.PayFreq = "W";
+                                    obj.Department = i.Department;
+                                    obj.ISSelectedWEEK1 = obj.WEEK1 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK2 = obj.WEEK2 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK3 = obj.WEEK3 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK4 = obj.WEEK4 == true ? "\u221A" : "X";
+                                    obj.ISSelectedWEEK5 = obj.WEEK5 == true ? "\u221A" : "X";
+                                    obj.TotalWadeges = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? Total_weekly = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    decimal? w1_amt = obj.WAGES1, w2_amt = obj.WAGES2, w3_amt = obj.WAGES3, w4_amt = obj.WAGES4, w5_amt = obj.WAGES5;
+
+
+                                    var W1_WDTDL = WeelelyDeductionsTaxDetailslist.Where(x => x.OverAmt < w1_amt).ToList();
+                                    decimal? W1_LEVYEE = _NonDirectorRepo.Levy_amount(W1_WDTDL, w1_amt);
+
+                                    var W2_WDTDL = WeelelyDeductionsTaxDetailslist.Where(x => x.OverAmt < w2_amt).ToList();
+                                    decimal? W2_LEVYEE = _NonDirectorRepo.Levy_amount(W2_WDTDL, w2_amt);
+
+                                    var W3_WDTDL = WeelelyDeductionsTaxDetailslist.Where(x => x.OverAmt < w3_amt).ToList();
+                                    decimal? W3_LEVYEE = _NonDirectorRepo.Levy_amount(W3_WDTDL, w3_amt);
+
+                                    var W4_WDTDL = WeelelyDeductionsTaxDetailslist.Where(x => x.OverAmt < w4_amt).ToList();
+                                    decimal? W4_LEVYEE = _NonDirectorRepo.Levy_amount(W4_WDTDL, w4_amt);
+
+                                    var W5_WDTDL = WeelelyDeductionsTaxDetailslist.Where(x => x.OverAmt < w5_amt).ToList();
+                                    decimal? W5_LEVYEE = _NonDirectorRepo.Levy_amount(W5_WDTDL, w5_amt);
+
+                                    decimal? amount_WDTDL = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+                                    var Total_WDTDL = WeelelyDeductionsTaxDetailslist.Where(x => x.OverAmt < amount_WDTDL).ToList();
+                                    decimal? totalmonthwageslevy = _NonDirectorRepo.Levy_amount(Total_WDTDL, amount_WDTDL);
+                                    decimal? totallevy = W1_LEVYEE + W2_LEVYEE + W3_LEVYEE + W4_LEVYEE + W5_LEVYEE;
+                                    obj.LEVYEE = (amount_WDTDL >= 6500 ? totalmonthwageslevy : totallevy) + (obj.BONUS > 1500 ? ((obj.BONUS * 8) / 100) : 0);
+                                    amount = obj.WAGES1 + obj.WAGES2 + obj.WAGES3 + obj.WAGES4 + obj.WAGES5;
+
+                                    obj.Levy_Penalty = Latemonths >= 2 ? (obj.LEVYEE * (8 + Latemonths)) / 100 : 0;
+
+                                    obj.Remarks = i.Remarks.ToString();
+                                    obj.IsemployeeDirector = false;
+                                    obj.BirthDate = i.BirthDate;
+                                    obj.emp_add_remove = i.emp_add_remove;
+                                    obj_list.Add(obj);
+                                }
+                                else if ((!ear || !w) && PayFreq == "W")
+                                {
+                                    C3Contributions Not_obj = new C3Contributions();
+                                    Not_obj.SSN = i.SSN.ToString();
+                                    Not_obj.SSND = i.SSND.ToString();
+                                    Not_obj.EmployeeName = i.EmployeeName.ToString();
+                                    Not_obj.WEEK1 = (bool)i.WEEK1;
+                                    Not_obj.WEEK2 = (bool)i.WEEK2;
+                                    Not_obj.WEEK3 = (bool)i.WEEK3;
+                                    Not_obj.WEEK4 = (bool)i.WEEK4;
+                                    Not_obj.WEEK5 = (bool)i.WEEK5;
+                                    Not_obj.WAGES1 = (decimal)i.WAGES1;
+                                    Not_obj.WAGES2 = (decimal)i.WAGES2;
+                                    Not_obj.WAGES3 = (decimal)i.WAGES3;
+                                    Not_obj.WAGES4 = (decimal)i.WAGES4;
+                                    Not_obj.WAGES5 = (decimal)i.WAGES5;
+                                    Not_obj.HPAY = (decimal)i.HPAY;
+                                    Not_obj.BONUS = (decimal)i.BONUS;
+                                    Not_obj.Date_Joining = i.Date_Joining;
+                                    Not_obj.Date_terminated = i.Date_terminated;
+                                    Not_obj.PayFreq = "W";
+                                    Not_obj.BirthDate = i.BirthDate;
+                                    Not_obj.emp_add_remove = i.emp_add_remove;
+                                    Not_Selected_list.Add(Not_obj);
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        return BadRequest(new ResponseModel
+                        {
+                            Status = false,
+                            Message = "Data not found for weekly levy deductions  details for this year",
+                            Data = null,
+                            Statuscode = 200
+                        });
+                    }
+
+                    if (!request.IsSave && request.Is_Preview)
+                    {
+                        bool Isneedtosave = request.IsRecordEdit ? true : false;
+                        var Result = _NonDirectorRepo.NWDIRECTORC3(obj_list, Not_Selected_list, request.Monthno, Convert.ToInt32(request.Year), request.H_Id, request.schedule_no, Isneedtosave, request.IsRecordEdit, request.Is_Preview, TextChanged, request.CompanyId, request.UserID, request.User_Name);
+                        Result.MonthName = MonthName((request.Monthno).ToString());
+                        Result.Year = request.Year;
+                        Result.OrderKey = request.OrderKey;
+                        Result.OrderName = request.OrderName;
+                        Result.company_reg_no = CompanyDetails.company_reg_no;
+                        Result.company_name = CompanyDetails.company_name;
+                        Result.company_address = CompanyDetails.company_address;
+                        Result.trade_name = CompanyDetails.trade_name;
+                        Result.isNilReturn = request.isNilReturn;
+                        return Ok(new ResponseModel
+                        {
+                            Status = true,
+                            Message = "Result.",
+                            Data = Result,
+                            Statuscode = 200
+                        });
+                    }
+                    else
+                    {
+                        int result = _NonDirectorRepo.NwSaveC3Record(obj_list, Not_Selected_list, request.Monthno, Convert.ToInt32(request.Year), request.H_Id, request.schedule_no, request.IsSave, request.IsRecordEdit, Convert.ToInt32(request.Year), TextChanged, request.CompanyId, request.UserID, request.User_Name, request.OrderKey, request.OrderName, CompanyDetails.company_reg_no, request.isNilReturn);
+                        if (result > 0)
+                        {
+
+                            if (request.Is_SendBima)
+                            {
+                                var response = await _NonDirectorRepo.SubmitDirectorC3_ClickBulk(result, request.CompanyId, request.UserID);
+                                if (response.Status == true)
+                                {
+                                    return Ok(response);
+                                }
+                                return BadRequest(response);
+                            }
+                            else
+                            {
+
+                                return Ok(new ResponseModel
+                                {
+                                    Status = true,
+                                    Message = "C3 Wizard saved successfully",
+                                    Data = result,
+                                    Statuscode = 200
+                                });
+                            }
+                        }
+                    }
+                    return NotFound(new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Data not found the this employee",
+                        Data = null,
+
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Levy deductions details no data found for this year",
+                        Data = null,
+                        Statuscode = 200
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel
+                {
+                    Status = false,
+                    Message = ex.Message,
+                    Data = null,
+                    Statuscode = ex.GetHashCode()
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("NWButton_Finalize_Click")]
+        public async Task<IActionResult> NWButton_Finalize_Click(SaveNContinueRequest request)
+        {
+            try
+            {
+                string fyear = request.Year.ToString();
+                //int fmonthno = request.Monthno;
+                int fmonthno = _C3.MonthNumber(request.MonthName);
+                request.Monthno = fmonthno;
+                string fmonthval = fmonthno <= 9 ? "0" + fmonthno.ToString() : fmonthno.ToString();
+                DateTime? newFrom_date = DateTime.ParseExact(("01/" + fmonthval + "/" + fyear), Helper.DateFormat, CultureInfo.InvariantCulture);
+                int daysfMonth = DateTime.DaysInMonth(int.Parse(fyear), fmonthno);
+                DateTime? newTo_date = newFrom_date.Value.AddDays(daysfMonth - 1);
+                ViewModelMaster_Setting_Rates_Rates Master_Setting_Rates_Rates = _C3.Get_Master_Setting_Rates_Rates(newFrom_date, newTo_date);
+                int C3H_Id = 0;
+                if (C3WizardRepository.Repository.ConnectionInfom.HasConnection() && C3WizardRepository.Repository.ConnectionInfom.APIConnection(_configuration))
+                {
+                    //int savestatus = request.H_Id > 0 ? 1 : 0;
+                    //if (request.Is_Preview)
+                    //{
+                    C3H_Id = await Task.Run(() => _NonDirectorRepo.NWSave_button_Click(request, Master_Setting_Rates_Rates));
+                    request.H_Id = C3H_Id;
+                    //}
+                    if (C3H_Id != 0)
+                    {
+                        SqlConnection staticConnectioncheck = C3WizardLayerConn_BaseData.StaticSqlConnection;
+                        staticConnectioncheck.Open();
+                        SqlCommand cmdDelete = new SqlCommand("C3Header_Finalize", staticConnectioncheck);
+                        cmdDelete.CommandType = CommandType.StoredProcedure;
+                        cmdDelete.Parameters.Add(new SqlParameter("@HeaderId", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)request.H_Id ?? (object)DBNull.Value));
+                        SqlDataAdapter sqlAdapterdelete = new SqlDataAdapter(cmdDelete);
+                        DataTable dtcheck = new DataTable();
+                        sqlAdapterdelete.Fill(dtcheck);
+                        DataTable dt = new DataTable();
+                        sqlAdapterdelete.Fill(dt);
+                        staticConnectioncheck.Close();
+                        if (dt.Rows.Count > 0)
+                        {
+                            var response = await _NonDirectorRepo.SubmitDirectorC3_ClickBulk(request.H_Id, request.CompanyId, request.UserID);
+                            return Ok(response);
+
+                        }
+                    }
+                }
+
+                C3H_Id = await Task.Run(() => _NonDirectorRepo.NWSave_button_Click(request, Master_Setting_Rates_Rates));
+                if (C3H_Id != 0)
+                {
+                    return Ok(new ResponseModel
+                    {
+                        Status = true,
+                        Message = "Director payroll Saved successfully",
+                        Statuscode = 200,
+                        Data = C3H_Id
+                    });
+                }
+
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Message = "Failed to save C3",
+                    Statuscode = 400
+                });
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return StatusCode(500, new ResponseModel
+                {
+                    Status = false,
+                    Message = "An error occurred while processing your request.",
+                    Statuscode = 500
+                });
+            }
+
+        }
+        [HttpPost("NWSubmitC3Bulk")]
+        public async Task<IActionResult> NWSubmitC3Bulk(int headerId, int CompanyId, int UserID)
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                var IsBEMA_APIs_Integration = _configuration["IsBEMA_APIs_Integration"];
+                if (IsBEMA_APIs_Integration == "1")
+                {
+                    response = await _NonDirectorRepo.SubmitDirectorC3_ClickBulk(headerId, CompanyId, UserID);
+                    if (response.Status == true)
+                    {
+                        return Ok(response);
+                    }
+                    return BadRequest(response);
+                }
+                else
+                {
+
+                    bool isc3submitted = _context.ProcessC3headers.Any(x => x.C3headerid == headerId && (bool)x.IsSubmitted == true);
+                    if (!isc3submitted)
+                    {
+                        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                        string updateHeaderQuery = $"UPDATE PROCESS_C3Header SET Is_submitted=1, C3_SubmittedDate='{DateTime.Now.ToString(Helper.SQLDateFormat)}', C3_SubmittedBy={UserID} WHERE C3HEADERID={headerId}";
+                        SqlCommand updateC3Header = new SqlCommand(updateHeaderQuery, staticConnection);
+                        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                        int uprow = updateC3Header.ExecuteNonQuery();
+                        staticConnection.Close();
+
+                        string updateContributionQuery = $"UPDATE Process_Contributions SET Is_submitted=1, C3_SubmittedDate='{DateTime.Now.ToString(Helper.SQLDateFormat)}', C3_SubmittedBy={UserID} WHERE C3HEADERID={headerId}";
+                        SqlCommand updateContributions = new SqlCommand(updateContributionQuery, staticConnection);
+                        if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+                        int urow2 = updateContributions.ExecuteNonQuery();
+                        staticConnection.Close();
+                        response.Status = true;
+                        response.Statuscode = 200;
+                        response.Message = "C3 submitted successfully.";
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response.Status = false;
+                        response.Statuscode = 400;
+                        response.Message = "C3 already submitted in SSB.";
+                        return BadRequest(response);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return Ok(new ResponseModel
+                {
+                    Status = false,  // Indicate success
+                    Message = ex.Message,
+                    Statuscode = 400
+                });
+            }
+        }
+
+        // ===================================nondirectorreport==============
+        [HttpGet("btn_Search_Click")]
+        public ResponseModel btn_Search_Click(int FromMonth, int ToMonth, string Year, int CompanyId)
+        {
+            //if (ValidateDetails())
+            //{
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                //if (CmbFromMonth.SelectedIndex != -1 && CmbToMonth.SelectedIndex != -1 && CmbYear.SelectedIndex != -1)
+                //{
+                int F_month = FromMonth;
+                int T_month = ToMonth;
+                //int S_year = int.Parse(CmbYear.Text);
+                //ComboBoxItem year = (ComboBoxItem)CmbYear.SelectedItem;
+                string value = Year != null ? Year : null;
+                string S_year = Year != "" ? value : null;
+
+                List<C3Header> listDVOC3Header = new List<C3Header>();
+                SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+                SqlCommand cmd = new SqlCommand("Get_Director_C3_Genrated_data", staticConnection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)CompanyId ?? (object)DBNull.Value));
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                sqlAdapter.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        bool issubmited = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                        bool isfinalize = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                        int C3month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+                        int C3year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                        if ((issubmited == true || isfinalize == true))
+                        {
+                            C3Header Obj = new C3Header();
+                            Obj.HeaderID = Convert.IsDBNull(row["C3HEADERID"]) ? 0 : int.Parse(row["C3HEADERID"].ToString());
+                            Obj.RegNo = Convert.IsDBNull(row["RegNo"]) ? null : row["RegNo"].ToString();
+                            Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? null : MonthName(row["PERIODD_MONTH"].ToString());
+                            Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? null : row["PERIOD_YEAR"].ToString();
+                            Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+                            Obj.P_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+                            Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+                            Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_SSCONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SSCONTRIBUTIONS"].ToString())));
+                            Obj.TOTALLEVYEEEMPLOYEE = Convert.IsDBNull(row["TOTAL_LEVYEEEMPLOYEE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_LEVYEEEMPLOYEE"].ToString())));
+                            Obj.TOTALSERVAYANCE = Convert.IsDBNull(row["TOTAL_SERVAYANCE"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_SERVAYANCE"].ToString())));
+                            Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+                            //Obj.Insert_Datetime = Convert.IsDBNull(row["Insert_Datetime"]) ? DateTime.Parse("01/01/1900") : DateTime.Parse(row["Insert_Datetime"].ToString());
+                            Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+                            Obj.Is_submitted = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+                            Obj.C3_IsFinalized = !Obj.C3_IsFinalized;
+                            Obj.IssubmittedShow = (bool)Obj.Is_submitted ? "C3 Submitted" : "C3 not Submitted";
+                            Obj.Issubmittedcolor = (bool)Obj.Is_submitted ? "Black" : "Red";
+                            Obj.IssubmittedShowimg = (bool)Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+                            Obj.Schedule_NO = Convert.IsDBNull(row["Schedule_NO"]) ? 0 : int.Parse(row["Schedule_NO"].ToString());
+                            listDVOC3Header.Add(Obj);
+                        }
+                    }
+                    listDVOC3Header = S_year != null ? listDVOC3Header.Where(x => x.Period_year == S_year).ToList() : listDVOC3Header;
+                    listDVOC3Header = F_month != -1 ? listDVOC3Header.Where(x => x.p_Month >= F_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+                    listDVOC3Header = T_month != -1 ? listDVOC3Header.Where(x => x.p_Month <= T_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+
+                    if (listDVOC3Header.Count > 0)
+                    {
+                        var c3HeaderList = listDVOC3Header.Select(row => new C3HeaderViewModel
+                        {
+                            HeaderID = row.HeaderID,
+                            RegNo = row.RegNo,
+                            PeriodMonth = row.period_Month,
+                            PeriodYear = row.Period_year,
+                            PMonth = row.p_Month,
+                            PYear = row.P_year,
+                            TotalWages = row.TOTAL_WAGES,
+                            TotalSSContributions = row.TOTALSSCONTRIBUTIONS,
+                            TotalLevyEmployee = row.TOTALLEVYEEEMPLOYEE,
+                            TotalServayance = row.TOTALSERVAYANCE,
+                            InsertDatetimeInfo = row.Insert_Datetimeinfo,
+                            IsFinalized = row.Is_Fianalize,
+                            IsSubmitted = row.Is_submitted,
+                            C3IsFinalized = row.C3_IsFinalized,
+                            IssubmittedShow = row.IssubmittedShow,
+                            IssubmittedColor = row.Issubmittedcolor,
+                            IssubmittedShowImg = row.IssubmittedShowimg,
+                            ScheduleNo = row.Schedule_NO
+                        }).ToList();
+
+                        response.Data = c3HeaderList;
+                        response.Status = true;
+                        response.Statuscode = 200;
+                        response.Message = "Data Get Successfully!";
+
+                    }
+                    else
+                    {
+                        response.Data = null;
+                        response.Status = false;
+                        response.Statuscode = 404;
+                        response.Message = "Data Not Found!";
+
+                    }
+
+                }
+                else
+                {
+                    response.Data = null;
+                    response.Status = false;
+                    response.Statuscode = 404;
+                    response.Message = "Data Not Found!";
+                }
+                //}
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                response.Status = false;
+                response.Statuscode = 500;
+                response.Message = ex.Message;
+            }
+
+            return response;
+            //}
+        }
+
+        private string MonthName1(string m_no)
+        {
+            string Month = "";
+            switch (m_no)
+            {
+                case "1": Month = "January"; break;
+                case "2": Month = "February"; break;
+                case "3": Month = "March"; break;
+                case "4": Month = "April"; break;
+                case "5": Month = "May"; break;
+                case "6": Month = "June"; break;
+                case "7": Month = "July"; break;
+                case "8": Month = "August"; break;
+                case "9": Month = "September"; break;
+                case "10": Month = "October"; break;
+                case "11": Month = "November"; break;
+                case "12": Month = "December"; break;
+                default: Month = string.Empty; break;
+            }
+            return Month;
+        }
+        [HttpGet]
+        [Route("NwCheckC3Created")]
+        public async Task<IActionResult> NwCheckC3Created(int Year, int Month, int CompanyId)
+        {
+            try
+            {
+                using (SqlConnection staticConnectionsave = C3WizardLayerConn_BaseData.StaticSqlConnection)
+                using (SqlCommand cmdsave = new SqlCommand("check_Director_C3Created", staticConnectionsave))
+                {
+                    cmdsave.CommandType = CommandType.StoredProcedure;
+                    cmdsave.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50) { Value = (object)Month ?? DBNull.Value });
+                    cmdsave.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50) { Value = (object)Year ?? DBNull.Value });
+                    cmdsave.Parameters.Add(new SqlParameter("@CompanyId", SqlDbType.Int, 50) { Value = (object)CompanyId ?? DBNull.Value });
+
+                    using (SqlDataAdapter sqlAdaptersave = new SqlDataAdapter(cmdsave))
+                    {
+                        DataTable dtsave = new DataTable();
+                        sqlAdaptersave.Fill(dtsave);
+
+                        if (dtsave.Rows.Count > 0)
+                        {
+                            int c3Hid = (int)dtsave.Rows[0]["C3HEADERID"];
+
+                            return Ok(new ResponseModel
+                            {
+                                Status = true,
+                                Data = c3Hid,
+                                Message = $"A C3 for the month {MonthName1(Month.ToString())} {Year} has already been created. Overwriting it will replace the existing C3. Would you like to proceed?",
+                                Statuscode = 200
+                            });
+                        }
+                        else
+                        {
+                            return Ok(new ResponseModel
+                            {
+                                Status = false,
+                                Message = "No C3 record found for the given month and year.",
+                                Statuscode = 200
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var (controller, action) = ExceptionMiddleware.GetActionInfo(this);
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                return BadRequest(new ResponseModel
+                {
+                    Status = false,
+                    Message = ex.Message,
+                    Statuscode = 400
+                });
+            }
+        }
+    }
+}

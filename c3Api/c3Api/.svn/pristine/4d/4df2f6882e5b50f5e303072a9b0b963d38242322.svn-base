@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CyberSource.Rest.Client" Version="0.0.1.49" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\C3WizardData\C3WizardData.csproj" />
+  </ItemGroup>
+
+</Project>

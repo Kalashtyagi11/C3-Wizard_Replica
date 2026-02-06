@@ -1,0 +1,15 @@
+C:\Atul\c3Api\C3Wizard.COMMONPROP\bin\Release\net8.0\C3Wizard.COMMONPROP.deps.json
+C:\Atul\c3Api\C3Wizard.COMMONPROP\bin\Release\net8.0\C3Wizard.COMMONPROP.dll
+C:\Atul\c3Api\C3Wizard.COMMONPROP\bin\Release\net8.0\C3Wizard.COMMONPROP.pdb
+C:\Atul\c3Api\C3Wizard.COMMONPROP\bin\Release\net8.0\C3WizardData.dll
+C:\Atul\c3Api\C3Wizard.COMMONPROP\bin\Release\net8.0\C3WizardData.pdb
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.csproj.AssemblyReference.cache
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.AssemblyInfoInputs.cache
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.AssemblyInfo.cs
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.csproj.CoreCompileInputs.cache
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.AAC0CCD2.Up2Date
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.dll
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\refint\C3Wizard.COMMONPROP.dll
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\C3Wizard.COMMONPROP.pdb
+C:\Atul\c3Api\C3Wizard.COMMONPROP\obj\Release\net8.0\ref\C3Wizard.COMMONPROP.dll

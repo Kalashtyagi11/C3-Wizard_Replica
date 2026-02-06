@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace C3WizardData.Models
+{
+
+    public class SECUsersProfile
+    {
+        public int ProfileId { get; set; }
+        public int? EmpId { get; set; }
+        public string REG_NUMBER { get; set; }
+        public int UserId { get; set; }
+        public string CreatedMachineInfo { get; set; }
+        public int? InsertedBy { get; set; }
+        public DateTime? InsertedOn { get; set; }
+        public string InsertedMachineInfo { get; set; }
+        public int? UpdatedBy { get; set; }
+        public DateTime? UpdatedOn { get; set; }
+        public string UpdatedMachineInfo { get; set; }
+        public bool IsActive { get; set; }
+        public bool ISSelfEmployee { get; set; }
+      
+       
+    }
+
+
+}

@@ -1,0 +1,1087 @@
+﻿using C3Wizard.COMMONPROP;
+using C3WizardData.Models;
+using C3WizardData.SelfEmpModel;
+using C3WizardHelper.ViewModels;
+using C3WizardLayer.BusinessObjects;
+using C3WizardLayer.DataObjects;
+using C3WizardRepository.Common;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Data;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace C3WizardRepository.Repository
+{
+  public class SelpEmpContributionRepo
+  {
+
+    int mondays = 0;
+    bool IsWeekfifth = false;
+    bool is_dashboard = false;
+    bool ListHavingItems = false;
+    bool ispayperiodchange = false;
+    public class WageList
+    {
+      public int? CategoryId { get; set; }
+      public string Category { get; set; }
+      public decimal? WeeklyIncome { get; set; }
+      public decimal? WeeklyContribution { get; set; }
+    }
+    public async Task<string> btn_SearchSelfEmpContribution(int monthIndex, int Year, int CompanyId, int? SEC3ID)
+    {
+
+
+      string PatPmessage = "";
+      if (monthIndex == -1)
+      {
+        PatPmessage += "pay period Month \n";
+      }
+      if (Year == -1)
+      {
+        PatPmessage += "pay period Year \n";
+      }
+
+      if (PatPmessage != "")
+      {
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        //C3WizardMessageBox.Show("C3 Wizard", "Please select \n \n" + PatPmessage);
+        return "Please select" + PatPmessage;
+      }
+      ispayperiodchange = false;
+      //searchclicked = true;
+      //Monthselectedindex = CmbMonth.SelectedIndex;
+      //yearselectedindex = CmbYear.SelectedIndex;
+      if (monthIndex != -1 && Year != -1 /*&& (H_Id == 0)*/)
+      {
+        List<BLSelfEmployed> emplist = BLSelfEmployed.SelfEmployedCollection().ToList();
+        emplist = emplist.Where(x => x.EmployeeID == CompanyId).ToList();
+        string SSNofEmp = emplist.Count > 0 ? emplist.FirstOrDefault().SocSecNum : null;
+
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+        SqlCommand cmd = new SqlCommand("Check_SelfEmployed_C3Created", staticConnection);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)monthIndex ?? (object)DBNull.Value));
+        cmd.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)Year ?? (object)DBNull.Value));
+        cmd.Parameters.Add(new SqlParameter("@SSN", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)SSNofEmp ?? (object)DBNull.Value));
+        cmd.Parameters.Add(new SqlParameter("@SEC3ID", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)SEC3ID ?? (object)DBNull.Value));
+
+        SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+        DataTable dt = new DataTable();
+        sqlAdapter.Fill(dt);
+        if (dt.Rows.Count > 0)
+        {
+          //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+          //C3WizardMessageBox.Show("C3 Wizard", "Self employed C3 already exists");
+          //return "Already-" + int.Parse(dt.Rows[0].ItemArray[0].ToString()); 
+        }
+
+
+        // mondays = MondaysInMonth(monthIndex + 1, Year);// Changes.....
+        mondays = MondaysInMonth(monthIndex, Year);
+        IsWeekfifth = mondays == 5 ? true : false;
+        return await LoadEmployee(monthIndex, Year, emplist, SSNofEmp);
+
+        //ButtonSave.IsEnabled = true;
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+      }
+      return "please fill all required field..";
+    }
+    public async Task<string> LoadEmployee(int monthNum, int year, List<BLSelfEmployed> emplist, string SSNofEmp)
+    {
+      //Application.Current.Properties["TextChanged"] = 0;
+      List<C3ContributionVm> listforview = new List<C3ContributionVm>();
+      ListHavingItems = false;
+      //int monthno = monthNum + 1;//Changes..
+      int monthno = monthNum;
+
+      string value = year.ToString();
+
+      //string Mvalue = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthno);
+      int daysin_month = DateTime.DaysInMonth(int.Parse(value), monthno);
+      string monthval = monthno <= 9 ? "0" + monthno.ToString() : monthno.ToString();
+      DateTime Today_date = DateTime.ParseExact(("01/" + monthval + "/" + value), Helper.DateFormat, CultureInfo.InvariantCulture);
+      DateTime? Todaydate = DateTime.ParseExact(("01/" + monthval + "/" + value), Helper.DateFormat, CultureInfo.InvariantCulture);
+      int count = -1;
+      int Latemonths = (DateTime.Now.Year - int.Parse(value)) * 12 + DateTime.Now.Month - monthno;
+      Latemonths = Latemonths <= 0 ? 0 : Latemonths;
+      //SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+      //List<BLSelfEmployed> emplist = BLSelfEmployed.SelfEmployedCollection().ToList();
+      //DateTime? end_date = Todaydate != null ? (DateTime?)((DateTime)Todaydate).AddDays(daysin_month - 1) : null;
+      //emplist = emplist.Where(x => x.EmployeeID == CompanyId).ToList();
+      List<WageList> IncomCategory = new List<WageList>();
+
+
+      string userName = "";
+      string address = "";
+      string TextTotalWages = "";
+      string TextTotalWagesNLevy = "";
+      string TextLevyPenalty = "";
+      string TextTotalAccountantGeneral = "";
+      decimal? wcontribution = 0;
+      string? Category = "";
+      decimal? wincome = 0;
+
+      if (ValidateC3settingExists(monthNum, year)) // 17325 date -1
+      {
+        IncomCategory = WageCategory(S_E_S_id);
+        int daysThisMonth = DateTime.DaysInMonth(int.Parse(value), monthno);
+        foreach (var empl in emplist)
+        {
+          C3ContributionVm blemp = new C3ContributionVm();
+          userName = empl.FullName;
+          count++;
+          wincome = IncomCategory.Any(x => x.CategoryId == empl.Category_Type) ? IncomCategory.FirstOrDefault(x => x.CategoryId == empl.Category_Type).WeeklyIncome : decimal.Parse(String.Format("{0:0.00}", 0.00));
+          wcontribution = IncomCategory.Any(x => x.CategoryId == empl.Category_Type) ? IncomCategory.FirstOrDefault(x => x.CategoryId == empl.Category_Type).WeeklyContribution : decimal.Parse(String.Format("{0:0.00}", 0.00));
+          Category= IncomCategory.Any(x => x.CategoryId == empl.Category_Type) ? IncomCategory.FirstOrDefault(x => x.CategoryId == empl.Category_Type).Category : "";
+          blemp.SSN = empl.SocSecNum;
+          blemp.C3HEADERID = 0;
+          blemp.PayFreq = (empl.Category_Type).ToString();
+          blemp.EmployeeId = empl.EmployeeID;
+          blemp.EmployeeName = empl.LastName + " " + empl.FirstName;
+          blemp.IsWeekfifth = IsWeekfifth;
+          blemp.WEEK1 = true;
+          blemp.WEEK2 = true;
+          blemp.WEEK3 = true;
+          blemp.WEEK4 = true;
+          blemp.WEEK5 = IsWeekfifth;
+          blemp.SelectedTypeWEEK1 = 0;
+          blemp.SelectedTypeWEEK2 = 0;
+          blemp.SelectedTypeWEEK3 = 0;
+          blemp.SelectedTypeWEEK4 = 0;
+          blemp.SelectedTypeWEEK5 = IsWeekfifth ? 0 : -1;
+          blemp.WAGES1 = decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.WAGES2 = decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.WAGES3 = decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.WAGES4 = IsWeekfifth ? decimal.Parse(String.Format("{0:0.00}", (wincome))) : decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.WAGES5 = IsWeekfifth ? decimal.Parse(String.Format("{0:0.00}", (wincome))) : decimal.Parse(String.Format("{0:0.00}", 0.00));
+          address = string.Concat(empl.Address1, !string.IsNullOrEmpty(empl.Address2) ? " " + empl.Address2 : "");
+          blemp.tempWAGES1 = decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.tempWAGES2 = decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.tempWAGES3 = decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.tempWAGES4 = IsWeekfifth ? decimal.Parse(String.Format("{0:0.00}", (wincome))) : decimal.Parse(String.Format("{0:0.00}", (wincome)));
+          blemp.tempWAGES5 = IsWeekfifth ? decimal.Parse(String.Format("{0:0.00}", (wincome))) : decimal.Parse(String.Format("{0:0.00}", 0.00));
+          blemp.TotalWadeges = blemp.WAGES1 + blemp.WAGES2 + blemp.WAGES3 + blemp.WAGES4 + blemp.WAGES5;
+          blemp.LEVYEE = IsWeekfifth ? decimal.Parse(String.Format("{0:0.00}", wcontribution * 5)) : decimal.Parse(String.Format("{0:0.00}", wcontribution * 4));
+          blemp.BirthDate = ((DateTime)empl.BirthDate).ToString(Helper.SQLDateFormat);
+          listforview.Add(blemp);
+          //TextTotalWages.Text = blemp.TotalWadeges.ToString();
+          //TextTotalWagesNLevy.Text = blemp.LEVYEE.ToString();
+          //TextLevyPenalty.Text = Latemonths >= 2 ? decimal.Parse(String.Format("{0:0.00}", (blemp.LEVYEE * ((Latemonths - 1) * 5) / 100))).ToString() : "0.00";
+          //TextTotalAccountantGeneral.Text = (decimal.Parse(String.Format("{0:0.00}", decimal.Parse(TextLevyPenalty.Text) + blemp.LEVYEE))).ToString();
+          //wage1dbinded = true;
+          //wage2dbinded = true;
+          //wage3dbinded = true;
+          //wage4dbinded = true;
+          //wage5dbinded = true;
+          //AddC3RecordWages.ItemsSource = listforview;
+          //AddC3RecordWages.SelectedIndex = -1;
+          TextTotalWages = blemp.TotalWadeges.ToString();
+          TextTotalWagesNLevy = blemp.LEVYEE.ToString();
+          TextLevyPenalty = Latemonths >= 2 ? decimal.Parse(String.Format("{0:0.00}", (blemp.LEVYEE * ((Latemonths - 1) * 5) / 100))).ToString() : "0.00";
+          TextTotalAccountantGeneral = (decimal.Parse(String.Format("{0:0.00}", decimal.Parse(TextLevyPenalty) + blemp.LEVYEE))).ToString();
+
+
+
+        }
+        string ManthName = MonthName(monthNum.ToString());
+        var obj = new selfEmpVm
+        {
+          textTotalWages = TextTotalWages,
+          textTotalWagesNLevy = TextTotalWagesNLevy,
+          textLevyPenalty = TextLevyPenalty,
+          textTotalAccountantGeneral = TextTotalAccountantGeneral,
+          obj_list = listforview,
+          wcontribution = wcontribution,
+          wincome = wincome,
+          category_Type = Category+ " (Weekly Income :" + wincome+ ", Weekly Contribution :"+ wcontribution + ")",
+          year = year.ToString(),
+          month = monthNum,
+          ssNofEmp = SSNofEmp,
+          userName = userName,
+          address = address,
+          currentMonth = ManthName + " " + year
+        };
+
+        return JsonConvert.SerializeObject(obj);
+      }
+      else
+      {
+        return "Self employed settings not exists for this month please add.";
+      }
+
+
+    }
+
+    public string MonthName2(string m_no)
+    {
+      string Month = "";
+      switch (m_no)
+      {
+        case "0":
+          Month = "January";
+          break;
+        case "1":
+          Month = "February";
+          break;
+        case "2":
+          Month = "March";
+          break;
+        case "3":
+          Month = "April";
+          break;
+        case "4":
+          Month = "May";
+          break;
+        case "5":
+          Month = "June";
+          break;
+        case "6":
+          Month = "July";
+          break;
+        case "7":
+          Month = "August";
+          break;
+        case "8":
+          Month = "September";
+          break;
+        case "9":
+          Month = "October";
+          break;
+        case "10":
+          Month = "November";
+          break;
+        case "11":
+          Month = "December";
+          break;
+        default:
+          Month = string.Empty;
+          break;
+      }
+      return Month;
+    }
+    public static int MondaysInMonth(int CmbMonth, int CmbYear)
+    {
+      int weeks = 0;
+      int daysThisMonth = DateTime.DaysInMonth(CmbYear, CmbMonth);
+      DateTime beginingOfThisMonth = new DateTime(CmbYear, CmbMonth, 1);
+      for (int i = 0; i < daysThisMonth; i++)
+        if (beginingOfThisMonth.AddDays(i).DayOfWeek == DayOfWeek.Monday)
+          weeks++;
+      return weeks;
+    }
+
+    int S_E_S_id = 0;
+    public bool ValidateC3settingExists(int monthNum, int year)
+    {
+
+      string fyear = year.ToString();
+      //old narender//int fmonthno = monthNum + 1;
+      int fmonthno = monthNum;
+
+      string fMvalue = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(fmonthno); ;
+      string fmonthval = fmonthno <= 9 ? "0" + fmonthno.ToString() : fmonthno.ToString();
+      DateTime? newFrom_date = DateTime.ParseExact(("01/" + fmonthval + "/" + fyear), Helper.DateFormat, CultureInfo.InvariantCulture);
+      int daysfMonth = DateTime.DaysInMonth(int.Parse(fyear), fmonthno);
+      DateTime? newTo_date = newFrom_date.Value.AddDays(daysfMonth - 1);
+
+      SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+
+      SqlCommand cmd = new SqlCommand("SelfEmployedSettingExists", staticConnection);
+      cmd.CommandType = CommandType.StoredProcedure;
+      cmd.Parameters.Add(new SqlParameter("@From_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)newFrom_date ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@To_date", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)newTo_date ?? (object)DBNull.Value));
+
+      SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+      DataTable dt = new DataTable();
+      sqlAdapter.Fill(dt);
+      if (dt.Rows.Count > 0)
+      {
+        foreach (DataRow row in dt.Rows)
+        {
+          S_E_S_id = Convert.IsDBNull(row["SESId"]) ? 0 : int.Parse(row["SESId"].ToString());
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private List<WageList> WageCategory(int? S_E_S_id)
+    {
+      List<WageList> wlist = new List<WageList>();
+      DataSet CdataSet = new DataSet();
+      try
+      {
+
+        //string SqlQuerystring = ConfigurationSettings.AppSettings.Get("AppConnection");
+
+        SqlConnection con = new SqlConnection(C3WizardLayerConn_BaseData.StaticSqlConnection.ConnectionString);
+        con.Open();
+        SqlCommand cmd = new SqlCommand("SELECT CategoryID, Category, cast(WeeklyIncome as numeric(18,2)) as WeeklyIncome, cast(WeeklyContribution as numeric(18,2)) as WeeklyContribution FROM WageCategories where SESId=" + S_E_S_id, con);
+        cmd.CommandType = CommandType.Text;
+        SqlDataAdapter adapter = new SqlDataAdapter();
+        adapter.SelectCommand = cmd;
+        adapter.Fill(CdataSet);
+        for (int i = 0; CdataSet.Tables[0].Rows.Count > i; i++)
+        {
+          WageList wcat = new WageList();
+          wcat.CategoryId = Convert.IsDBNull(CdataSet.Tables[0].Rows[i][0]) ? (Int32?)null : (Int32?)CdataSet.Tables[0].Rows[i][0];
+          wcat.Category = Convert.IsDBNull(CdataSet.Tables[0].Rows[i][1]) ? null : CdataSet.Tables[0].Rows[i][1].ToString();
+          wcat.WeeklyIncome = Convert.IsDBNull(CdataSet.Tables[0].Rows[i][2]) ? (decimal?)null : (decimal?)CdataSet.Tables[0].Rows[i][2];
+          wcat.WeeklyContribution = Convert.IsDBNull(CdataSet.Tables[0].Rows[i][3]) ? (decimal?)null : (decimal?)CdataSet.Tables[0].Rows[i][3];
+          wlist.Add(wcat);
+        }
+
+        return wlist;
+
+      }
+      catch (Exception ex)
+      {
+                string controller = "UnknownController";
+                string action = "UnknownAction";
+                var context = ExceptionMiddleware1.GetActionInfo();
+                controller = context.Controller;
+                action = context.Action;
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                //Login login = new Login();
+                //login.Error_Log(ex.Message);
+                return wlist;
+      }
+
+    }
+
+
+    public async Task<ContributionOnChange> BindCountribution(decimal wincome, decimal wcontribution, decimal wage_amt, decimal stw, decimal totalWadeg, decimal TextLevyPenalty, decimal TextTotalWagesNLevy, decimal Levyee, int monthNo, int year)
+    {
+
+      //decimal tempw1 = (decimal)((C3Contributions)(AddC3RecordWages.Items.GetItemAt(0))).tempWAGES1;
+      //int monthno = monthNo + 1;//old zero index
+            int monthno = monthNo;
+
+
+         string value = year.ToString() != null ? year.ToString() : DateTime.Now.Year.ToString();
+
+      //string Mvalue = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNo);
+      int daysin_month = DateTime.DaysInMonth(int.Parse(value), monthno);
+      string monthval = monthno <= 9 ? "0" + monthno.ToString() : monthno.ToString();
+      int Latemonths = (DateTime.Now.Year - int.Parse(value)) * 12 + DateTime.Now.Month - monthno;
+      Latemonths = Latemonths <= 0 ? 0 : Latemonths;
+      decimal T_levy = Levyee;
+      //------
+      var TotalWadeges = stw == 0 ? wage_amt == 0 ? decimal.Parse(String.Format("{0:0.00}", totalWadeg + wincome)) : decimal.Parse(String.Format("{0:0.00}", totalWadeg)) : wage_amt == 0 ? decimal.Parse(String.Format("{0:0.00}", totalWadeg)) : decimal.Parse(String.Format("{0:0.00}", totalWadeg - wincome));
+      var LEVYEE = stw == 0 ? wage_amt == 0 ? decimal.Parse(String.Format("{0:0.00}", T_levy + wcontribution)) : decimal.Parse(String.Format("{0:0.00}", T_levy)) : wage_amt == 0 ? decimal.Parse(String.Format("{0:0.00}", T_levy)) : decimal.Parse(String.Format("{0:0.00}", T_levy - wcontribution));
+      var TextTotalWages = stw == 0 ? wage_amt == 0 ? (totalWadeg + wincome).ToString() : totalWadeg.ToString() : wage_amt == 0 ? (decimal.Parse(String.Format("{0:0.00}", totalWadeg))).ToString() : (decimal.Parse(String.Format("{0:0.00}", totalWadeg - wincome))).ToString();
+      TextTotalWagesNLevy = stw == 0 ? wage_amt == 0 ? (T_levy + wcontribution) : (T_levy) : wage_amt == 0 ? (decimal.Parse(String.Format("{0:0.00}", T_levy))) : (decimal.Parse(String.Format("{0:0.00}", (T_levy - wcontribution))));
+      TextLevyPenalty = stw == 0 ? wage_amt == 0 ? Latemonths >= 2 ? TextTotalWagesNLevy * ((Latemonths - 1) * 5) / 100 : decimal.Parse("0.00") : TextLevyPenalty : wage_amt == 0 ? TextLevyPenalty : Latemonths >= 2 ? TextTotalWagesNLevy * ((Latemonths - 1) * 5) / 100 : decimal.Parse("0.00");
+      var TextTotalAccountantGeneral = (TextLevyPenalty + TextTotalWagesNLevy);
+      //if (H_Id > 0 && isEdit)
+      //{
+      //  ButtonSave.Visibility = Visibility.Visible;
+      //  ButtonFinalize.Visibility = Visibility.Hidden;
+      //}
+      var obj = new ContributionOnChange
+      {
+        //TotalWadeges = TotalWadeges,
+        //LEVYEE = LEVYEE,
+        TextTotalWages = TextTotalWages,
+        TextTotalWagesNLevy = TextTotalWagesNLevy,
+        TextLevyPenalty = TextLevyPenalty,
+        TextTotalAccountantGeneral = TextTotalAccountantGeneral,
+        gridAmount = stw == 0 ? wincome : decimal.Parse(String.Format("{0:0.00}", 0.00))
+      };
+      return obj;
+    }
+
+
+    public async Task<string> Save_button_Click(int monthIndex, int Year, int H_Id, int SSNofEmp, string UserName, int UserID, List<C3ContributionVm> list, string TextLevyPenalty, int SEC3ID = 0)
+    {
+
+
+
+
+      string value = Year.ToString();
+
+      //string Mvalue = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthIndex + 1);//old
+      string Mvalue = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthIndex);//changes
+
+      if (H_Id == 0)
+      {
+
+        string valuesave = value;
+        SqlConnection staticConnectionsave = C3WizardLayerConn_BaseData.StaticSqlConnection;
+        SqlCommand cmdsave = new SqlCommand("Check_SelfEmployed_C3Created", staticConnectionsave);
+        cmdsave.CommandType = CommandType.StoredProcedure;
+        cmdsave.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)monthIndex ?? (object)DBNull.Value));
+        cmdsave.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)valuesave ?? (object)DBNull.Value));
+        cmdsave.Parameters.Add(new SqlParameter("@SSN", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)SSNofEmp ?? (object)DBNull.Value));
+        cmdsave.Parameters.Add(new SqlParameter("@SEC3ID", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)SEC3ID ?? (object)DBNull.Value));
+        SqlDataAdapter sqlAdaptersave = new SqlDataAdapter(cmdsave);
+        DataTable dtsave = new DataTable();
+        sqlAdaptersave.Fill(dtsave);
+        if (dtsave.Rows.Count > 0)
+        {
+          DataRow row = dtsave.Rows[0];
+          bool isSubmitted = row["Is_submitted"] != DBNull.Value && Convert.ToBoolean(row["Is_submitted"]);
+          if (isSubmitted)
+          {
+            return "C3 has already been submitted for this month," + dtsave?.Rows[0]?.ItemArray[0]?.ToString();
+          }
+          else
+          {
+            return "openPopUp," + dtsave?.Rows[0]?.ItemArray[0]?.ToString();
+          }
+          //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+          //C3WizardMessageBox.Show("C3 Wizard", "Self emoloyed C3 already created for " + Mvalue + " " + value);
+          // return "Self emoloyed C3 already created for" + Mvalue + " " + value+","+ dtsave?.Rows[0]?.ItemArray[0]?.ToString();
+
+
+        }
+      }
+
+      //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+      C3Contributions blemp = new C3Contributions();
+      for (int i = 0; i < list.Count; i++)
+      {
+
+        blemp.SSN = list[i].SSN.ToString();
+        blemp.EmployeeName = list[i].EmployeeName.ToString();
+        blemp.C3HEADERID = list[i].C3HEADERID;
+        blemp.WEEK1 = (bool)list[i].WEEK1;
+        blemp.WEEK2 = (bool)list[i].WEEK2;
+        blemp.WEEK3 = (bool)list[i].WEEK3;
+        blemp.WEEK4 = (bool)list[i].WEEK4;
+        blemp.WEEK5 = (bool)list[i].WEEK5;
+        blemp.SelectedTypeWEEK1 = (int)list[i].SelectedTypeWEEK1;
+        blemp.SelectedTypeWEEK2 = (int)list[i].SelectedTypeWEEK2;
+        blemp.SelectedTypeWEEK3 = (int)list[i].SelectedTypeWEEK3;
+        blemp.SelectedTypeWEEK4 = (int)list[i].SelectedTypeWEEK4;
+        blemp.SelectedTypeWEEK5 = (int)list[i].SelectedTypeWEEK5;
+        blemp.WAGES1 = (decimal)list[i].WAGES1;
+        blemp.WAGES2 = (decimal)list[i].WAGES2;
+        blemp.WAGES3 = (decimal)list[i].WAGES3;
+        blemp.WAGES4 = (decimal)list[i].WAGES4;
+        blemp.WAGES5 = (decimal)list[i].WAGES5;
+        blemp.tempWAGES1 = (decimal)list[i].WAGES1;
+        blemp.tempWAGES2 = (decimal)list[i].WAGES2;
+        blemp.tempWAGES3 = (decimal)list[i].WAGES3;
+        blemp.tempWAGES4 = (decimal)list[i].WAGES4;
+        blemp.tempWAGES5 = (decimal)list[i].WAGES5;
+        blemp.IsWeekfifth = list[i].IsWeekfifth;
+        blemp.PayFreq = list[i].PayFreq.ToString();
+        blemp.ISSelectedWEEK1 = blemp.WEEK1 == true ? "\u221A" : "X";
+        blemp.ISSelectedWEEK2 = blemp.WEEK2 == true ? "\u221A" : "X";
+        blemp.ISSelectedWEEK3 = blemp.WEEK3 == true ? "\u221A" : "X";
+        blemp.ISSelectedWEEK4 = blemp.WEEK4 == true ? "\u221A" : "X";
+        blemp.ISSelectedWEEK5 = blemp.WEEK5 == true ? "\u221A" : "X";
+        blemp.TotalWadeges = blemp.WAGES1 + blemp.WAGES2 + blemp.WAGES3 + blemp.WAGES4 + blemp.WAGES5;
+        blemp.LEVYEE = (decimal)list[i].LEVYEE;
+        blemp.Remarks = list[i].Remarks?.ToString();
+        blemp.BirthDate = list[i].BirthDate;
+
+      }
+      C3Header obj = new C3Header();
+      SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+      if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+      SqlCommand cmd = H_Id > 0 ? new SqlCommand("PROCESS_Self_EmployedC3_Update", staticConnection) : new SqlCommand("PROCESS_Self_EmployedC3_Insert_One", staticConnection);
+      cmd.CommandType = CommandType.StoredProcedure;
+      if (H_Id > 0)
+      {
+        cmd.Parameters.Add(new SqlParameter("@SEC3ID", SqlDbType.Int, 12, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)H_Id ?? (object)DBNull.Value));
+      }
+      cmd.Parameters.Add(new SqlParameter("@SSN", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(string)blemp.SSN ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@PERIODD_MONTH", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)monthIndex ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@PERIOD_YEAR", SqlDbType.VarChar, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)value ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@TOTAL_WAGES", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.TotalWadeges ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@TOTAL_CONTRIBUTIONS", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.LEVYEE ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@TOTAL_Fine", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(decimal.Parse(TextLevyPenalty)) ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Category_Type", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.PayFreq ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WAGES1", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WAGES1 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WAGES2", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WAGES2 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WAGES3", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WAGES3 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WAGES4", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WAGES4 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WAGES5", SqlDbType.Decimal, 18, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WAGES5 ?? (object)DBNull.Value));
+
+      cmd.Parameters.Add(new SqlParameter("@SelectedTypeWEEK1", SqlDbType.Int, 10, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.SelectedTypeWEEK1 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@SelectedTypeWEEK2", SqlDbType.Int, 10, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.SelectedTypeWEEK2 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@SelectedTypeWEEK3", SqlDbType.Int, 10, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.SelectedTypeWEEK3 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@SelectedTypeWEEK4", SqlDbType.Int, 10, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.SelectedTypeWEEK4 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@SelectedTypeWEEK5", SqlDbType.Int, 10, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.SelectedTypeWEEK5 ?? (object)DBNull.Value));
+
+      cmd.Parameters.Add(new SqlParameter("@WEEK1", SqlDbType.Bit, 6, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WEEK1 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WEEK2", SqlDbType.Bit, 9, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WEEK2 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WEEK3", SqlDbType.Bit, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WEEK3 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WEEK4", SqlDbType.Bit, 6, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WEEK4 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@WEEK5", SqlDbType.Bit, 6, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.WEEK5 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Remarks", SqlDbType.VarChar, 500, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)blemp.Remarks ?? (object)DBNull.Value));
+
+      cmd.Parameters.Add(new SqlParameter("@Insert_Datetimeinfo", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)DateTime.Now ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Schedule_NO", SqlDbType.Int, 10, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)0 ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Is_Fianalize", SqlDbType.Bit, 1, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)false ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Is_submitted", SqlDbType.Bit, 1, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)false ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Inserted_By", SqlDbType.Int, 12, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(int)UserID ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Modified_By", SqlDbType.Int, 12, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(int)UserID ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Print_By", SqlDbType.Int, 12, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(int)UserID ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Export_By", SqlDbType.Int, 12, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(int)UserID ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Modified_On", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)DateTime.Now ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Export_On", SqlDbType.DateTime, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)DateTime.Now ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Modified_Machineinfo", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(string)Helper.MachineInfo ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@UserName", SqlDbType.NVarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)(string)UserName ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@IsImportFromBEMA", SqlDbType.Bit, 1, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)false ?? (object)DBNull.Value));
+      SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+      DataTable dt = new DataTable();
+      sqlAdapter.Fill(dt);
+
+      if (dt.Rows.Count > 0)
+      {
+        H_Id = int.Parse(dt.Rows[0].ItemArray[0].ToString());
+
+        //CmbMonth.IsEnabled = false;
+        //CmbYear.IsEnabled = false;
+        //AddC3RecordWages.IsEnabled = false;
+        //ButtonSave.Visibility = Visibility.Hidden;
+        //ButtonFinalize.Visibility = Visibility.Visible;
+        // ButtonEdit.IsEnabled = true;
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        var msg = Finalize_C3(H_Id);
+        //C3WizardMessageBox.Show("C3 Wizard", "Saved successfully");
+        //Application.Current.Properties["TextChanged"] = 0;
+        return msg + "," + H_Id;
+      }
+      return "false";
+    }
+
+
+    public async Task<string> C3Report_Delete_Click(int HeaderID)
+    {
+
+      //int? HeaderID = ((C3Wizard.COMMONPROP.C3Header)(((System.Windows.Controls.Primitives.ButtonBase)(e.Source)).CommandParameter)).HeaderID;
+      SqlConnection staticConnectioncheck = C3WizardLayerConn_BaseData.StaticSqlConnection;
+      SqlCommand cmdDelete = new SqlCommand("C3_Self_Employed_Delete", staticConnectioncheck);
+      cmdDelete.CommandType = CommandType.StoredProcedure;
+      cmdDelete.Parameters.Add(new SqlParameter("@SEC3ID", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)HeaderID ?? (object)DBNull.Value));
+
+      SqlDataAdapter sqlAdapterdelete = new SqlDataAdapter(cmdDelete);
+      DataTable dtcheck = new DataTable();
+      sqlAdapterdelete.Fill(dtcheck);
+      DataTable dt = new DataTable();
+      sqlAdapterdelete.Fill(dt);
+      if (dt.Rows.Count == 0)
+      {
+        //C3WizardMessageBox.Show("C3 Wizard", "Self employed C3 deleted successfully");
+        //load_defaults();
+        return "Self employed C3 deleted successfully";
+      }
+      else
+      {
+        return "false";
+      }
+
+
+    }
+
+    private string Finalize_C3(int H_Id)
+    {
+      //if (ConnectionInfo.HasConnection() && ConnectionInfo.APIConnection())
+      //{
+      //if (C3WizardMessageBox.Show("C3 Wizard", "Finalized data will not allow you to edit. Do you want to finalized this C3 ?", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+      //{
+      //ButtonPrint.IsEnabled = true;
+      //ButtonExport.IsEnabled = true;
+      //Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+      SqlConnection staticConnectioncheck = C3WizardLayerConn_BaseData.StaticSqlConnection;
+      SqlCommand cmdDelete = new SqlCommand("SelfEmployedC3_Finalize", staticConnectioncheck);
+      cmdDelete.CommandType = CommandType.StoredProcedure;
+      cmdDelete.Parameters.Add(new SqlParameter("@SEC3ID", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)H_Id ?? (object)DBNull.Value));
+
+      SqlDataAdapter sqlAdapterdelete = new SqlDataAdapter(cmdDelete);
+      DataTable dtcheck = new DataTable();
+      sqlAdapterdelete.Fill(dtcheck);
+      DataTable dt = new DataTable();
+      sqlAdapterdelete.Fill(dt);
+      if (dt.Rows.Count > 0)
+      {
+        // Export_button_Click(sender, e);
+        // SubmitselfC3_Click((int)H_Id);
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        //C3WizardMessageBox.Show("C3 Wizard", "Self employed C3 finalized successfully");
+        // ButtonFinalize.IsEnabled = false;
+        return "Self employed C3 finalized successfully";
+
+      }
+      else
+      {
+        //Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+        //  C3WizardMessageBox.Show("C3 Wizard", "Self Employed C3 Not finalized");
+
+        return "Self Employed C3 Not finalized";
+      }
+
+    }
+    public string MonthName(string m_no)
+    {
+      string Month = "";
+      switch (m_no)
+      {
+        //case "1" or "0":
+        //    Month = "January";
+        //    break;
+        case "1":
+          Month = "January";
+          break;
+        case "2":
+          Month = "February";
+          break;
+        case "3":
+          Month = "March";
+          break;
+        case "4":
+          Month = "April";
+          break;
+        case "5":
+          Month = "May";
+          break;
+        case "6":
+          Month = "June";
+          break;
+        case "7":
+          Month = "July";
+          break;
+        case "8":
+          Month = "August";
+          break;
+        case "9":
+          Month = "September";
+          break;
+        case "10":
+          Month = "October";
+          break;
+        case "11":
+          Month = "November";
+          break;
+        case "12":
+          Month = "December";
+          break;
+        default:
+          Month = string.Empty;
+          break;
+      }
+
+
+      return Month;
+    }
+    //public string MonthName(string m_no)
+    //{
+    //    string Month = "";
+    //    switch (m_no)
+    //    {
+    //        case "0":
+    //            Month = "January";
+    //            break;
+    //        case "1":
+    //            Month = "February";
+    //            break;
+    //        case "2":
+    //            Month = "March";
+    //            break;
+    //        case "3":
+    //            Month = "April";
+    //            break;
+    //        case "4":
+    //            Month = "May";
+    //            break;
+    //        case "5":
+    //            Month = "June";
+    //            break;
+    //        case "6":
+    //            Month = "July";
+    //            break;
+    //        case "7":
+    //            Month = "August";
+    //            break;
+    //        case "8":
+    //            Month = "September";
+    //            break;
+    //        case "9":
+    //            Month = "October";
+    //            break;
+    //        case "10":
+    //            Month = "November";
+    //            break;
+    //        case "11":
+    //            Month = "December";
+    //            break;
+    //        default:
+    //            Month = string.Empty;
+    //            break;
+    //    }
+
+
+    //    return Month;
+    //}
+
+    public async Task<List<C3HeaderVM>> load_defaults(string ssN)
+    {
+      var listDVOC3Header = new List<C3HeaderVM>();
+      var ObjC3Header = new C3HeaderVM();
+      var listC3Header = new List<C3HeaderVM>();
+      SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+      SqlCommand cmd = new SqlCommand("Get_PROCESS_Self_Employed_C3_Genrated_data", staticConnection);
+      cmd.CommandType = CommandType.StoredProcedure;
+      cmd.Parameters.Add(new SqlParameter("@SSN", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)ssN ?? (object)DBNull.Value));
+      SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+      DataTable dt = new DataTable();
+      sqlAdapter.Fill(dt);
+      if (dt.Rows.Count > 0)
+      {
+        foreach (DataRow row in dt.Rows)
+        {
+          C3HeaderVM Obj = new C3HeaderVM();
+          Obj.HeaderID = Convert.IsDBNull(row["SEC3ID"]) ? 0 : int.Parse(row["SEC3ID"].ToString());
+          Obj.RegNo = Convert.IsDBNull(row["SSN"]) ? null : row["SSN"].ToString();
+          Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == string.Empty ? null : MonthName(row["PERIODD_MONTH"].ToString());
+          Obj.PMonth = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? 0 : Convert.ToInt32(row["PERIODD_MONTH"]);
+          Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == string.Empty ? null : row["PERIOD_YEAR"].ToString();
+          Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+          Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_CONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_CONTRIBUTIONS"].ToString())));
+          Obj.TOTALSSPENALTY = Convert.IsDBNull(row["TOTAL_Fine"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["TOTAL_Fine"].ToString());
+          Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+          Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+          Obj.Is_submitted = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+
+          listDVOC3Header.Add(Obj);
+          //}
+        }
+        foreach (var row in listDVOC3Header)
+        {
+          bool is_f = listDVOC3Header.Any(X => X.Is_Fianalize != true && X.period_Month == row.period_Month && X.Period_year == row.Period_year);
+          bool issubmited = row.Is_submitted;
+          bool isfinalize = row.Is_Fianalize;
+          if (issubmited == false)
+          {
+            C3HeaderVM Obj = new C3HeaderVM();
+            Obj.HeaderID = row.HeaderID;
+            Obj.RegNo = row.RegNo;
+            Obj.PMonth = row.PMonth;
+            Obj.period_Month = row.period_Month;
+            Obj.Period_year = row.Period_year;
+            Obj.TOTAL_WAGES = row.TOTAL_WAGES;
+            Obj.TOTALSSCONTRIBUTIONS = row.TOTALSSCONTRIBUTIONS + row.TOTALSSPENALTY;
+            Obj.payAmt = Obj.TOTALSSCONTRIBUTIONS;
+            Obj.TOTALSSPENALTY = row.TOTALSSPENALTY;
+            Obj.Insert_Datetimeinfo = row.Insert_Datetimeinfo;
+            Obj.Is_Fianalize = is_f ? false : true;
+            Obj.Is_submitted = row.Is_Fianalize;
+            listC3Header.Add(Obj);
+          }
+        }
+      }
+      return listC3Header;
+      //C3ReportsList.ItemsSource = listC3Header;
+      //C3ReportsList.SelectedIndex = -1;
+      //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(C3ReportsList.ItemsSource);
+      // PropertyGroupDescription groupDescription = new PropertyGroupDescription("Period_year");
+      //view.GroupDescriptions.Add(groupDescription);
+    }
+
+
+
+    public async Task<List<SelfEmployedC3ReportVM>> check_batch_created(int Month, string year, int SEC3ID)
+    {
+      //close_button.Visibility = Visibility.Visible;
+      //ReportDataSource reportDataSource = new ReportDataSource();
+      //Month = Month - 1;
+      var reports = new List<SelfEmployedC3ReportVM>();
+      DataTable dt = new DataTable();
+      //is_dashboard = is_dash;
+      SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+      SqlCommand cmd = new SqlCommand("Generate_Self_Employed_C3_Report", staticConnection);
+      cmd.Parameters.Add(new SqlParameter("@Month", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)Month.ToString() ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@Year", SqlDbType.VarChar, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)year ?? (object)DBNull.Value));
+      cmd.Parameters.Add(new SqlParameter("@SEC3ID", SqlDbType.Int, 50, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, (object)SEC3ID ?? (object)DBNull.Value));
+      cmd.CommandType = CommandType.StoredProcedure;
+      //SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+      //sqlAdapter.Fill(dt);
+      if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+      using (SqlDataReader reader = cmd.ExecuteReader())
+      {
+        while (reader.Read())
+        {
+          reports.Add(new SelfEmployedC3ReportVM
+          {
+            EmpName = reader["emp_name"].ToString(),
+            SocialSecurityNo = reader["social_security_no"].ToString(),
+            CompanyAddress = reader["company_address"].ToString(),
+            CurrentMonth = reader["current_month"].ToString(),
+            FirstWeekOfMonth = reader["first_week_of_month"].ToString(),
+            SecondWeekOfMonth = reader["second_week_of_month"].ToString(),
+            ThirdWeekOfMonth = reader["third_week_of_month"].ToString(),
+            FourthWeekOfMonth = reader["four_week_of_month"].ToString(),
+            FifthWeekOfMonth = reader["five_week_of_month"].ToString(),
+            DeductLeavyWages = Convert.ToDecimal(reader["deduct_leavy_wages"]),
+            TotalWages = Convert.ToDecimal(reader["total_wages"]),
+            fine = Convert.ToDecimal(reader["TOTAL_LEVYEEPENALTY"]),
+            Remarks = reader["remarks"].ToString(),
+            grandTotal = Convert.ToDecimal(reader["deduct_leavy_wages"]) + Convert.ToDecimal(reader["TOTAL_LEVYEEPENALTY"]),
+            Category_Type = reader["Category_Type"].ToString(),
+            // Map additional fields here
+          });
+        }
+      }
+      staticConnection.Close();
+      return reports;
+
+      // ReportDataSource rprtDTSource = new ReportDataSource("C3Report", dt);
+      // reportDataSource.Name = "CustomerReport"; // Name of the DataSet we set in .rdlc
+      // reportViewer.LocalReport.ReportPath = Helper.ApplicationPath("SelfEmployedC3Report.rdlc");  // Path of the rdlc file
+      // reportViewer.LocalReport.DataSources.Add(rprtDTSource);
+      // reportViewer.SetDisplayMode(Microsoft.Reporting.WinForms.DisplayMode.PrintLayout);
+      // reportViewer.ZoomMode = ZoomMode.Percent;
+      // reportViewer.ZoomPercent = 100;
+      // reportViewer.RefreshReport();
+    }
+
+
+    public async Task<List<dashboarddata>> btn_Search_ReprtsSelfEmp(int F_month, int T_month, string year, int CompanyId)
+    {
+
+      try
+      {
+        //int F_month = CmbFromMonth.SelectedIndex;
+        //int T_month = CmbToMonth.SelectedIndex;
+
+        List<BLSelfEmployed> emplist = BLSelfEmployed.SelfEmployedCollection().ToList();
+        emplist = emplist.Where(x => x.EmployeeID == CompanyId).ToList();
+        var SSNofEmp = emplist.Count > 0 ? emplist.FirstOrDefault().SocSecNum : null;
+
+        //ComboBoxItem year = (ComboBoxItem)CmbYear.SelectedItem;
+        string value = year;//CmbYear.SelectedItem != null ? CmbYear.SelectedItem.ToString() : null;
+        string S_year = year;// CmbYear.Text != "" ? value : null;
+        List<C3Header> listDVOC3Header = new List<C3Header>();
+        SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+        SqlCommand cmd = new SqlCommand("Get_PROCESS_Self_Employed_C3_Genrated_data", staticConnection);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.Add(new SqlParameter("@SSN", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)SSNofEmp ?? (object)DBNull.Value));
+        SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+        DataTable dt = new DataTable();
+        sqlAdapter.Fill(dt);
+        if (dt.Rows.Count > 0)
+        {
+          foreach (DataRow row in dt.Rows)
+          {
+            bool issubmited = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+            bool isfinalize = Convert.IsDBNull(row["Is_submitted"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+            int C3month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+            int C3year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+            if (true)//(issubmited == true || isfinalize == true))
+            {
+              C3Header Obj = new C3Header();
+              Obj.HeaderID = Convert.IsDBNull(row["SEC3ID"]) ? 0 : int.Parse(row["SEC3ID"].ToString());
+              Obj.RegNo = Convert.IsDBNull(row["SSN"]) ? null : row["SSN"].ToString();
+              Obj.period_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == string.Empty ? null : MonthName(row["PERIODD_MONTH"].ToString());
+              Obj.Period_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == string.Empty ? null : row["PERIOD_YEAR"].ToString();
+              Obj.TOTAL_WAGES = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+              Obj.p_Month = Convert.IsDBNull(row["PERIODD_MONTH"]) || row["PERIODD_MONTH"].ToString() == "" ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+              Obj.P_year = Convert.IsDBNull(row["PERIOD_YEAR"]) || row["PERIOD_YEAR"].ToString() == "" ? -1 : int.Parse(row["PERIOD_YEAR"].ToString());
+              Obj.TOTALSSCONTRIBUTIONS = Convert.IsDBNull(row["TOTAL_CONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_CONTRIBUTIONS"].ToString())));
+              Obj.TOTALSSPENALTY = Convert.IsDBNull(row["TOTAL_Fine"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["TOTAL_Fine"].ToString());
+              Obj.TOTALSSCONTRIBUTIONS = Obj.TOTALSSCONTRIBUTIONS + Obj.TOTALSSPENALTY;
+              Obj.Insert_Datetimeinfo = Convert.IsDBNull(row["Insert_Datetimeinfo"]) ? null : DateTime.Parse(row["Insert_Datetimeinfo"].ToString()).ToString(Helper.DisplayDateFormat);
+              Obj.Is_Fianalize = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_Fianalize"].ToString());
+              Obj.Is_submitted = Convert.IsDBNull(row["Is_Fianalize"]) ? false : bool.Parse(row["Is_submitted"].ToString());
+              Obj.C3_IsFinalized = !Obj.C3_IsFinalized;
+              Obj.IssubmittedShow = (bool)Obj.Is_submitted ? "C3 Submitted" : "C3 Not Submitted";
+              Obj.Issubmittedcolor = (bool)Obj.Is_submitted ? "Black" : "Red";
+              Obj.IssubmittedShowimg = (bool)Obj.Is_submitted ? "/img/RightSine.png" : "/img/close.png";
+              listDVOC3Header.Add(Obj);
+            }
+          }
+          listDVOC3Header = S_year != null ? listDVOC3Header.Where(x => x.Period_year == S_year).ToList() : listDVOC3Header;
+          listDVOC3Header = F_month != -1 ? listDVOC3Header.Where(x => x.p_Month >= F_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+          listDVOC3Header = T_month != -1 ? listDVOC3Header.Where(x => x.p_Month <= T_month).OrderBy(x => x.p_Month).ToList() : listDVOC3Header;
+          //dashboard_list.ItemsSource = listDVOC3Header;
+          //dashboard_list.SelectedIndex = -1;
+
+          var data = listDVOC3Header.Select(e => new dashboarddata
+          {
+            year = e.Period_year,
+            month = e.period_Month,
+            monthNo = e.p_Month,
+            TotalWages = e.TOTAL_WAGES,
+            Countribution = e.TOTALSSCONTRIBUTIONS,
+            CreationDate = e.Insert_Datetimeinfo,
+            HeaderId = e.HeaderID
+          }).ToList();
+
+          return data;
+        }
+        else
+        {
+          //dashboard_list.ItemsSource = null;
+          return new List<dashboarddata>();
+        }
+        //}
+      }
+      catch (Exception ex)
+      {
+                string controller = "UnknownController";
+                string action = "UnknownAction";
+                var context = ExceptionMiddleware1.GetActionInfo();
+                controller = context.Controller;
+                action = context.Action;
+                LoggingHelper.LogError(controller, action, ex.Message, ex.StackTrace);
+                //Login login = new Login();
+                //login.Error_Log(ex.Message);
+                return new List<dashboarddata>();
+      }
+
+
+
+
+    }
+
+
+
+    public async Task<selfEmpVm> Editload_defaults(int? HeaderId, int CompanyId)
+    {
+      //var listDVOC3Header = new List<C3Header>();
+      //var ObjC3Header = new C3Header();
+      SqlConnection staticConnection = C3WizardLayerConn_BaseData.StaticSqlConnection; C3WizardLayerConn_BaseData.SetAuditSessionContextAsync(staticConnection);
+      if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+      List<BLSelfEmployed> emplist = BLSelfEmployed.SelfEmployedCollection().ToList();
+      emplist = emplist.Where(x => x.EmployeeID == CompanyId).ToList();
+      var SSNofEmp = emplist.Count > 0 ? emplist.FirstOrDefault().SocSecNum : null;
+      List<WageList> IncomCategory = new List<WageList>();
+
+
+
+      staticConnection.Close();
+      if (staticConnection.State == System.Data.ConnectionState.Closed) staticConnection.Open();
+      SqlCommand cmd = new SqlCommand("Get_PROCESS_Self_Employed_C3_Genrated_data", staticConnection);
+      cmd.CommandType = CommandType.StoredProcedure;
+      cmd.Parameters.Add(new SqlParameter("@SSN", SqlDbType.Int, 50, ParameterDirection.Input, false, 10, 0, "", DataRowVersion.Proposed, (object)SSNofEmp ?? (object)DBNull.Value));
+      SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+      DataTable dt = new DataTable();
+      sqlAdapter.Fill(dt);
+      if (dt.Rows.Count > 0)
+      {
+        int monthIndex = -1;
+        string userName = "";
+        string year = "";
+        var TextTotalWages = "";
+        var TextTotalWagesNLevy = "";
+        var TextLevyPenalty = "";
+        var TextTotalAccountantGeneral = "";
+        decimal? wcontribution = 0m;
+        decimal? wincome = 0m;
+        string? Category = "";
+        var listSEC3Header = new List<C3ContributionVm>();
+        foreach (DataRow row in dt.Rows)
+        {
+          C3ContributionVm blemp = new C3ContributionVm();
+          int sc3H_Id = Convert.IsDBNull(row["SEC3ID"]) ? 0 : int.Parse(row["SEC3ID"].ToString());
+          if (sc3H_Id == HeaderId)
+          {
+            //H_Id = HeaderId;
+            monthIndex = Convert.IsDBNull(row["PERIODD_MONTH"]) ? -1 : int.Parse(row["PERIODD_MONTH"].ToString());
+            //CmbYear.Text = Convert.IsDBNull(row["PERIOD_YEAR"]) ? null : row["PERIOD_YEAR"].ToString();
+            year = Convert.IsDBNull(row["PERIOD_YEAR"]) ? null : row["PERIOD_YEAR"].ToString();
+            //CmbYear.SelectedIndex = Helper.yearindex(ylist, int.Parse(year));
+            // CmbYear.SelectedIndex = Helper.yearindex(ylist, int.Parse(year)) > -1 ? Helper.yearindex(ylist, int.Parse(year)) : Addyearindex(int.Parse(year));
+
+            //string value = CmbYear.SelectedItem.ToString();
+           // mondays = MondaysInMonth(monthIndex + 1, int.Parse(year));
+            mondays = MondaysInMonth(monthIndex , int.Parse(year));
+            IsWeekfifth = mondays == 5 ? true : false;
+            blemp.SSN = Convert.IsDBNull(row["SSN"]) ? null : row["SSN"].ToString();
+            blemp.PayFreq = Convert.IsDBNull(row["Category_Type"]) ? null : row["Category_Type"].ToString();
+            blemp.EmployeeName = emplist.Count > 0 ? emplist.FirstOrDefault().LastName + " " + emplist.FirstOrDefault().FirstName : null;
+            userName = blemp.EmployeeName;
+            blemp.IsWeekfifth = IsWeekfifth;
+            blemp.WEEK1 = Convert.IsDBNull(row["WEEK1"]) ? false : bool.Parse(row["WEEK1"].ToString());
+            blemp.WEEK2 = Convert.IsDBNull(row["WEEK2"]) ? false : bool.Parse(row["WEEK2"].ToString());
+            blemp.WEEK3 = Convert.IsDBNull(row["WEEK3"]) ? false : bool.Parse(row["WEEK3"].ToString());
+            blemp.WEEK4 = Convert.IsDBNull(row["WEEK4"]) ? false : bool.Parse(row["WEEK4"].ToString());
+            blemp.WEEK5 = Convert.IsDBNull(row["WEEK5"]) ? false : bool.Parse(row["WEEK5"].ToString());
+            blemp.SelectedTypeWEEK1 = Convert.IsDBNull(row["SelectedTypeWEEK1"]) ? -1 : int.Parse(row["SelectedTypeWEEK1"].ToString());
+            blemp.SelectedTypeWEEK2 = Convert.IsDBNull(row["SelectedTypeWEEK2"]) ? -1 : int.Parse(row["SelectedTypeWEEK2"].ToString());
+            blemp.SelectedTypeWEEK3 = Convert.IsDBNull(row["SelectedTypeWEEK3"]) ? -1 : int.Parse(row["SelectedTypeWEEK3"].ToString());
+            blemp.SelectedTypeWEEK4 = Convert.IsDBNull(row["SelectedTypeWEEK4"]) ? -1 : int.Parse(row["SelectedTypeWEEK4"].ToString());
+            blemp.SelectedTypeWEEK5 = Convert.IsDBNull(row["SelectedTypeWEEK5"]) ? -1 : int.Parse(row["SelectedTypeWEEK5"].ToString());
+            blemp.WAGES1 = Convert.IsDBNull(row["WAGES1"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES1"].ToString());
+            blemp.WAGES2 = Convert.IsDBNull(row["WAGES2"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES2"].ToString());
+            blemp.WAGES3 = Convert.IsDBNull(row["WAGES3"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES3"].ToString());
+            blemp.WAGES4 = Convert.IsDBNull(row["WAGES4"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES4"].ToString());
+            blemp.WAGES5 = Convert.IsDBNull(row["WAGES5"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES5"].ToString());
+            blemp.tempWAGES1 = Convert.IsDBNull(row["WAGES1"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES1"].ToString());
+            blemp.tempWAGES2 = Convert.IsDBNull(row["WAGES2"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES2"].ToString());
+            blemp.tempWAGES3 = Convert.IsDBNull(row["WAGES3"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES3"].ToString());
+            blemp.tempWAGES4 = Convert.IsDBNull(row["WAGES4"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES4"].ToString());
+            blemp.tempWAGES5 = Convert.IsDBNull(row["WAGES5"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(row["WAGES5"].ToString());
+            blemp.TotalWadeges = Convert.IsDBNull(row["TOTAL_WAGES"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_WAGES"].ToString())));
+            blemp.LEVYEE = Convert.IsDBNull(row["TOTAL_CONTRIBUTIONS"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)) : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_CONTRIBUTIONS"].ToString())));
+            blemp.Remarks = Convert.IsDBNull(row["Remarks"]) ? null : row["Remarks"].ToString();
+            listSEC3Header.Add(blemp);
+            TextTotalWages = blemp.TotalWadeges.ToString();
+            TextTotalWagesNLevy = blemp.LEVYEE.ToString();
+            TextLevyPenalty = Convert.IsDBNull(row["TOTAL_Fine"]) ? decimal.Parse(String.Format("{0:0.00}", 0.00)).ToString() : decimal.Parse(String.Format("{0:0.00}", decimal.Parse(row["TOTAL_Fine"].ToString()))).ToString();
+            TextTotalAccountantGeneral = (decimal.Parse(TextLevyPenalty) + decimal.Parse(TextTotalWagesNLevy)).ToString();
+
+
+            if (ValidateC3settingExists(monthIndex, Convert.ToInt32(year)))
+            {
+              IncomCategory = WageCategory(S_E_S_id);
+              foreach (var empl in emplist)
+              {
+                wincome = IncomCategory.Any(x => x.CategoryId == empl.Category_Type) ? IncomCategory.FirstOrDefault(x => x.CategoryId == empl.Category_Type).WeeklyIncome : decimal.Parse(String.Format("{0:0.00}", 0.00));
+                wcontribution = IncomCategory.Any(x => x.CategoryId == empl.Category_Type) ? IncomCategory.FirstOrDefault(x => x.CategoryId == empl.Category_Type).WeeklyContribution : decimal.Parse(String.Format("{0:0.00}", 0.00));
+                                Category = IncomCategory.Any(x => x.CategoryId == empl.Category_Type) ? IncomCategory.FirstOrDefault(x => x.CategoryId == empl.Category_Type).Category : "";
+                            }
+            }
+          }
+        }
+        //AddC3RecordWages.ItemsSource = listSEC3Header;
+        //AddC3RecordWages.SelectedIndex = -1;
+        //wage1dbinded = true;
+        //wage2dbinded = true;
+        //wage3dbinded = true;
+        //wage4dbinded = true;
+        //wage5dbinded = true;
+
+        var obj = new selfEmpVm
+        {
+          textTotalWages = TextTotalWages,
+          textTotalWagesNLevy = TextTotalWagesNLevy,
+          textLevyPenalty = TextLevyPenalty,
+          textTotalAccountantGeneral = TextTotalAccountantGeneral,
+          obj_list = listSEC3Header,
+          wcontribution = wcontribution,
+          wincome = wincome,
+            category_Type = Category + " (Weekly Income :" + wincome + ", Weekly Contribution :" + wcontribution + ")",
+            month = monthIndex,
+          year = year,
+          ssNofEmp = SSNofEmp,
+          userName = userName
+        };
+
+        return obj;
+      }
+      //}
+      else
+      {
+        //    C3WizardMessageBox.Show("C3 Wizard", "Self Employed Settings not exists for this month please add.");
+        return new selfEmpVm();
+      }
+
+
+    }
+  }
+}
