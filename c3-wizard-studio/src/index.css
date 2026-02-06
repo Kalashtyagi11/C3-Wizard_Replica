@@ -1,0 +1,126 @@
+/* C3 Wizard - SSB Green Theme (#16A34A) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* C3 Wizard Brand Theme - #16A34A Green (HSL: 142 76% 36%) */
+    --background: 142 15% 98%;
+    --foreground: 142 25% 8%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 142 25% 8%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 142 25% 8%;
+    
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 142 15% 94%;
+    --secondary-foreground: 142 25% 20%;
+    
+    --muted: 142 15% 92%;
+    --muted-foreground: 142 12% 45%;
+    
+    --accent: 142 40% 92%;
+    --accent-foreground: 142 76% 28%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 142 15% 85%;
+    --input: 142 15% 85%;
+    --ring: 142 76% 36%;
+    
+    --radius: 0.5rem;
+    
+    /* Sidebar */
+    --sidebar-background: 142 76% 20%;
+    --sidebar-foreground: 142 15% 95%;
+    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 55% 28%;
+    --sidebar-accent-foreground: 142 15% 95%;
+    --sidebar-border: 142 50% 25%;
+    --sidebar-ring: 142 76% 36%;
+    
+    /* Custom C3 Wizard colors */
+    --c3-success: 142 76% 36%;
+    --c3-warning: 38 92% 50%;
+    --c3-info: 199 89% 48%;
+  }
+
+  .dark {
+    --background: 142 25% 6%;
+    --foreground: 142 15% 95%;
+    
+    --card: 142 25% 9%;
+    --card-foreground: 142 15% 95%;
+    
+    --popover: 142 25% 9%;
+    --popover-foreground: 142 15% 95%;
+    
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 142 25% 18%;
+    --secondary-foreground: 142 15% 90%;
+    
+    --muted: 142 20% 14%;
+    --muted-foreground: 142 12% 60%;
+    
+    --accent: 142 35% 18%;
+    --accent-foreground: 142 76% 50%;
+    
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 142 20% 18%;
+    --input: 142 20% 18%;
+    --ring: 142 76% 36%;
+    
+    /* Sidebar Dark */
+    --sidebar-background: 142 45% 7%;
+    --sidebar-foreground: 142 15% 95%;
+    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 35% 14%;
+    --sidebar-accent-foreground: 142 15% 95%;
+    --sidebar-border: 142 25% 16%;
+    --sidebar-ring: 142 76% 36%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 30%) 100%);
+  }
+  
+  .gradient-sidebar {
+    background: linear-gradient(180deg, hsl(var(--sidebar-background)) 0%, hsl(142 50% 15%) 100%);
+  }
+}
+
+/* Form input focus states */
+@layer components {
+  .input-focus {
+    @apply focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+  }
+}

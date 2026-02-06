@@ -1,0 +1,33 @@
+﻿--- Master_Rate_Setting ---
+CREATE TABLE [dbo].[Master_Rate_Setting](
+	[MRSId] [int] IDENTITY(1,1) NOT NULL,
+	[Bonus_Levy_EE_Rate] [float] NULL,
+	[SeveranceRate] [float] NULL,
+	[Soc_EE_Rate] [float] NULL,
+	[Soc_ER_Rate] [float] NULL,
+	[EIB] [float] NULL,
+	[Fine_Rate] [float] NULL,
+	[Additional_Fine_Rate] [float] NULL,
+	[Penalty_Rate] [float] NULL,
+	[Additional_Penalty_Rate] [float] NULL,
+	[Min_Age] [int] NULL,
+	[Max_Age] [int] NULL,
+	[FromDate] [datetime] NULL,
+	[ToDate] [datetime] NULL,
+	[IsLocked] [bit] NULL,
+	[EmployerLevy] [float] NULL,
+ CONSTRAINT
+
+--- NWD_Master_Rate_Settings ---
+CREATE TABLE [dbo].[NWD_Master_Rate_Settings](
+	[NWDS_Id] [int] IDENTITY(1,1) NOT NULL,
+	[NWDLevy_Rate] [float] NULL,
+	[Min_Age] [int] NULL,
+	[Max_Age] [int] NULL,
+	[Penality_Rate] [float] NULL,
+	[Additional_Penalty_Rate] [float] NULL,
+	[From_Date] [datetime] NULL,
+	[To_Date] [datetime] NULL,
+	[IsLocked] [bit] NULL,
+ CONSTRAINT
+

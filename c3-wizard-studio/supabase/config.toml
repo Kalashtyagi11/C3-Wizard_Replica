@@ -1,0 +1,49 @@
+project_id = "nfvtlyvxfxzbhoqzprkr"
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.bima-integration]
+verify_jwt = false
+
+[functions.seed-test-users]
+verify_jwt = false
+
+[functions.validate-registration]
+verify_jwt = false
+
+[functions.import-mssql-data]
+verify_jwt = false
+
+[functions.db-info]
+verify_jwt = false
+
+[functions.convert-sql]
+verify_jwt = false
+
+[functions.calculate-c3-contributions]
+verify_jwt = false
+
+[functions.register-employer]
+verify_jwt = false
+
+[functions.register-self-employed]
+verify_jwt = false
+
+[functions.verify-otp]
+verify_jwt = false
+
+[functions.delete-test-users]
+verify_jwt = false
+
+[functions.execute-sql-batch]
+verify_jwt = false
+
+[functions.migrate-legacy-users]
+verify_jwt = false
+
+[functions.setup-real-admin]
+verify_jwt = false
+
+[functions.decrypt-password]
+verify_jwt = false
